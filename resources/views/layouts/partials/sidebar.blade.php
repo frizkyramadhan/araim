@@ -55,7 +55,7 @@
 					<a href="#" class="nav-link">
 						<i class="nav-icon fas fa-file-contract"></i>
 						<p>
-							Berita Acara
+							Berita Acara*
 							<i class="right fas fa-angle-left"></i>
 						</p>
 					</a>
@@ -63,13 +63,13 @@
 						<li class="nav-item">
 							<a href="pages/charts/chartjs.html" class="nav-link">
 								<i class="far fa-circle nav-icon"></i>
-								<p>Serah Terima</p>
+								<p>Serah Terima*</p>
 							</a>
 						</li>
 						<li class="nav-item">
 							<a href="pages/charts/flot.html" class="nav-link">
 								<i class="far fa-circle nav-icon"></i>
-								<p>Peminjaman</p>
+								<p>Peminjaman*</p>
 							</a>
 						</li>
 					</ul>
@@ -99,7 +99,7 @@
 						<li class="nav-item">
 							<a href="pages/examples/e-commerce.html" class="nav-link">
 								<i class="far fa-circle nav-icon"></i>
-								<p>Components</p>
+								<p>Components*</p>
 							</a>
 						</li>
 					</ul>
@@ -143,7 +143,7 @@
 				<li class="nav-item">
 					<a href="iframe.html" class="nav-link">
 						<i class="nav-icon fas fa-key"></i>
-						<p>Users</p>
+						<p>Users*</p>
 					</a>
 				</li>
 			</ul>
