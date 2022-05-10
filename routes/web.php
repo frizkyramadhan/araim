@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DepartmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,3 +20,5 @@ Route::get('/', function () {
 Route::get('contact', function () {
     return view('contact', ['title' => 'Contact Us']);
 });
+
+Route::resource('departments', DepartmentController::class)->except(['show']);
