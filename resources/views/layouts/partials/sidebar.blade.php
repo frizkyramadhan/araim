@@ -36,7 +36,8 @@
 			<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 				<!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
 				<li class="nav-item">
-					<a href="{{ url('/') }}" class="nav-link active">
+					<a href="{{ url('/') }}"
+						class="nav-link {{ Request::is('/') || Request::is('/dashboard') ? 'active' : '' }}">
 						<i class="nav-icon fas fa-tachometer-alt"></i>
 						<p>
 							Dashboard
@@ -104,8 +105,10 @@
 						</li>
 					</ul>
 				</li>
-				<li class="nav-item">
-					<a href="#" class="nav-link">
+				<li
+					class="nav-item {{ Request::is('employees*') || Request::is('positions*') || Request::is('departments*') || Request::is('projects*') ? 'menu-open' : '' }}">
+					<a href="#"
+						class="nav-link {{ Request::is('employees*') || Request::is('positions*') || Request::is('departments*') || Request::is('projects*') ? 'active' : '' }}">
 						<i class="nav-icon fas fa-users"></i>
 						<p>
 							Human Resources
@@ -126,7 +129,7 @@
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="pages/mailbox/read-mail.html" class="nav-link">
+							<a href="{{ url('departments') }}" class="nav-link {{ Request::is('departments*') ? 'active' : '' }}">
 								<i class="far fa-circle nav-icon"></i>
 								<p>Departments</p>
 							</a>
