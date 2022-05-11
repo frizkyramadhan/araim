@@ -46,26 +46,6 @@
 							<form class="form-horizontal" action="{{ url('users') }}" method="POST">
 								@csrf
 								<div class="card-body">
-									@if (session('success'))
-										<div class="alert alert-success alert-dismissible show fade">
-											<div class="alert-body">
-												<button class="close" data-dismiss="alert">
-													<span>&times;</span>
-												</button>
-												{{ session('success') }}
-											</div>
-										</div>
-									@elseif (session('error'))
-										<div class="alert alert-error alert-dismissible show fade">
-											<div class="alert-body">
-												<button class="close" data-dismiss="alert">
-													<span>&times;</span>
-												</button>
-												{{ session('error') }}
-											</div>
-										</div>
-									@endif
-
 									<div class="tab-content p-0">
 										<div class="form-group row">
 											<label class="col-sm-2 col-form-label">User Name</label>

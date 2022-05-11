@@ -140,7 +140,7 @@
 								</a>
 							</li>
 							<li class="nav-item">
-								<a href="pages/mailbox/read-mail.html" class="nav-link">
+								<a href="{{ url('projects') }}" class="nav-link {{ Request::is('projects*') ? 'active' : '' }}">
 									<i class="far fa-circle nav-icon"></i>
 									<p>Projects</p>
 								</a>

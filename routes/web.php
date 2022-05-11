@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DepartmentController;
 
@@ -35,6 +36,7 @@ Route::middleware('auth')->group(function () {
 
 Route::group(['middleware' => 'check_role:admin,superuser' ], function() {
     Route::resource('departments', DepartmentController::class)->except(['show']);
+    Route::resource('projects', ProjectController::class)->except(['show']);
 });
 
 Route::middleware('check_role:admin')->group(function () {
