@@ -95,7 +95,7 @@
 								</a>
 							</li>
 							<li class="nav-item">
-								<a href="pages/examples/profile.html" class="nav-link">
+								<a href="{{ url('categories') }}" class="nav-link {{ Request::is('categories*') ? 'active' : '' }}">
 									<i class="far fa-circle nav-icon"></i>
 									<p>Categories</p>
 								</a>
