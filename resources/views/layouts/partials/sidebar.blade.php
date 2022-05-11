@@ -15,7 +15,7 @@
 				<img src="{{ asset('assets/dist/img/avatar6.png') }}" class="img-circle elevation-2" alt="User Image">
 			</div>
 			<div class="info">
-				<a href="#" class="d-block">User Name</a>
+				<a href="#" class="d-block">{{ auth()->user()->name }}</a>
 			</div>
 		</div>
 
@@ -52,110 +52,122 @@
 						</p>
 					</a>
 				</li>
-				<li class="nav-item">
-					<a href="#" class="nav-link">
-						<i class="nav-icon fas fa-file-contract"></i>
-						<p>
-							Berita Acara*
-							<i class="right fas fa-angle-left"></i>
-						</p>
-					</a>
-					<ul class="nav nav-treeview">
-						<li class="nav-item">
-							<a href="pages/charts/chartjs.html" class="nav-link">
-								<i class="far fa-circle nav-icon"></i>
-								<p>Serah Terima*</p>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="pages/charts/flot.html" class="nav-link">
-								<i class="far fa-circle nav-icon"></i>
-								<p>Peminjaman*</p>
-							</a>
-						</li>
-					</ul>
-				</li>
-				<li class="nav-header">MASTER DATA</li>
-				<li class="nav-item">
-					<a href="#" class="nav-link">
-						<i class="nav-icon fas fa-boxes"></i>
-						<p>
-							Item Master Data
-							<i class="fas fa-angle-left right"></i>
-						</p>
-					</a>
-					<ul class="nav nav-treeview">
-						<li class="nav-item">
-							<a href="pages/examples/invoice.html" class="nav-link">
-								<i class="far fa-circle nav-icon"></i>
-								<p>Assets</p>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="pages/examples/profile.html" class="nav-link">
-								<i class="far fa-circle nav-icon"></i>
-								<p>Categories</p>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="pages/examples/e-commerce.html" class="nav-link">
-								<i class="far fa-circle nav-icon"></i>
-								<p>Components*</p>
-							</a>
-						</li>
-					</ul>
-				</li>
-				<li
-					class="nav-item {{ Request::is('employees*') || Request::is('positions*') || Request::is('departments*') || Request::is('projects*') ? 'menu-open' : '' }}">
-					<a href="#"
-						class="nav-link {{ Request::is('employees*') || Request::is('positions*') || Request::is('departments*') || Request::is('projects*') ? 'active' : '' }}">
-						<i class="nav-icon fas fa-users"></i>
-						<p>
-							Human Resources
-							<i class="fas fa-angle-left right"></i>
-						</p>
-					</a>
-					<ul class="nav nav-treeview">
-						<li class="nav-item">
-							<a href="pages/mailbox/mailbox.html" class="nav-link">
-								<i class="far fa-circle nav-icon"></i>
-								<p>Employees</p>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="pages/mailbox/compose.html" class="nav-link">
-								<i class="far fa-circle nav-icon"></i>
-								<p>Positions</p>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="{{ url('departments') }}" class="nav-link {{ Request::is('departments*') ? 'active' : '' }}">
-								<i class="far fa-circle nav-icon"></i>
-								<p>Departments</p>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="pages/mailbox/read-mail.html" class="nav-link">
-								<i class="far fa-circle nav-icon"></i>
-								<p>Projects</p>
-							</a>
-						</li>
-					</ul>
-				</li>
-				<li class="nav-header">ADMINISTRATOR</li>
-				<li class="nav-item">
-					<a href="iframe.html" class="nav-link">
-						<i class="nav-icon fas fa-key"></i>
-						<p>Users*</p>
-					</a>
-				</li>
+				@can('admin')
+					<li class="nav-item">
+						<a href="#" class="nav-link">
+							<i class="nav-icon fas fa-file-contract"></i>
+							<p>
+								Berita Acara
+								<i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="pages/charts/chartjs.html" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Serah Terima</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="pages/charts/flot.html" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Peminjaman</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+				@endcan
+				@cannot('user')
+					<li class="nav-header">MASTER DATA</li>
+					<li class="nav-item">
+						<a href="#" class="nav-link">
+							<i class="nav-icon fas fa-boxes"></i>
+							<p>
+								Item Master Data
+								<i class="fas fa-angle-left right"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="pages/examples/invoice.html" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Assets</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="pages/examples/profile.html" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Categories</p>
+								</a>
+							</li>
+							@can('admin')
+								<li class="nav-item">
+									<a href="pages/examples/e-commerce.html" class="nav-link">
+										<i class="far fa-circle nav-icon"></i>
+										<p>Components</p>
+									</a>
+								</li>
+							@endcan
+						</ul>
+					</li>
+					<li
+						class="nav-item {{ Request::is('employees*') || Request::is('positions*') || Request::is('departments*') || Request::is('projects*') ? 'menu-open' : '' }}">
+						<a href="#"
+							class="nav-link {{ Request::is('employees*') || Request::is('positions*') || Request::is('departments*') || Request::is('projects*') ? 'active' : '' }}">
+							<i class="nav-icon fas fa-users"></i>
+							<p>
+								Human Resources
+								<i class="fas fa-angle-left right"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="pages/mailbox/mailbox.html" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Employees</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="pages/mailbox/compose.html" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Positions</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="{{ url('departments') }}" class="nav-link {{ Request::is('departments*') ? 'active' : '' }}">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Departments</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="pages/mailbox/read-mail.html" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Projects</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+				@endcannot
+				@can('admin')
+					<li class="nav-header">ADMINISTRATOR</li>
+					<li class="nav-item">
+						<a href="{{ url('users') }}" class="nav-link {{ Request::is('users*') ? 'active' : '' }}">
+							<i class="nav-icon fas fa-key"></i>
+							<p>Users</p>
+						</a>
+					</li>
+				@endcan
 			</ul>
 		</nav>
 		<!-- /.sidebar-menu -->
 	</div>
 	<div class="sidebar-custom">
-		<!-- <a href="#" class="btn btn-link"><i class="fas fa-cogs"></i></a> -->
-		<a href="" class="btn btn-block btn-danger">Logout</a>
+		<form action="{{ url('logout') }}" method="POST">
+			@csrf
+			<button type="submit" class="btn btn-block btn-danger">
+				<i class="fas fa-sign-out-alt"></i>
+			</button>
+		</form>
 	</div>
 	<!-- /.sidebar -->
 </aside>

@@ -36,12 +36,13 @@
 								<div class="card-tools">
 									<ul class="nav nav-pills ml-auto">
 										<li class="nav-item mr-2">
-											<a class="btn btn-warning" href="{{ url('departments/create') }}"><i class="fas fa-plus"></i>
+											<a class="btn btn-warning" href="{{ url('users/create') }}"><i class="fas fa-plus"></i>
 												Add</a>
 										</li>
 									</ul>
 								</div>
 							</div><!-- /.card-header -->
+
 							<div class="card-body">
 								@if (session('success'))
 									<div class="alert alert-success alert-dismissible show fade">
@@ -67,27 +68,31 @@
 										<thead>
 											<tr>
 												<th class="text-center">No</th>
-												<th>Department Name</th>
+												<th>Name</th>
+												<th>Email</th>
+												<th>Level</th>
 												<th class="text-center">Status</th>
 												<th class="text-center">Action</th>
 											</tr>
 										</thead>
 										<tbody>
-											@foreach ($departments as $department)
+											@foreach ($users as $user)
 												<tr>
 													<td class="text-center">{{ $loop->iteration }}</td>
-													<td>{{ $department->dept_name }}</td>
+													<td>{{ $user->name }}</td>
+													<td>{{ $user->email }}</td>
+													<td>{{ $user->level }}</td>
 													<td class="text-center">
-														@if ($department->dept_status == 1)
+														@if ($user->user_status == 1)
 															<span class="badge badge-success">Active</span>
 														@else
 															<span class="badge badge-danger">Inactive</span>
 														@endif
 													</td>
 													<td class="text-center">
-														<a class="btn btn-icon btn-primary" href="{{ url('departments/' . $department->id . '/edit') }}"><i
+														<a class="btn btn-icon btn-primary" href="{{ url('users/' . $user->id . '/edit') }}"><i
 																class="fas fa-pen-square"></i></a>
-														<form action="{{ url('departments/' . $department->id) }}" method="post"
+														<form action="{{ url('users/' . $user->id) }}" method="post"
 															onsubmit="return confirm('Are you sure want to delete this data?')" class="d-inline">
 															@method('delete')
 															@csrf
