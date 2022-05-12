@@ -31,7 +31,7 @@ class UserController extends Controller
     public function create()
     {
         $title = 'Users';
-        $subtitle = 'List of users';
+        $subtitle = 'Add User';
 
         return view('users.create', compact('title', 'subtitle'));
     }
@@ -83,7 +83,7 @@ class UserController extends Controller
     public function edit($id)
     {
         $title = 'Users';
-        $subtitle = 'List of users';
+        $subtitle = 'Edit User';
         $user = User::find($id);
 
         return view('users.edit', compact('title', 'subtitle', 'user'));

@@ -87,7 +87,6 @@ class PositionController extends Controller
         $title = "Positions";
         $subtitle = "Edit Positions";
         $departments = Department::where('dept_status', '=' ,'1')->orderBy('dept_name', 'asc')->get();
-        // $position = Position::with('department')->find($position->id);
 
         return view('positions.edit', compact('title', 'subtitle', 'departments', 'position'));
     }
