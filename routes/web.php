@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PositionController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\DepartmentController;
@@ -39,6 +40,7 @@ Route::middleware('auth')->group(function () {
 Route::group(['middleware' => 'check_role:admin,superuser' ], function() {
     Route::resource('departments', DepartmentController::class)->except(['show']);
     Route::resource('categories', CategoryController::class)->except(['show']);
+    Route::resource('positions', PositionController::class)->except(['show']);
     Route::resource('projects', ProjectController::class)->except(['show']);
 });
 

@@ -128,7 +128,7 @@
 								</a>
 							</li>
 							<li class="nav-item">
-								<a href="pages/mailbox/compose.html" class="nav-link">
+								<a href="{{ url('positions') }}" class="nav-link {{ Request::is('positions*') ? 'active' : '' }}">
 									<i class="far fa-circle nav-icon"></i>
 									<p>Positions</p>
 								</a>
