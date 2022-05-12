@@ -89,7 +89,7 @@
 						</a>
 						<ul class="nav nav-treeview">
 							<li class="nav-item">
-								<a href="pages/examples/invoice.html" class="nav-link">
+								<a href="{{ url('assets') }}" class="nav-link {{ Request::is('assets*') ? 'active' : '' }}">
 									<i class="far fa-circle nav-icon"></i>
 									<p>Assets</p>
 								</a>

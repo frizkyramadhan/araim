@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
-use App\Models\Assets;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Category extends Model
+class Asset extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
 
-    public function assets()
+    public function category()
     {
-        return $this->hasMany(Assets::class);
+        return $this->belongsTo(Category::class);
     }
 }

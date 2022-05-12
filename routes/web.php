@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AssetController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CategoryController;
@@ -42,6 +43,7 @@ Route::group(['middleware' => 'check_role:admin,superuser' ], function() {
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('positions', PositionController::class)->except(['show']);
     Route::resource('projects', ProjectController::class)->except(['show']);
+    Route::resource('assets', AssetController::class)->except(['show']);
 });
 
 Route::middleware('check_role:admin')->group(function () {
