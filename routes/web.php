@@ -6,6 +6,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\DepartmentController;
 
 /*
@@ -42,5 +43,6 @@ Route::group(['middleware' => 'check_role:admin,superuser' ], function() {
 });
 
 Route::middleware('check_role:admin')->group(function () {
+    Route::resource('components', ComponentController::class)->except(['show']);
     Route::resource('users', UserController::class)->except(['show']);
 });

@@ -102,7 +102,7 @@
 							</li>
 							@can('admin')
 								<li class="nav-item">
-									<a href="pages/examples/e-commerce.html" class="nav-link">
+									<a href="{{ url('components') }}" class="nav-link {{ Request::is('components*') ? 'active' : '' }}">
 										<i class="far fa-circle nav-icon"></i>
 										<p>Components</p>
 									</a>
