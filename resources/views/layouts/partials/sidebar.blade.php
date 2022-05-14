@@ -122,7 +122,7 @@
 						</a>
 						<ul class="nav nav-treeview">
 							<li class="nav-item">
-								<a href="pages/mailbox/mailbox.html" class="nav-link">
+								<a href="{{ url('employees') }}" class="nav-link {{ Request::is('employees*') ? 'active' : '' }}">
 									<i class="far fa-circle nav-icon"></i>
 									<p>Employees</p>
 								</a>
