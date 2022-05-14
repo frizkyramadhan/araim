@@ -6,6 +6,7 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ComponentController;
@@ -44,6 +45,10 @@ Route::group(['middleware' => 'check_role:admin,superuser' ], function() {
     Route::resource('positions', PositionController::class)->except(['show']);
     Route::resource('projects', ProjectController::class)->except(['show']);
     Route::resource('assets', AssetController::class)->except(['show']);
+
+    Route::get('employees/getEmployees', [EmployeeController::class, 'getEmployees'])->name('employees.getEmployees');
+    Route::get('employees/json', [EmployeeController::class, 'json'])->name('employees.json');
+    Route::resource('employees', EmployeeController::class);
 });
 
 Route::middleware('check_role:admin')->group(function () {
