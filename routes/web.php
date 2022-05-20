@@ -10,6 +10,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ComponentController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\DepartmentController;
 
 /*
@@ -49,6 +50,10 @@ Route::group(['middleware' => 'check_role:admin,superuser' ], function() {
     Route::get('employees/getEmployees', [EmployeeController::class, 'getEmployees'])->name('employees.getEmployees');
     Route::get('employees/json', [EmployeeController::class, 'json'])->name('employees.json');
     Route::resource('employees', EmployeeController::class);
+    
+    Route::get('inventories/getInventories', [InventoryController::class, 'getInventories'])->name('inventories.getInventories');
+    Route::get('inventories/json', [InventoryController::class, 'json'])->name('inventories.json');
+    Route::resource('inventories', InventoryController::class);
 });
 
 Route::middleware('check_role:admin')->group(function () {

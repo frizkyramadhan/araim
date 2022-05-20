@@ -120,6 +120,23 @@
 												@enderror
 											</div>
 										</div>
+										<div class="form-group row">
+											<label class="col-sm-2 col-form-label">Status</label>
+											<div class="col-sm-10">
+												<select name="status" class="form-control @error('status') is-invalid @enderror">
+													<option value="1" {{ old('status', $employee->status) == '1' ? 'selected' : '' }}>
+														Active</option>
+													<option value="0" {{ old('status', $employee->status) == '0' ? 'selected' : '' }}>
+														Inactive
+													</option>
+												</select>
+												@error('status')
+													<div class="invalid-feedback">
+														{{ $message }}
+													</div>
+												@enderror
+											</div>
+										</div>
 									</div>
 								</div><!-- /.card-body -->
 								<div class="card-footer">

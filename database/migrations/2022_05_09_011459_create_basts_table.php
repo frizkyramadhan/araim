@@ -17,7 +17,7 @@ class CreateBastsTable extends Migration
             $table->id();
             $table->string('bast_no');
             $table->string('bast_reg');
-            $table->dateTime('bast_date');
+            $table->date('bast_date');
             $table->foreignId('bast_submit')->references('id')->on('employees');
             $table->foreignId('bast_receive')->references('id')->on('employees');
             $table->foreignId('inventory_id')->references('id')->on('inventories');
