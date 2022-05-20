@@ -53,8 +53,8 @@
 					</a>
 				</li>
 				@can('admin')
-					<li class="nav-item">
-						<a href="#" class="nav-link">
+					<li class="nav-item {{ Request::is('basts*') || Request::is('bapbs*') ? 'menu-open' : '' }}">
+						<a href="#" class="nav-link {{ Request::is('basts*') || Request::is('bapbs*') ? 'active' : '' }}">
 							<i class="nav-icon fas fa-file-contract"></i>
 							<p>
 								Berita Acara
@@ -63,13 +63,13 @@
 						</a>
 						<ul class="nav nav-treeview">
 							<li class="nav-item">
-								<a href="pages/charts/chartjs.html" class="nav-link">
+								<a href="{{ url('basts') }}" class="nav-link {{ Request::is('basts*') ? 'active' : '' }}">
 									<i class="far fa-circle nav-icon"></i>
 									<p>Serah Terima</p>
 								</a>
 							</li>
 							<li class="nav-item">
-								<a href="pages/charts/flot.html" class="nav-link">
+								<a href="{{ url('bapbs') }}" class="nav-link {{ Request::is('bapbs*') ? 'active' : '' }}">
 									<i class="far fa-circle nav-icon"></i>
 									<p>Peminjaman</p>
 								</a>
@@ -79,8 +79,10 @@
 				@endcan
 				@cannot('user')
 					<li class="nav-header">MASTER DATA</li>
-					<li class="nav-item">
-						<a href="#" class="nav-link">
+					<li
+						class="nav-item {{ Request::is('assets*') || Request::is('categories*') || Request::is('components*') ? 'menu-open' : '' }}">
+						<a href="#"
+							class="nav-link {{ Request::is('assets*') || Request::is('categories*') || Request::is('components*') ? 'active' : '' }}">
 							<i class="nav-icon fas fa-boxes"></i>
 							<p>
 								Item Master Data

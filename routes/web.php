@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BastController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\LoginController;
@@ -59,4 +60,5 @@ Route::group(['middleware' => 'check_role:admin,superuser' ], function() {
 Route::middleware('check_role:admin')->group(function () {
     Route::resource('components', ComponentController::class)->except(['show']);
     Route::resource('users', UserController::class)->except(['show']);
+    Route::resource('basts', BastController::class);
 });
