@@ -187,7 +187,8 @@ class EmployeeController extends Controller
                 'fullname' => $request->fullname,
                 'project_id' => $request->project_id,
                 'position_id' => $request->position_id,
-                'email' => $request->email
+                'email' => $request->email,
+                'status' => $request->status
             ]);
 
         return redirect()->route('employees.index')->with('success', 'Employee has been updated');

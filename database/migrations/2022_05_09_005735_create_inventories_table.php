@@ -28,15 +28,14 @@ class CreateInventoriesTable extends Migration
             $table->integer('quantity')->nullable();
             $table->integer('spesifikasi')->nullable();
             $table->string('remarks')->nullable();
-            $table->dateTime('input_date')->nullable();
+            $table->date('input_date')->nullable();
             $table->foreignId('created_by')->references('id')->on('users');
             $table->string('reference_no')->nullable();
-            $table->dateTime('reference_date')->nullable();
+            $table->date('reference_date')->nullable();
             $table->string('location')->nullable();
             $table->string('qrcode')->nullable();
             $table->string('inventory_status')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

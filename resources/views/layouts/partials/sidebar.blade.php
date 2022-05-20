@@ -45,7 +45,7 @@
 					</a>
 				</li>
 				<li class="nav-item">
-					<a href="{{ url('/') }}" class="nav-link">
+					<a href="{{ url('inventories') }}" class="nav-link {{ Request::is('inventories*') ? 'active' : '' }}">
 						<i class="nav-icon fas fa-qrcode"></i>
 						<p>
 							Inventories

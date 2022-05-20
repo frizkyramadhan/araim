@@ -17,7 +17,7 @@ class CreateBapbsTable extends Migration
             $table->id();
             $table->string('bapb_no');
             $table->string('bapb_reg');
-            $table->dateTime('bapb_date');
+            $table->date('bapb_date');
             $table->foreignId('bapb_submit')->references('id')->on('employees');
             $table->foreignId('bapb_receive')->references('id')->on('employees');
             $table->foreignId('inventory_id')->references('id')->on('inventories');
