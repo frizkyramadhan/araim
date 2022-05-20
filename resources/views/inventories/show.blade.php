@@ -22,13 +22,12 @@
 	<!-- Main content -->
 	<section class="content">
 		<div class="container-fluid">
-			<!-- Main row -->
 			<div class="row">
 				<!-- Left col -->
 				<section class="col-lg-12">
 					<!-- Custom tabs (Charts with tabs)-->
 					<div id="accordion">
-						<div class="card">
+						<div class="card card-dark">
 							<div class="card-header">
 								<h3 class="card-title">
 									<strong>{{ $subtitle }}</strong>
@@ -46,94 +45,183 @@
 								</div>
 							</div><!-- /.card-header -->
 							<div class="card-body">
-								{{-- @dd($inventory->toArray()) --}}
-								@if ($errors->any())
-									<div class="alert alert-danger alert-dismissible show fade">
-										<button class="close" data-dismiss="alert">
-											<span>&times;</span>
-										</button>
-										<ul>
-											@foreach ($errors->all() as $error)
-												<li>{{ $error }}</li>
-											@endforeach
-										</ul>
-									</div>
-								@endif
 								<div class="row">
-									<div class="col-5 col-sm-3">
-										<div class="nav flex-column nav-tabs h-100" id="vert-tabs-tab" role="tablist" aria-orientation="vertical">
-											<a class="nav-link active" id="vert-tabs-pic-tab" data-toggle="pill" href="#vert-tabs-pic" role="tab"
-												aria-controls="vert-tabs-pic" aria-selected="true">PIC</a>
-											<a class="nav-link" id="vert-tabs-asset-tab" data-toggle="pill" href="#vert-tabs-asset" role="tab"
-												aria-controls="vert-tabs-asset" aria-selected="false">Asset</a>
-											<a class="nav-link" id="vert-tabs-location-tab" data-toggle="pill" href="#vert-tabs-location" role="tab"
-												aria-controls="vert-tabs-location" aria-selected="false">Location</a>
-											<a class="nav-link" id="vert-tabs-reference-tab" data-toggle="pill" href="#vert-tabs-reference"
-												role="tab" aria-controls="vert-tabs-reference" aria-selected="false">Reference</a>
-											<a class="nav-link" id="vert-tabs-specification-tab" data-toggle="pill" href="#vert-tabs-specification"
-												role="tab" aria-controls="vert-tabs-specification" aria-selected="false">Specification <label
-													class="text-danger text-sm">* if available</label></a>
+									<div class="col-md-6">
+										<div class="card card-primary">
+											<div class="card-header">
+												<h3 class="card-title">PIC</h3>
+												<div class="card-tools">
+													<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+														<i class="fas fa-minus"></i>
+													</button>
+												</div>
+											</div>
+											<div class="card-body">
+												<table width=100% class="table table-borderless">
+													<tr>
+														<td style="width: 20%">No</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->inventory_no }}</b></td>
+													</tr>
+													<tr>
+														<td>Date</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->input_date }}</b></td>
+													</tr>
+													<tr>
+														<td>PIC</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->employee->fullname }}</b> - <b>{{ $inventory->employee->nik }}</b></td>
+													</tr>
+												</table>
+											</div>
+											<!-- /.card-body -->
+										</div>
+										<!-- /.card -->
+										<div class="card card-success">
+											<div class="card-header">
+												<h3 class="card-title">Asset Detail</h3>
+
+												<div class="card-tools">
+													<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+														<i class="fas fa-minus"></i>
+													</button>
+												</div>
+											</div>
+											<div class="card-body">
+												<table width=100% class="table table-borderless">
+													<tr>
+														<td style="width: 20%">Asset</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->asset->asset_name }}</b></td>
+													</tr>
+													<tr>
+														<td>Brand</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->brand }}</b></td>
+													</tr>
+													<tr>
+														<td>Model</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->model_asset }}</b></td>
+													</tr>
+													<tr>
+														<td>Serial No</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->serial_no }}</b></td>
+													</tr>
+													<tr>
+														<td>Part No</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->part_no }}</b></td>
+													</tr>
+													<tr>
+														<td>Quantity</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->quantity }}</b></td>
+													</tr>
+													<tr>
+														<td>Status</td>
+														<td style="width: 5%">:</td>
+														<td><b>
+																@if ($inventory->inventory_status == 'Good')
+																	<span class="badge badge-primary">Good</span>
+																@elseif ($inventory->inventory_status == 'Broken')
+																	<span class="badge badge-danger">Broken</span>
+																@elseif ($inventory->inventory_status == 'Mutated')
+																	<span class="badge badge-warning">Mutated</span>
+																@elseif ($inventory->inventory_status == 'Discarded')
+																	<span class="badge badge-secondary">Discarded</span>
+																@endif
+															</b></td>
+													</tr>
+												</table>
+											</div>
+											<!-- /.card-body -->
+										</div>
+										<!-- /.card -->
+									</div>
+									<div class="col-md-6">
+										<div class="card card-warning">
+											<div class="card-header">
+												<h3 class="card-title">Asset Location</h3>
+												<div class="card-tools">
+													<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+														<i class="fas fa-minus"></i>
+													</button>
+												</div>
+											</div>
+											<div class="card-body">
+												<table width=100% class="table table-borderless">
+													<tr>
+														<td style="width: 20%">Project</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->project->project_code }}</b> - <b>{{ $inventory->project->project_name }}</b>
+														</td>
+													</tr>
+													<tr>
+														<td>Department</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->department->dept_name }}</b></td>
+													</tr>
+													<tr>
+														<td>Location</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->location }}</b></td>
+													</tr>
+												</table>
+											</div>
+										</div>
+										<!-- /.card-body -->
+										<div class="card card-danger">
+											<div class="card-header">
+												<h3 class="card-title">References</h3>
+												<div class="card-tools">
+													<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+														<i class="fas fa-minus"></i>
+													</button>
+												</div>
+											</div>
+											<div class="card-body">
+												<table width=100% class="table table-borderless">
+													<tr>
+														<td style="width: 20%">Reference No</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->reference_no }}</b></td>
+													</tr>
+													<tr>
+														<td>Reference Date</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->reference_date }}</b></td>
+													</tr>
+													<tr>
+														<td>PO No</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->po_no }}</b></td>
+													</tr>
+													<tr>
+														<td>Remarks</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->remarks }}</b></td>
+													</tr>
+												</table>
+											</div>
+											<!-- /.card-body -->
 										</div>
 									</div>
-									<div class="col-7 col-sm-9">
-										<div class="tab-content" id="vert-tabs-tabContent">
-											<div class="tab-pane text-left fade show active" id="vert-tabs-pic" role="tabpanel"
-												aria-labelledby="vert-tabs-pic-tab">
-												<dl class="row">
-													<dt class="col-sm-4">Inventory No</dt>
-													<dd class="col-sm-8">{{ $inventory->inventory_no }}</dd>
-													<dt class="col-sm-4">Posting Date</dt>
-													<dd class="col-sm-8">{{ $inventory->input_date }}</dd>
-													<dt class="col-sm-4">Person in Charge</dt>
-													<dd class="col-sm-8">{{ $inventory->employee->fullname }} - {{ $inventory->employee->nik }}</dd>
-												</dl>
+									<div class="col-md-12">
+										<div class="card card-info">
+											<div class="card-header">
+												<h3 class="card-title">Specification <label class="text-danger text-sm">*if available</label></h3>
+												<div class="card-tools">
+													<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+														<i class="fas fa-minus"></i>
+													</button>
+												</div>
 											</div>
-											<div class="tab-pane fade" id="vert-tabs-asset" role="tabpanel" aria-labelledby="vert-tabs-asset-tab">
-												<dl class="row">
-													<dt class="col-sm-4">Asset</dt>
-													<dd class="col-sm-8">{{ $inventory->asset->asset_name }}</dd>
-													<dt class="col-sm-4">Brand</dt>
-													<dd class="col-sm-8">{{ $inventory->brand ?? '-' }}</dd>
-													<dt class="col-sm-4">Model</dt>
-													<dd class="col-sm-8">{{ $inventory->model_asset ?? '-' }}</dd>
-													<dt class="col-sm-4">Serial No</dt>
-													<dd class="col-sm-8">{{ $inventory->serial_no ?? '-' }}</dd>
-													<dt class="col-sm-4">Part No</dt>
-													<dd class="col-sm-8">{{ $inventory->part_no ?? '-' }}</dd>
-													<dt class="col-sm-4">Quantity</dt>
-													<dd class="col-sm-8">{{ $inventory->quantity ?? '-' }}</dd>
-													<dt class="col-sm-4">Status</dt>
-													<dd class="col-sm-8">{{ $inventory->inventory_status }}</dd>
-												</dl>
-											</div>
-											<div class="tab-pane fade" id="vert-tabs-location" role="tabpanel" aria-labelledby="vert-tabs-location-tab">
-												<dl class="row">
-													<dt class="col-sm-4">Project</dt>
-													<dd class="col-sm-8">{{ $inventory->project->project_code ?? '-' }} -
-														{{ $inventory->project->project_name ?? '-' }}</dd>
-													<dt class="col-sm-4">Department</dt>
-													<dd class="col-sm-8">{{ $inventory->department->dept_name ?? '-' }}</dd>
-													<dt class="col-sm-4">Location</dt>
-													<dd class="col-sm-8">{{ $inventory->location ?? '-' }}</dd>
-												</dl>
-											</div>
-											<div class="tab-pane fade" id="vert-tabs-reference" role="tabpanel"
-												aria-labelledby="vert-tabs-reference-tab">
-												<dl class="row">
-													<dt class="col-sm-4">Reference No</dt>
-													<dd class="col-sm-8">{{ $inventory->reference_no ?? '-' }}</dd>
-													<dt class="col-sm-4">Reference Date</dt>
-													<dd class="col-sm-8">{{ $inventory->reference_date ?? '-' }}</dd>
-													<dt class="col-sm-4">PO No</dt>
-													<dd class="col-sm-8">{{ $inventory->po_no ?? '-' }}</dd>
-													<dt class="col-sm-4">Remarks</dt>
-													<dd class="col-sm-8">{{ $inventory->remarks ?? '-' }}</dd>
-												</dl>
-											</div>
-											<div class="tab-pane fade" id="vert-tabs-specification" role="tabpanel"
-												aria-labelledby="vert-tabs-specification-tab">
+											<div class="card-body">
 												<div class="table-responsive">
-													<table class="table table-striped table-hover">
+													<table width=100% class="table table-striped table-hover" id="dynamicAddRemove">
 														<thead>
 															<tr>
 																<th style="vertical-align: middle">Component</th>
@@ -144,15 +232,9 @@
 														<tbody>
 															@foreach ($specifications as $spec)
 																<tr>
-																	<td>
-																		{{ $spec->component->component_name }}
-																	</td>
-																	<td>
-																		{{ $spec->specification }}
-																	</td>
-																	<td>
-																		{{ $spec->spec_remarks }}
-																	</td>
+																	<td>{{ $spec->component->component_name }}</td>
+																	<td>{{ $spec->specification }}</td>
+																	<td>{{ $spec->spec_remarks }}</td>
 																</tr>
 															@endforeach
 														</tbody>
@@ -160,6 +242,7 @@
 												</div>
 											</div>
 										</div>
+										<!-- /.card-body -->
 									</div>
 								</div>
 							</div>
