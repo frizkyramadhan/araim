@@ -28,7 +28,7 @@
 				<section class="col-lg-12">
 					<!-- Custom tabs (Charts with tabs)-->
 					<div id="accordion">
-						<div class="card">
+						<div class="card card-dark">
 							<div class="card-header">
 								<h3 class="card-title">
 									<strong>{{ $subtitle }}</strong>
@@ -36,7 +36,7 @@
 								<div class="card-tools">
 									<ul class="nav nav-pills ml-auto">
 										<li class="nav-item mr-2">
-											<a class="btn btn-warning" href="{{ url('inventories/create') }}"><i class="fas fa-plus"></i>
+											<a class="btn btn-warning text-dark" href="{{ url('inventories/create') }}"><i class="fas fa-plus"></i>
 												Add</a>
 										</li>
 									</ul>
@@ -62,6 +62,122 @@
 										</div>
 									</div>
 								@endif
+								<div class="card card-primary">
+									<div class="card-header">
+										<h4 class="card-title w-100">
+											<a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
+												<i class="fas fa-filter"></i> Filter
+											</a>
+										</h4>
+									</div>
+									<div id="collapseOne" class="collapse" data-parent="#accordion">
+										<div class="card-body">
+											<div class="row form-group">
+												<div class="col-3">
+													<div class="form-group">
+														<label class=" form-control-label">From</label>
+														<input type="date" class="form-control" name="date1" id="date1" value="{{ request('date1') }}">
+													</div>
+												</div>
+												<div class="col-3">
+													<div class="form-group">
+														<label class=" form-control-label">To</label>
+														<input type="date" class="form-control" name="date2" id="date2" value="{{ request('date2') }}">
+													</div>
+												</div>
+												<div class="col-3">
+													<div class="form-group">
+														<label class="form-control-label">Inventory No</label>
+														<input type="text" class="form-control" name="inventory_no" id="inventory_no"
+															value="{{ request('inventory_no') }}">
+													</div>
+												</div>
+												<div class="col-3">
+													<div class="form-group">
+														<label class="form-control-label">Asset</label>
+														<select name="asset_name" class="form-control select2bs4" id="asset_name" style="width: 100%;">
+															<option value="">- All -</option>
+															@foreach ($assets as $asset => $data)
+																<option value="{{ $data->asset_name }}"
+																	{{ request('asset_name') == $data->asset_name ? 'selected' : '' }}>
+																	{{ $data->asset_name }}
+																</option>
+															@endforeach
+														</select>
+													</div>
+												</div>
+												<div class="col-3">
+													<div class="form-group">
+														<label class="form-control-label">Brand</label>
+														<input type="text" class="form-control" name="brand" id="brand" value="{{ request('brand') }}">
+													</div>
+												</div>
+												<div class="col-3">
+													<div class="form-group">
+														<label class="form-control-label">Model</label>
+														<input type="text" class="form-control" name="model_asset" id="model_asset"
+															value="{{ request('model_asset') }}">
+													</div>
+												</div>
+												<div class="col-3">
+													<div class="form-group">
+														<label class=" form-control-label">Serial No</label>
+														<input type="text" class="form-control" name="serial_no" id="serial_no"
+															value="{{ request('serial_no') }}">
+													</div>
+												</div>
+												<div class="col-3">
+													<div class="form-group">
+														<label class=" form-control-label">PIC</label>
+														<input type="text" class="form-control" name="fullname" id="fullname"
+															value="{{ request('fullname') }}">
+													</div>
+												</div>
+												<div class="col-3">
+													<div class="form-group">
+														<label class=" form-control-label">Project Asset</label>
+														<select name="project_code" class="form-control select2bs4" id="project_code" style="width: 100%;">
+															<option value="">- All -</option>
+															@foreach ($projects as $project => $data)
+																<option value="{{ $data->project_code }}"
+																	{{ request('project_code') == $data->project_code ? 'selected' : '' }}>
+																	{{ $data->project_code }} - {{ $data->project_name }}
+																</option>
+															@endforeach
+														</select>
+													</div>
+												</div>
+												<div class="col-3">
+													<div class="form-group">
+														<label class=" form-control-label">Inventory Status</label>
+														<select name="inventory_status" class="form-control" id="inventory_status">
+															<option value="">- All -</option>
+															<option value="Good">Good</option>
+															<option value="Broken">Broken</option>
+														</select>
+													</div>
+												</div>
+												<div class="col-3">
+													<div class="form-group">
+														<label class=" form-control-label">Transfer Status</label>
+														<select name="transfer_status" class="form-control" id="transfer_status">
+															<option value="">- All -</option>
+															<option value="Available">Available</option>
+															<option value="Mutated">Mutated</option>
+															<option value="Discarded">Discarded</option>
+														</select>
+													</div>
+												</div>
+												<div class="col-3">
+													<div class="form-group">
+														<label class=" form-control-label">&nbsp;</label>
+														<button id="btn-reset" type="button" class="btn btn-danger btn-block">Reset</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
 								<div class="tab-content p-0">
 									<table id="example1" class="table table-sm table-bordered table-striped">
 										<thead>
@@ -74,41 +190,12 @@
 												<th>Model</th>
 												<th>S/N</th>
 												<th>PIC</th>
-												<th>Project</th>
-												<th class="text-center">Status</th>
+												<th class="text-center">Project Asset</th>
+												<th class="text-center">Inventory Status</th>
+												<th class="text-center">Transfer Status</th>
 												<th class="text-center">Action</th>
 											</tr>
 										</thead>
-										{{-- <tbody>
-											@foreach ($inventories as $employee)
-												<tr>
-													<td class="text-center">{{ $loop->iteration }}</td>
-													<td>{{ $employee->nik }}</td>
-													<td>{{ $employee->fullname }}</td>
-													<td>{{ $employee->position->position_name ?? 'null' }}</td>
-													<td>{{ $employee->project->project_code ?? 'null' }}</td>
-													<td class="text-center">
-														@if ($employee->status == 1)
-															<span class="badge badge-success">Active</span>
-														@else
-															<span class="badge badge-danger">Inactive</span>
-														@endif
-													</td>
-													<td class="text-center">
-														<a class="btn btn-icon btn-success" href="{{ url('inventories/' . $employee->id) }}"><i
-																class="fas fa-info-circle"></i></a>
-														<a class="btn btn-icon btn-primary" href="{{ url('inventories/' . $employee->id . '/edit') }}"><i
-																class="fas fa-pen-square"></i></a>
-														<form action="{{ url('inventories/' . $employee->id) }}" method="post"
-															onsubmit="return confirm('Are you sure want to delete this data?')" class="d-inline">
-															@method('delete')
-															@csrf
-															<button class="btn btn-icon btn-danger"><i class="fas fa-times"></i></button>
-														</form>
-													</td>
-												</tr>
-											@endforeach
-										</tbody> --}}
 									</table>
 								</div>
 							</div><!-- /.card-body -->
@@ -129,6 +216,10 @@
 	<link rel="stylesheet" href="{{ asset('assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+
+	<!-- Select2 -->
+	<link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
 @endsection
 
 @section('scripts')
@@ -160,16 +251,31 @@
 	 $(function() {
 	  var table = $("#example1").DataTable({
 	   responsive: true,
-	   lengthChange: true,
 	   autoWidth: false,
-	   dom: 'lBfrtpi',
-	   buttons: ["copy", "csv", "excel", "pdf", "print"],
+	   lengthChange: true,
+	   lengthMenu: [
+	    [10, 25, 50, 100, -1],
+	    ['10', '25', '50', '100', 'Show all']
+	   ],
+	   dom: 'lBrtpi',
+	   buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
 	   processing: true,
 	   serverSide: true,
 	   ajax: {
 	    url: "{{ route('inventories.getInventories') }}",
 	    data: function(d) {
-	     d.search = $("input[type=search][aria-controls=example1]").val()
+	     d.date1 = $('#date1').val(),
+	      d.date2 = $('#date2').val(),
+	      d.inventory_no = $('#inventory_no').val(),
+	      d.asset_name = $('#asset_name').val(),
+	      d.brand = $('#brand').val(),
+	      d.model_asset = $('#model_asset').val(),
+	      d.serial_no = $('#serial_no').val(),
+	      d.fullname = $('#fullname').val(),
+	      d.project_code = $('#project_code').val(),
+	      d.inventory_status = $('#inventory_status').val(),
+	      d.transfer_status = $('#transfer_status').val(),
+	      d.search = $("input[type=search][aria-controls=example1]").val()
 	     console.log(d);
 	    }
 	   },
@@ -210,9 +316,15 @@
 	    data: "project_code",
 	    name: "project_code",
 	    orderable: false,
+	    className: 'text-center'
 	   }, {
 	    data: "inventory_status",
 	    name: "inventory_status",
+	    className: "text-center",
+	    orderable: false,
+	   }, {
+	    data: "transfer_status",
+	    name: "transfer_status",
 	    className: "text-center",
 	    orderable: false,
 	   }, {
@@ -223,7 +335,41 @@
 	    className: "text-center"
 	   }],
 	   fixedColumns: true,
-	  }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+	  })
+	  $(
+	    '#date1, #date2, #asset_name, #project_code, #inventory_no, #brand, #model_asset, #serial_no, #fullname, #inventory_status, #transfer_status'
+	   )
+	   .keyup(function() {
+	    table.draw();
+	   });
+	  $('#date1, #date2, #asset_name, #project_code, #inventory_status, #transfer_status').change(function() {
+	   table.draw();
+	  });
+	  $('#btn-reset').click(function() {
+	   $(
+	     '#date1, #date2, #asset_name, #project_code, #inventory_no, #brand, #model_asset, #serial_no, #fullname, #inventory_status, #transfer_status'
+	    )
+	    .val('');
+	   $('#date1, #date2, #asset_name, #project_code, #inventory_status, #transfer_status').change();
+	  });
 	 });
+	</script>
+
+	<!-- Select2 -->
+	<script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
+	<script>
+	 $(function() {
+	  //Initialize Select2 Elements
+	  $('.select2').select2()
+
+	  //Initialize Select2 Elements
+	  $('.select2bs4').select2({
+	   theme: 'bootstrap4'
+	  })
+
+	  $(document).on('select2:open', () => {
+	   document.querySelector('.select2-search__field').focus();
+	  })
+	 })
 	</script>
 @endsection

@@ -35,7 +35,8 @@
 								<div class="card-tools">
 									<ul class="nav nav-pills ml-auto">
 										<li class="nav-item mr-2">
-											<a class="btn btn-warning" href="{{ url('inventories') }}"><i class="fas fa-undo-alt"></i>
+											<a class="btn btn-warning text-dark" href="{{ url('inventories/' . $inventory->id) }}"><i
+													class="fas fa-undo-alt"></i>
 												Back</a>
 										</li>
 									</ul>
@@ -71,22 +72,10 @@
 														</div>
 													</div>
 													<div class="form-group row">
-														<label class="col-sm-3 col-form-label">Date</label>
-														<div class="col-sm-9">
-															<input type="date" class="form-control @error('input_date') is-invalid @enderror" name="input_date"
-																value="{{ old('input_date', $inventory->input_date) }}" tabindex="1">
-															@error('input_date')
-																<div class="error invalid-feedback">
-																	{{ $message }}
-																</div>
-															@enderror
-														</div>
-													</div>
-													<div class="form-group row">
 														<label class="col-sm-3 col-form-label">PIC</label>
 														<div class="col-sm-9">
 															<select name="employee_id" class="form-control @error('employee_id') is-invalid @enderror select2bs4"
-																style="width: 100%;" tabindex="2">
+																style="width: 100%;" tabindex="1">
 																@foreach ($employees as $employee)
 																	<option value="{{ $employee->id }}"
 																		{{ old('employee_id', $inventory->employee_id) == $employee->id ? 'selected' : '' }}>
@@ -96,6 +85,18 @@
 															</select>
 															@error('employee_id')
 																<div class="invalid-feedback">
+																	{{ $message }}
+																</div>
+															@enderror
+														</div>
+													</div>
+													<div class="form-group row">
+														<label class="col-sm-3 col-form-label">Date</label>
+														<div class="col-sm-9">
+															<input type="date" class="form-control @error('input_date') is-invalid @enderror" name="input_date"
+																value="{{ old('input_date', $inventory->input_date) }}" tabindex="2">
+															@error('input_date')
+																<div class="error invalid-feedback">
 																	{{ $message }}
 																</div>
 															@enderror
@@ -195,6 +196,7 @@
 															@enderror
 														</div>
 													</div>
+													{{-- @can('admin') --}}
 													<div class="form-group row">
 														<label class="col-sm-3 col-form-label">Status</label>
 														<div class="col-sm-9">
@@ -205,17 +207,9 @@
 																	{{ old('inventory_status', $inventory->inventory_status) == 'Good' ? 'selected' : '' }}>
 																	Good
 																</option>
-																<option value="Mutated"
-																	{{ old('inventory_status', $inventory->inventory_status) == 'Mutated' ? 'selected' : '' }}>
-																	Mutated
-																</option>
 																<option value="Broken"
 																	{{ old('inventory_status', $inventory->inventory_status) == 'Broken' ? 'selected' : '' }}>
 																	Broken
-																</option>
-																<option value="Discarded"
-																	{{ old('inventory_status', $inventory->inventory_status) == 'Discarded' ? 'selected' : '' }}>
-																	Discarded
 																</option>
 															</select>
 															@error('inventory_status')
@@ -225,6 +219,7 @@
 															@enderror
 														</div>
 													</div>
+													{{-- @endcan --}}
 												</div>
 												<!-- /.card-body -->
 											</div>

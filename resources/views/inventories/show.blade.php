@@ -35,10 +35,15 @@
 								<div class="card-tools">
 									<ul class="nav nav-pills ml-auto">
 										<li class="nav-item mr-2">
-											<a class="btn btn-primary" href="{{ url('inventories/' . $inventory->id . '/edit') }}"><i
-													class="fas fa-pen-square"></i>
-												Edit</a>
-											<a class="btn btn-warning" href="{{ url('inventories') }}"><i class="fas fa-undo-alt"></i>
+											@if ($inventory->transfer_status != 'Mutated')
+												<a class="btn btn-danger" href="{{ url('inventories/transfer/' . $inventory->id) }}"><i
+														class="fas fa-exchange-alt"></i>
+													Transfer</a>
+												<a class="btn btn-primary" href="{{ url('inventories/' . $inventory->id . '/edit') }}"><i
+														class="fas fa-pen-square"></i>
+													Edit</a>
+											@endif
+											<a class="btn btn-warning text-dark" href="{{ url('inventories') }}"><i class="fas fa-undo-alt"></i>
 												Back</a>
 										</li>
 									</ul>
@@ -64,14 +69,14 @@
 														<td><b>{{ $inventory->inventory_no }}</b></td>
 													</tr>
 													<tr>
-														<td>Date</td>
-														<td style="width: 5%">:</td>
-														<td><b>{{ $inventory->input_date }}</b></td>
-													</tr>
-													<tr>
 														<td>PIC</td>
 														<td style="width: 5%">:</td>
 														<td><b>{{ $inventory->employee->fullname }}</b> - <b>{{ $inventory->employee->nik }}</b></td>
+													</tr>
+													<tr>
+														<td>Date</td>
+														<td style="width: 5%">:</td>
+														<td><b>{{ $inventory->input_date }}</b></td>
 													</tr>
 												</table>
 											</div>
@@ -135,6 +140,23 @@
 																@endif
 															</b></td>
 													</tr>
+													<tr>
+														<td style="width: 20%">Transfer Status</td>
+														<td style="width: 5%">:</td>
+														<td>
+															<b>
+																<b>
+																	@if ($inventory->transfer_status == 'Available')
+																		<span class="badge badge-success">Available</span>
+																	@elseif ($inventory->transfer_status == 'Discarded')
+																		<span class="badge badge-secondary">Discarded</span>
+																	@elseif ($inventory->transfer_status == 'Mutated')
+																		<span class="badge badge-warning">Mutated</span>
+																	@endif
+																</b>
+															</b>
+														</td>
+													</tr>
 												</table>
 											</div>
 											<!-- /.card-body -->
@@ -156,13 +178,14 @@
 													<tr>
 														<td style="width: 20%">Project</td>
 														<td style="width: 5%">:</td>
-														<td><b>{{ $inventory->project->project_code }}</b> - <b>{{ $inventory->project->project_name }}</b>
+														<td><b>{{ $inventory->project->project_code ?? '-' }}</b> -
+															<b>{{ $inventory->project->project_name ?? '-' }}</b>
 														</td>
 													</tr>
 													<tr>
 														<td>Department</td>
 														<td style="width: 5%">:</td>
-														<td><b>{{ $inventory->department->dept_name }}</b></td>
+														<td><b>{{ $inventory->department->dept_name ?? '-' }}</b></td>
 													</tr>
 													<tr>
 														<td>Location</td>
@@ -227,6 +250,7 @@
 																<th style="vertical-align: middle">Component</th>
 																<th style="vertical-align: middle">Description</th>
 																<th style="vertical-align: middle">Remarks</th>
+																<th style="vertical-align: middle">Status</th>
 															</tr>
 														</thead>
 														<tbody>
@@ -235,6 +259,15 @@
 																	<td>{{ $spec->component->component_name }}</td>
 																	<td>{{ $spec->specification }}</td>
 																	<td>{{ $spec->spec_remarks }}</td>
+																	<td>
+																		@if ($spec->spec_status == 'Available')
+																			<span class="badge badge-success">{{ $spec->spec_status }}</span>
+																		@elseif ($spec->spec_status == 'Discarded')
+																			<span class="badge badge-secondary">{{ $spec->spec_status }}</span>
+																		@elseif ($spec->spec_status == 'Mutated')
+																			<span class="badge badge-warning">{{ $spec->spec_status }}</span>
+																		@endif
+																	</td>
 																</tr>
 															@endforeach
 														</tbody>

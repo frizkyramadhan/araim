@@ -72,6 +72,7 @@
 												<th>Position</th>
 												<th>Project</th>
 												<th class="text-center">Status</th>
+												<th class="text-center">Total Assets</th>
 												<th class="text-center">Action</th>
 											</tr>
 										</thead>
@@ -193,6 +194,11 @@
 	   }, {
 	    data: "status",
 	    name: "status",
+	    className: "text-center",
+	    orderable: false,
+	   }, {
+	    data: "total",
+	    name: "total",
 	    className: "text-center",
 	    orderable: false,
 	   }, {
