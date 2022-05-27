@@ -52,6 +52,14 @@
 						</p>
 					</a>
 				</li>
+				<li class="nav-item">
+					<a href="{{ url('trackings') }}" class="nav-link {{ Request::is('trackings*') ? 'active' : '' }}">
+						<i class="nav-icon fas fa-search"></i>
+						<p>
+							Tracking
+						</p>
+					</a>
+				</li>
 				@can('admin')
 					<li class="nav-item {{ Request::is('basts*') || Request::is('bapbs*') ? 'menu-open' : '' }}">
 						<a href="#" class="nav-link {{ Request::is('basts*') || Request::is('bapbs*') ? 'active' : '' }}">

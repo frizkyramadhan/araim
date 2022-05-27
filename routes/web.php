@@ -10,6 +10,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\DepartmentController;
@@ -58,6 +59,8 @@ Route::group(['middleware' => 'check_role:admin,superuser' ], function() {
     Route::get('inventories/transfer/{id}', [InventoryController::class, 'transfer'])->name('inventories.transfer');
     Route::patch('inventories/transferProcess/{id}', [InventoryController::class, 'transferProcess'])->name('inventories.transferProcess');
     Route::resource('inventories', InventoryController::class);
+
+    Route::get('trackings', [TrackingController::class, 'index'])->name('trackings.index');
 });
 
 Route::middleware('check_role:admin')->group(function () {
