@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Employee;
+use App\Models\Inventory;
 use App\Models\Position;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -67,6 +68,10 @@ class EmployeeController extends Controller
                     }
                 })
                 ->addColumn('action', 'employees.action')
+                ->addColumn('total', function($employees){
+                    $total = Inventory::where('employee_id', '=', $employees->id)->where('inventory_status', '=', 'Good')->count('id');
+                    return $total;
+                })
                 ->rawColumns(['status','action'])
                 ->toJson();
         }
@@ -133,8 +138,9 @@ class EmployeeController extends Controller
         $subtitle = 'Detail Employee';
         $projects = Project::where('project_status', '=', '1')->orderBy('project_code', 'asc')->get();
         $positions = Position::where('position_status', '=', '1')->orderBy('position_name', 'asc')->get();
+        $inventories = Inventory::with('asset')->where('employee_id', '=', $employee->id)->orderBy('inventory_no', 'desc')->get();
 
-        return view('employees.show', compact('title', 'subtitle', 'employee', 'projects', 'positions'));
+        return view('employees.show', compact('title', 'subtitle', 'employee', 'projects', 'positions','inventories'));
     }
 
     /**

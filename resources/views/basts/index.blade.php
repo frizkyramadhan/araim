@@ -36,7 +36,7 @@
 								<div class="card-tools">
 									<ul class="nav nav-pills ml-auto">
 										<li class="nav-item mr-2">
-											<a class="btn btn-warning" href="{{ url('employees/create') }}"><i class="fas fa-plus"></i>
+											<a class="btn btn-warning" href="{{ url('basts/create') }}"><i class="fas fa-plus"></i>
 												Add</a>
 										</li>
 									</ul>
@@ -67,45 +67,36 @@
 										<thead>
 											<tr>
 												<th class="text-center">No</th>
-												<th>NIK</th>
-												<th>Name</th>
-												<th>Position</th>
-												<th>Project</th>
-												<th class="text-center">Status</th>
-												<th class="text-center">Total Assets</th>
+												<th>Reg. No</th>
+												<th>Date</th>
+												<th>Who Submit</th>
+												<th>Who Receive</th>
 												<th class="text-center">Action</th>
 											</tr>
 										</thead>
-										{{-- <tbody>
-											@foreach ($employees as $employee)
+										<tbody>
+											@foreach ($basts as $bast)
 												<tr>
 													<td class="text-center">{{ $loop->iteration }}</td>
-													<td>{{ $employee->nik }}</td>
-													<td>{{ $employee->fullname }}</td>
-													<td>{{ $employee->position->position_name ?? 'null' }}</td>
-													<td>{{ $employee->project->project_code ?? 'null' }}</td>
+													<td>{{ $bast->bast_reg }}</td>
+													<td>{{ $bast->bast_date }}</td>
+													<td>{{ $bast->submit_name }}</td>
+													<td>{{ $bast->receive_name }}</td>
 													<td class="text-center">
-														@if ($employee->status == 1)
-															<span class="badge badge-success">Active</span>
-														@else
-															<span class="badge badge-danger">Inactive</span>
-														@endif
-													</td>
-													<td class="text-center">
-														<a class="btn btn-icon btn-success" href="{{ url('employees/' . $employee->id) }}"><i
-																class="fas fa-info-circle"></i></a>
-														<a class="btn btn-icon btn-primary" href="{{ url('employees/' . $employee->id . '/edit') }}"><i
-																class="fas fa-pen-square"></i></a>
-														<form action="{{ url('employees/' . $employee->id) }}" method="post"
+														<a title="Detail" class="btn btn-icon btn-success"
+															href="{{ url('basts/' . $bast->bast_no . '/edit') }}"><i class="fas fa-info-circle"></i></a>
+														<a title="Edit" class="btn btn-icon btn-primary"
+															href="{{ url('basts/' . $bast->bast_no . '/edit') }}"><i class="fas fa-pen-square"></i></a>
+														<form action="{{ url('basts/' . $bast->bast_no) }}" method="post"
 															onsubmit="return confirm('Are you sure want to delete this data?')" class="d-inline">
 															@method('delete')
 															@csrf
-															<button class="btn btn-icon btn-danger"><i class="fas fa-times"></i></button>
+															<button title="Delete" class="btn btn-icon btn-danger"><i class="fas fa-times"></i></button>
 														</form>
 													</td>
 												</tr>
 											@endforeach
-										</tbody> --}}
+										</tbody>
 									</table>
 								</div>
 							</div><!-- /.card-body -->
@@ -143,72 +134,13 @@
 	<script src="{{ asset('assets/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
 	<script src="{{ asset('assets/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 	<!-- Page specific script -->
-	{{-- <script>
-	 	$(function() {
-	  		$("#example1").DataTable({
-	   	"responsive": true,
-			"lengthChange": false,
-			"autoWidth": false,
-			"buttons": ["copy", "csv", "excel", "pdf", "print"]
-	  	}).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-	});
-	</script> --}}
 	<script>
 	 $(function() {
-	  var table = $("#example1").DataTable({
-	   responsive: true,
-	   lengthChange: true,
-	   autoWidth: false,
-	   dom: 'lBfrtpi',
-	   buttons: ["copy", "csv", "excel", "pdf", "print"],
-	   processing: true,
-	   serverSide: true,
-	   ajax: {
-	    url: "{{ route('employees.getEmployees') }}",
-	    data: function(d) {
-	     d.search = $("input[type=search][aria-controls=example1]").val()
-	     console.log(d);
-	    }
-	   },
-	   columns: [{
-	    data: 'DT_RowIndex',
-	    orderable: false,
-	    searchable: false,
-	    className: 'text-center'
-	   }, {
-	    data: "nik",
-	    name: "nik",
-	    orderable: false,
-	   }, {
-	    data: "fullname",
-	    name: "fullname",
-	    orderable: false,
-	   }, {
-	    data: "position_name",
-	    name: "position_name",
-	    orderable: false,
-	   }, {
-	    data: "project_code",
-	    name: "project_code",
-	    orderable: false,
-	   }, {
-	    data: "status",
-	    name: "status",
-	    className: "text-center",
-	    orderable: false,
-	   }, {
-	    data: "total",
-	    name: "total",
-	    className: "text-center",
-	    orderable: false,
-	   }, {
-	    data: "action",
-	    name: "action",
-	    orderable: false,
-	    searchable: false,
-	    className: "text-center"
-	   }],
-	   fixedColumns: true,
+	  $("#example1").DataTable({
+	   "responsive": true,
+	   "lengthChange": false,
+	   "autoWidth": false,
+	   "buttons": ["copy", "csv", "excel", "pdf", "print"]
 	  }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 	 });
 	</script>

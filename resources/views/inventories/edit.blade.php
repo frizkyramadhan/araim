@@ -22,13 +22,12 @@
 	<!-- Main content -->
 	<section class="content">
 		<div class="container-fluid">
-			<!-- Main row -->
 			<div class="row">
 				<!-- Left col -->
 				<section class="col-lg-12">
 					<!-- Custom tabs (Charts with tabs)-->
 					<div id="accordion">
-						<div class="card">
+						<div class="card card-dark">
 							<div class="card-header">
 								<h3 class="card-title">
 									<strong>{{ $subtitle }}</strong>
@@ -36,7 +35,8 @@
 								<div class="card-tools">
 									<ul class="nav nav-pills ml-auto">
 										<li class="nav-item mr-2">
-											<a class="btn btn-warning" href="{{ url('inventories') }}"><i class="fas fa-undo-alt"></i>
+											<a class="btn btn-warning text-dark" href="{{ url('inventories/' . $inventory->id) }}"><i
+													class="fas fa-undo-alt"></i>
 												Back</a>
 										</li>
 									</ul>
@@ -47,51 +47,21 @@
 								@method('PATCH')
 								@csrf
 								<div class="card-body">
-									@if ($errors->any())
-										<div class="alert alert-danger alert-dismissible show fade">
-											<button class="close" data-dismiss="alert">
-												<span>&times;</span>
-											</button>
-											<ul>
-												@foreach ($errors->all() as $error)
-													<li>{{ $error }}</li>
-												@endforeach
-											</ul>
-										</div>
-									@endif
-									@if (session('success'))
-										<div class="alert alert-success alert-dismissible show fade">
-											<div class="alert-body">
-												<button class="close" data-dismiss="alert">
-													<span>&times;</span>
-												</button>
-												{{ session('success') }}
-											</div>
-										</div>
-									@endif
 									<div class="row">
-										<div class="col-5 col-sm-3">
-											<div class="nav flex-column nav-tabs h-100" id="vert-tabs-tab" role="tablist" aria-orientation="vertical">
-												<a class="nav-link active" id="vert-tabs-pic-tab" data-toggle="pill" href="#vert-tabs-pic" role="tab"
-													aria-controls="vert-tabs-pic" aria-selected="true">PIC</a>
-												<a class="nav-link" id="vert-tabs-asset-tab" data-toggle="pill" href="#vert-tabs-asset" role="tab"
-													aria-controls="vert-tabs-asset" aria-selected="false">Asset</a>
-												<a class="nav-link" id="vert-tabs-location-tab" data-toggle="pill" href="#vert-tabs-location"
-													role="tab" aria-controls="vert-tabs-location" aria-selected="false">Location</a>
-												<a class="nav-link" id="vert-tabs-reference-tab" data-toggle="pill" href="#vert-tabs-reference"
-													role="tab" aria-controls="vert-tabs-reference" aria-selected="false">Reference</a>
-												<a class="nav-link" id="vert-tabs-specification-tab" data-toggle="pill" href="#vert-tabs-specification"
-													role="tab" aria-controls="vert-tabs-specification" aria-selected="false">Specification <label
-														class="text-danger text-sm">* if available</label></a>
-											</div>
-										</div>
-										<div class="col-7 col-sm-9">
-											<div class="tab-content" id="vert-tabs-tabContent">
-												<div class="tab-pane text-left fade show active" id="vert-tabs-pic" role="tabpanel"
-													aria-labelledby="vert-tabs-pic-tab">
+										<div class="col-md-6">
+											<div class="card card-primary">
+												<div class="card-header">
+													<h3 class="card-title">PIC</h3>
+													<div class="card-tools">
+														<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+															<i class="fas fa-minus"></i>
+														</button>
+													</div>
+												</div>
+												<div class="card-body">
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Inventory No</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">No</label>
+														<div class="col-sm-9">
 															<input type="text" class="form-control @error('inventory_no') is-invalid @enderror" name="inventory_no"
 																value="{{ $inventory->inventory_no }}" readonly>
 															@error('inventory_no')
@@ -102,22 +72,10 @@
 														</div>
 													</div>
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Posting Date</label>
-														<div class="col-sm-10">
-															<input type="date" class="form-control @error('input_date') is-invalid @enderror" name="input_date"
-																value="{{ old('input_date', $inventory->input_date) }}">
-															@error('input_date')
-																<div class="error invalid-feedback">
-																	{{ $message }}
-																</div>
-															@enderror
-														</div>
-													</div>
-													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Person in Charge</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">PIC</label>
+														<div class="col-sm-9">
 															<select name="employee_id" class="form-control @error('employee_id') is-invalid @enderror select2bs4"
-																style="width: 100%;">
+																style="width: 100%;" tabindex="1">
 																@foreach ($employees as $employee)
 																	<option value="{{ $employee->id }}"
 																		{{ old('employee_id', $inventory->employee_id) == $employee->id ? 'selected' : '' }}>
@@ -132,13 +90,38 @@
 															@enderror
 														</div>
 													</div>
-												</div>
-												<div class="tab-pane fade" id="vert-tabs-asset" role="tabpanel" aria-labelledby="vert-tabs-asset-tab">
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Asset</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">Date</label>
+														<div class="col-sm-9">
+															<input type="date" class="form-control @error('input_date') is-invalid @enderror" name="input_date"
+																value="{{ old('input_date', $inventory->input_date) }}" tabindex="2">
+															@error('input_date')
+																<div class="error invalid-feedback">
+																	{{ $message }}
+																</div>
+															@enderror
+														</div>
+													</div>
+												</div>
+												<!-- /.card-body -->
+											</div>
+											<!-- /.card -->
+											<div class="card card-success">
+												<div class="card-header">
+													<h3 class="card-title">Asset Detail</h3>
+
+													<div class="card-tools">
+														<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+															<i class="fas fa-minus"></i>
+														</button>
+													</div>
+												</div>
+												<div class="card-body">
+													<div class="form-group row">
+														<label class="col-sm-3 col-form-label">Asset</label>
+														<div class="col-sm-9">
 															<select name="asset_id" class="form-control @error('asset_id') is-invalid @enderror select2bs4"
-																style="width: 100%;">
+																style="width: 100%;" tabindex="3">
 																@foreach ($assets as $asset)
 																	<option value="{{ $asset->id }}"
 																		{{ old('asset_id', $inventory->asset_id) == $asset->id ? 'selected' : '' }}>
@@ -154,10 +137,10 @@
 														</div>
 													</div>
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Brand</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">Brand</label>
+														<div class="col-sm-9">
 															<input type="text" class="form-control @error('brand') is-invalid @enderror" name="brand"
-																value="{{ old('brand', $inventory->brand) }}">
+																value="{{ old('brand', $inventory->brand) }}" tabindex="4">
 															@error('brand')
 																<div class="error invalid-feedback">
 																	{{ $message }}
@@ -166,10 +149,10 @@
 														</div>
 													</div>
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Model</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">Model</label>
+														<div class="col-sm-9">
 															<input type="text" class="form-control @error('model_asset') is-invalid @enderror" name="model_asset"
-																value="{{ old('model_asset', $inventory->model_asset) }}">
+																value="{{ old('model_asset', $inventory->model_asset) }}" tabindex="5">
 															@error('model_asset')
 																<div class="error invalid-feedback">
 																	{{ $message }}
@@ -178,10 +161,10 @@
 														</div>
 													</div>
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Serial No</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">Serial No</label>
+														<div class="col-sm-9">
 															<input type="text" class="form-control @error('serial_no') is-invalid @enderror" name="serial_no"
-																value="{{ old('serial_no', $inventory->serial_no) }}">
+																value="{{ old('serial_no', $inventory->serial_no) }}" tabindex="6">
 															@error('serial_no')
 																<div class="error invalid-feedback">
 																	{{ $message }}
@@ -190,10 +173,10 @@
 														</div>
 													</div>
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Part No</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">Part No</label>
+														<div class="col-sm-9">
 															<input type="text" class="form-control @error('part_no') is-invalid @enderror" name="part_no"
-																value="{{ old('part_no', $inventory->part_no) }}">
+																value="{{ old('part_no', $inventory->part_no) }}" tabindex="7">
 															@error('part_no')
 																<div class="error invalid-feedback">
 																	{{ $message }}
@@ -202,10 +185,10 @@
 														</div>
 													</div>
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Quantity</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">Quantity</label>
+														<div class="col-sm-9">
 															<input type="text" class="form-control @error('quantity') is-invalid @enderror" name="quantity"
-																value="{{ old('quantity', $inventory->quantity) }}">
+																value="{{ old('quantity', $inventory->quantity) }}" tabindex="8">
 															@error('quantity')
 																<div class="error invalid-feedback">
 																	{{ $message }}
@@ -213,26 +196,20 @@
 															@enderror
 														</div>
 													</div>
+													{{-- @can('admin') --}}
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Status</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">Status</label>
+														<div class="col-sm-9">
 															<select name="inventory_status"
-																class="form-control @error('inventory_status') is-invalid @enderror select2bs4" style="width: 100%;">
+																class="form-control @error('inventory_status') is-invalid @enderror select2bs4" style="width: 100%;"
+																tabindex="9">
 																<option value="Good"
 																	{{ old('inventory_status', $inventory->inventory_status) == 'Good' ? 'selected' : '' }}>
 																	Good
 																</option>
-																<option value="Mutated"
-																	{{ old('inventory_status', $inventory->inventory_status) == 'Mutated' ? 'selected' : '' }}>
-																	Mutated
-																</option>
 																<option value="Broken"
 																	{{ old('inventory_status', $inventory->inventory_status) == 'Broken' ? 'selected' : '' }}>
 																	Broken
-																</option>
-																<option value="Discarded"
-																	{{ old('inventory_status', $inventory->inventory_status) == 'Discarded' ? 'selected' : '' }}>
-																	Discarded
 																</option>
 															</select>
 															@error('inventory_status')
@@ -242,13 +219,28 @@
 															@enderror
 														</div>
 													</div>
+													{{-- @endcan --}}
 												</div>
-												<div class="tab-pane fade" id="vert-tabs-location" role="tabpanel" aria-labelledby="vert-tabs-location-tab">
+												<!-- /.card-body -->
+											</div>
+											<!-- /.card -->
+										</div>
+										<div class="col-md-6">
+											<div class="card card-warning">
+												<div class="card-header">
+													<h3 class="card-title">Asset Location</h3>
+													<div class="card-tools">
+														<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+															<i class="fas fa-minus"></i>
+														</button>
+													</div>
+												</div>
+												<div class="card-body">
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Project</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">Project</label>
+														<div class="col-sm-9">
 															<select name="project_id" class="form-control @error('project_id') is-invalid @enderror select2bs4"
-																style="width: 100%;">
+																style="width: 100%;" tabindex="10">
 																@foreach ($projects as $project)
 																	<option value="{{ $project->id }}"
 																		{{ old('project_id', $inventory->project_id) == $project->id ? 'selected' : '' }}>
@@ -264,10 +256,11 @@
 														</div>
 													</div>
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Department</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">Department</label>
+														<div class="col-sm-9">
 															<select name="department_id"
-																class="form-control @error('department_id') is-invalid @enderror select2bs4" style="width: 100%;">
+																class="form-control @error('department_id') is-invalid @enderror select2bs4" style="width: 100%;"
+																tabindex="11">
 																@foreach ($departments as $department)
 																	<option value="{{ $department->id }}"
 																		{{ old('department_id', $inventory->department_id) == $department->id ? 'selected' : '' }}>
@@ -283,10 +276,10 @@
 														</div>
 													</div>
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Location</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">Location</label>
+														<div class="col-sm-9">
 															<input type="text" class="form-control @error('location') is-invalid @enderror" name="location"
-																value="{{ old('location', $inventory->location) }}">
+																value="{{ old('location', $inventory->location) }}" tabindex="12">
 															@error('location')
 																<div class="error invalid-feedback">
 																	{{ $message }}
@@ -295,13 +288,23 @@
 														</div>
 													</div>
 												</div>
-												<div class="tab-pane fade" id="vert-tabs-reference" role="tabpanel"
-													aria-labelledby="vert-tabs-reference-tab">
+											</div>
+											<!-- /.card-body -->
+											<div class="card card-danger">
+												<div class="card-header">
+													<h3 class="card-title">References</h3>
+													<div class="card-tools">
+														<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+															<i class="fas fa-minus"></i>
+														</button>
+													</div>
+												</div>
+												<div class="card-body">
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Reference No</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">Ref No</label>
+														<div class="col-sm-9">
 															<input type="text" class="form-control @error('reference_no') is-invalid @enderror" name="reference_no"
-																value="{{ old('reference_no', $inventory->reference_no) }}">
+																value="{{ old('reference_no', $inventory->reference_no) }}" tabindex="13">
 															@error('reference_no')
 																<div class="error invalid-feedback">
 																	{{ $message }}
@@ -310,10 +313,10 @@
 														</div>
 													</div>
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Reference Date</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">Ref Date</label>
+														<div class="col-sm-9">
 															<input type="date" class="form-control @error('reference_date') is-invalid @enderror"
-																name="reference_date" value="{{ old('reference_date', $inventory->reference_date) }}">
+																name="reference_date" value="{{ old('reference_date', $inventory->reference_date) }}" tabindex="14">
 															@error('reference_date')
 																<div class="error invalid-feedback">
 																	{{ $message }}
@@ -322,10 +325,10 @@
 														</div>
 													</div>
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">PO No</label>
-														<div class="col-sm-10">
+														<label class="col-sm-3 col-form-label">PO No</label>
+														<div class="col-sm-9">
 															<input type="text" class="form-control @error('po_no') is-invalid @enderror" name="po_no"
-																value="{{ old('po_no', $inventory->po_no) }}">
+																value="{{ old('po_no', $inventory->po_no) }}" tabindex="15">
 															@error('po_no')
 																<div class="error invalid-feedback">
 																	{{ $message }}
@@ -334,10 +337,10 @@
 														</div>
 													</div>
 													<div class="form-group row">
-														<label class="col-sm-2 col-form-label">Remarks</label>
-														<div class="col-sm-10">
-															<textarea class="form-control @error('remarks') is-invalid @enderror" rows="3"
-                name="remarks">{{ old('remarks', $inventory->remarks) }}</textarea>
+														<label class="col-sm-3 col-form-label">Remarks</label>
+														<div class="col-sm-9">
+															<textarea class="form-control @error('remarks') is-invalid @enderror" rows="3" name="remarks"
+                tabindex="16">{{ old('remarks', $inventory->remarks) }}</textarea>
 															@error('remarks')
 																<div class="error invalid-feedback">
 																	{{ $message }}
@@ -346,8 +349,20 @@
 														</div>
 													</div>
 												</div>
-												<div class="tab-pane fade" id="vert-tabs-specification" role="tabpanel"
-													aria-labelledby="vert-tabs-specification-tab">
+												<!-- /.card-body -->
+											</div>
+										</div>
+										<div class="col-md-12">
+											<div class="card card-info">
+												<div class="card-header">
+													<h3 class="card-title">Specification <label class="text-danger text-sm">*if available</label></h3>
+													<div class="card-tools">
+														<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+															<i class="fas fa-minus"></i>
+														</button>
+													</div>
+												</div>
+												<div class="card-body">
 													<div class="table-responsive">
 														<table class="table table-striped table-hover" id="dynamicAddRemove">
 															<thead>
@@ -355,27 +370,20 @@
 																	<th style="vertical-align: middle">Component</th>
 																	<th style="vertical-align: middle">Description</th>
 																	<th style="vertical-align: middle">Remarks</th>
-																	<th style="width: 40px"><button type="button" id="dynamic-ar" class="btn btn-outline-primary"><i
-																				class="fas fa-plus"></i></button></th>
+																	<th style="width: 40px"><button type="button" id="dynamic-ar" class="btn btn-outline-primary"
+																			tabindex="17"><i class="fas fa-plus"></i></button></th>
 																</tr>
 															</thead>
 															<tbody>
-																@foreach ($specifications as $specification)
+																@foreach ($specifications as $spec)
 																	<tr>
-																		<td>
-																			{{ $specification->component->component_name }}
-																		</td>
-																		<td>
-																			{{ $specification->specification }}
-																		</td>
-																		<td>
-																			{{ $specification->spec_remarks }}
-																		</td>
+																		<td>{{ $spec->component->component_name }}</td>
+																		<td>{{ $spec->specification }}</td>
+																		<td>{{ $spec->spec_remarks }}</td>
 																		<td>
 																			<button type="submit" class="btn btn-outline-danger"
-																				onclick="return confirm('Are you sure want to delete this specification?')"
-																				value="deleteRow{{ $specification->id }}" name="deleteRow{{ $specification->id }}"><i
-																					class="fas fa-trash-alt"></i></button>
+																				onclick="return confirm('Are you sure to delete this record?')" value="deleteRow{{ $spec->id }}"
+																				name="deleteRow{{ $spec->id }}"><i class="fas fa-trash-alt"></i></button>
 																		</td>
 																	</tr>
 																@endforeach
@@ -384,11 +392,11 @@
 													</div>
 												</div>
 											</div>
+											<!-- /.card-body -->
 										</div>
 									</div>
-									<br>
 									<div class="card-footer">
-										<button type="submit" class="btn btn-info float-right">Submit</button>
+										<button type="submit" class="btn btn-info float-right" tabindex="22">Submit</button>
 									</div>
 							</form>
 						</div>
@@ -436,7 +444,7 @@
 	  var tr =
 	   `<tr>
 			<td>
-				<select name="component_id[]" class="form-control select2bs4" style="width: 100%;">
+				<select name="component_id[]" class="form-control select2bs4" style="width: 100%;" tabindex="18">
 					<?php foreach($components as $component):?>
 						<option value="{{ $component->id }}"
 							{{ old('component_id[]') == $component->id ? 'selected' : '' }}>
@@ -446,13 +454,13 @@
 				</select>
 			</td>
 			<td>
-				<input type="text" class="form-control" name="specification[]" required>
+				<input type="text" class="form-control" name="specification[]" required tabindex="19">
 			</td>
 			<td>
-				<input type="text" class="form-control" name="spec_remarks[]" required>
+				<input type="text" class="form-control" name="spec_remarks[]" required tabindex="20">
 			</td>
 			<td>
-				<button type="button" class="btn btn-outline-danger remove-input-field"><i class="fas fa-trash-alt"></i></button>
+				<button type="button" class="btn btn-outline-danger remove-input-field" tabindex="21"><i class="fas fa-trash-alt"></i></button>
 			</td>
 		</tr>`;
 	  $("#dynamicAddRemove").append(tr);

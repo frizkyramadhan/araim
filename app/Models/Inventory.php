@@ -40,4 +40,9 @@ class Inventory extends Model
     {
         return $this->hasMany(Specification::class);
     }
+
+    public function bast()
+    {
+        return $this->hasMany(Bast::class);
+    }
 }

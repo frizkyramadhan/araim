@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BastController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\LoginController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\DepartmentController;
@@ -53,10 +55,16 @@ Route::group(['middleware' => 'check_role:admin,superuser' ], function() {
     
     Route::get('inventories/getInventories', [InventoryController::class, 'getInventories'])->name('inventories.getInventories');
     Route::get('inventories/json', [InventoryController::class, 'json'])->name('inventories.json');
+    Route::get('inventories/create/{id}', [InventoryController::class, 'create']);
+    Route::get('inventories/transfer/{id}', [InventoryController::class, 'transfer'])->name('inventories.transfer');
+    Route::patch('inventories/transferProcess/{id}', [InventoryController::class, 'transferProcess'])->name('inventories.transferProcess');
     Route::resource('inventories', InventoryController::class);
+
+    Route::get('trackings', [TrackingController::class, 'index'])->name('trackings.index');
 });
 
 Route::middleware('check_role:admin')->group(function () {
     Route::resource('components', ComponentController::class)->except(['show']);
     Route::resource('users', UserController::class)->except(['show']);
+    Route::resource('basts', BastController::class);
 });
