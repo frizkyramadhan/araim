@@ -26,11 +26,6 @@ class TrackingController extends Controller
             })
             ->orderBy('inventories.id', 'desc')->get();
 
-        foreach($trackings as $tracking){
-            $specifications = Specification::with('component')->where('inventory_id', $tracking->id)->get();
-        }
-        // dd($specifications);
-
-        return view('trackings.index', compact('title', 'subtitle','trackings','specifications','request'));
+        return view('trackings.index', compact('title', 'subtitle','trackings','request'));
     }
 }

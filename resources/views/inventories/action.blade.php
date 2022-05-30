@@ -17,7 +17,8 @@
 	<div class="dropdown-menu" role="menu">
 		<a class="dropdown-item" href="{{ url('inventories/' . $model->id . '/edit') }}"><i class="fas fa-pen-square"></i>
 			Edit</a>
-		<a class="dropdown-item" href="#"><i class="fas fa-search"></i> Track</a>
+		<a class="dropdown-item" href="{{ url('trackings?search=' . $model->inventory_no) }}"><i class="fas fa-search"></i>
+			Track</a>
 		@if ($model->transfer_status != 'Mutated')
 			<a class="dropdown-item" href="{{ url('inventories/transfer/' . $model->id) }}"><i
 					class="fas fa-exchange-alt"></i>
