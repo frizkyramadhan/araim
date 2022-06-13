@@ -36,6 +36,10 @@
 								<div class="card-tools">
 									<ul class="nav nav-pills ml-auto">
 										<li class="nav-item mr-2">
+											@cannot('user')
+												<a class="btn btn-success" href="{{ url('inventories/import') }}"><i class="fas fa-upload"></i>
+													Import</a>
+											@endcannot
 											<a class="btn btn-warning text-dark" href="{{ url('inventories/create') }}"><i class="fas fa-plus"></i>
 												Add</a>
 										</li>

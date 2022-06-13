@@ -21,7 +21,7 @@ class CheckRole
         foreach($roles as $role) {
             if($request->user()->level === $role) { 
                 return $next($request); 
-            } 
+            }
         } 
         return response()->view('errors.403', ['title' => '403 Error']);
     }
