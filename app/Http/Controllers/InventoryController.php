@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
-use App\Models\Component;
-use App\Models\Department;
-use App\Models\Employee;
-use App\Models\Inventory;
 use App\Models\Project;
-use App\Models\Specification;
-use Illuminate\Http\Request;
+use App\Models\Employee;
+use App\Models\Component;
+use App\Models\Inventory;
+use App\Models\Department;
 use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
+use App\Models\Specification;
+use App\Exports\InventoryExport;
+use App\Imports\InventoryImport;
 use Yajra\DataTables\DataTables;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InventoryController extends Controller
 {
@@ -512,5 +515,25 @@ class InventoryController extends Controller
         }
 
         return redirect('inventories/'.$inventory->id)->with('success', 'Inventory successfully transferred!');
+    }
+
+    public function export()
+    {
+        return Excel::download(new InventoryExport, 'inventories.xlsx');
+    }
+
+    public function import()
+    {
+        $title = 'Inventories';
+        $subtitle = 'Import Inventories';
+
+        return view('inventories.import', compact('title', 'subtitle'));
+    }
+
+    public function importProcess(Request $request)
+    {
+        Excel::import(new InventoryImport, request()->file('import_file'));
+
+        return back()->with('success', 'Inventory successfully imported!');
     }
 }
