@@ -38,7 +38,8 @@
 																<p class="mb-0">{{ $tracking->nik }} - {{ $tracking->fullname }} |
 																	{{ $tracking->p_code_emp }} - {{ $tracking->p_name_emp }}</p>
 																<p class="mb-0">{{ $tracking->brand }} - {{ $tracking->model_asset }} |
-																	{{ $tracking->serial_no }} - {{ $tracking->part_no }} | {{ $tracking->remarks }}</p>
+																	{{ $tracking->serial_no }} - {{ $tracking->part_no }} | {{ $tracking->remarks }} | Qty :
+																	{{ $tracking->quantity }}</p>
 															</div>
 															<div class="col-md-2">
 																<div>{{ date('d-M-Y', strtotime($tracking->input_date)) }}</div>
@@ -150,6 +151,14 @@
 																		</table>
 																	</div>
 																</div>
+																@if ($tracking->transfer_status == 'Available')
+																	<div class="card-footer col-md-12">
+																		<a href="{{ url('inventories/' . $tracking->id . '/edit') }}" class="btn btn-primary"><i
+																				class="fas fa-pen-square"></i> Edit</a>
+																		<a href="{{ url('inventories/transfer/' . $tracking->id) }}" class="btn btn-danger float-right"><i
+																				class="fas fa-exchange-alt"></i> Transfer</a>
+																	</div>
+																@endif
 															</div>
 														</div>
 													</div>
