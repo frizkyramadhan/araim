@@ -102,8 +102,7 @@
 																		<td style="vertical-align: middle">Remarks</td>
 																		<td style="vertical-align: middle; width: 5%">:</td>
 																		<td>
-																			<textarea class="form-control @error('remarks') is-invalid @enderror" rows="3" name="remarks"
-                    tabindex="3">{{ old('remarks') }}</textarea>
+																			<textarea class="form-control @error('remarks') is-invalid @enderror" rows="3" name="remarks" tabindex="3">{{ old('remarks') }}</textarea>
 																			@error('remarks')
 																				<div class="error invalid-feedback">
 																					{{ $message }}
@@ -170,6 +169,20 @@
 																			@enderror
 																		</td>
 																	</tr>
+																	<tr>
+																		<td style="vertical-align: middle">Quantity</td>
+																		<td style="vertical-align: middle; width: 5%">:</td>
+																		<td>
+																			<input type="number" class="form-control @error('quantity') is-invalid @enderror" name="quantity"
+																				value="{{ old('quantity', $inventory->quantity) }}" min="1" max="{{ $inventory->quantity }}"
+																				tabindex="7" required>
+																			@error('quantity')
+																				<div class="error invalid-feedback">
+																					{{ $message }}
+																				</div>
+																			@enderror
+																		</td>
+																	</tr>
 																</table>
 															</div>
 														</div>
@@ -181,7 +194,6 @@
 													<input type="hidden" name="model_asset" value="{{ $inventory->model_asset }}">
 													<input type="hidden" name="serial_no" value="{{ $inventory->serial_no }}">
 													<input type="hidden" name="part_no" value="{{ $inventory->part_no }}">
-													<input type="hidden" name="quantity" value="{{ $inventory->quantity }}">
 													<input type="hidden" name="inventory_status" value="{{ $inventory->inventory_status }}">
 													<input type="hidden" name="reference_no" value="{{ $inventory->reference_no }}">
 													<input type="hidden" name="reference_date" value="{{ $inventory->reference_date }}">
