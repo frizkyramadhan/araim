@@ -14,7 +14,13 @@ use App\Models\Specification;
 use App\Exports\InventoryExport;
 use App\Imports\InventoryImport;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\DB;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Writer\PngWriter;
 use Maatwebsite\Excel\Facades\Excel;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
 
 class InventoryController extends Controller
 {
@@ -546,5 +552,76 @@ class InventoryController extends Controller
         Excel::import(new InventoryImport, request()->file('import_file'));
 
         return back()->with('success', 'Inventory successfully imported!');
+    }
+
+    public function qrcode($id)
+    {
+        $inventory = Inventory::with('asset')->find($id);
+        $content = "No. Aset = " . $inventory->inventory_no . "\n";
+        $content .= "Nama Aset = " . $inventory->asset->asset_name . "\n";
+        $content .= "Merk = " . $inventory->brand . "\n";
+        $content .= "Lokasi = " . $inventory->location . "\n";
+
+        $result = Builder::create()
+            ->writer(new PngWriter())
+            ->writerOptions([])
+            ->data($content)
+            ->encoding(new Encoding('ISO-8859-1'))
+            ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
+            ->size(400)
+            ->margin(15)
+            ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
+            // ->labelText('This is the label')
+            // ->labelFont(new NotoSans(20))
+            // ->labelAlignment(new LabelAlignmentCenter())
+            ->build();
+
+        $result->saveToFile(public_path('../storage/app/public/qrcode/qr-' . $inventory->id . '.png'));
+
+        $inventory->update([
+            'qrcode' => 'qr-' . $inventory->id . '.png',
+        ]);
+
+        // return redirect('inventories/' . $inventory->id)->with('success', 'QR Code successfully generated!');
+        return back()->with('success', 'QR Code successfully generated!');
+    }
+
+    public function delete_qrcode($id)
+    {
+        $inventory = Inventory::find($id);
+
+        // delete qrcode
+        $qrcode = public_path('../storage/app/public/qrcode/' . $inventory->qrcode);
+        if (file_exists($qrcode)) {
+            unlink($qrcode);
+            $inventory->update([
+                'qrcode' => null,
+            ]);
+        }
+
+        return back()->with('success', 'QR Code successfully deleted!');
+        // return redirect('inventories/' . $inventory->id)->with('success', 'QR Code successfully deleted!');
+    }
+
+    public function print_qrcode($id)
+    {
+        $title = 'QR Code Inventory Data';
+        $tag = 'qrcode';
+        $inventory = Inventory::with('asset', 'employee')->find($id);
+        return view('inventories.qrcode', compact('title', 'inventory', 'tag'));
+    }
+
+    public function print_qrcode_employee($id)
+    {
+        $title = 'QR Code Inventory Data';
+        $tag = 'qrcodes';
+        $inventories = DB::table('inventories')
+            ->join('assets', 'inventories.asset_id', '=', 'assets.id')
+            ->join('employees', 'inventories.employee_id', '=', 'employees.id')
+            ->where('employees.id', '=', $id)
+            ->where('inventories.qrcode', '!=', null)
+            ->orderBy('inventories.id', 'desc')
+            ->get();
+        return view('inventories.qrcode', compact('title', 'inventories', 'tag'));
     }
 }

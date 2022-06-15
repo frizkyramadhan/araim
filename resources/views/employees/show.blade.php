@@ -79,48 +79,74 @@
 											<input type="text" class="form-control" name="email" value="{{ $employee->email }}" disabled>
 										</div>
 									</div>
-									<div class="form-group text-center">
+									<hr>
+									<div class="form-group">
 										<label class="col-form-label">Existing Assets</label>
-										<a class="btn btn-warning float-right" href="{{ url('inventories/create/' . $employee->id) }}"><i
-												class="fas fa-plus"></i>
-											Add</a>
+										<div class="float-right">
+											<a class="btn btn-success" href="{{ url('inventories/print_qrcode_employee/' . $employee->id) }}"
+												target="_blank"><i class="fas fa-qrcode"></i>
+												Print</a>
+											<a class="btn btn-warning" href="{{ url('inventories/create/' . $employee->id) }}"><i
+													class="fas fa-plus"></i>
+												Add</a>
+										</div>
 									</div>
 									<div class="table-responsive">
 										<table id="example1" class="table table-bordered table-striped">
 											<thead>
 												<tr>
-													<th class="text-center">No</th>
-													<th>Inventory No</th>
-													<th>Date</th>
-													<th>Asset</th>
-													<th>Brand / Model</th>
-													<th>S/N / P/N</th>
-													<th>PO No</th>
-													<th>QR Code</th>
-													<th class="text-center">Status</th>
-													<th class="text-center">Action</th>
+													<th class="text-center align-middle">No</th>
+													<th class="align-middle">Inventory No</th>
+													<th class="align-middle">Date</th>
+													<th class="align-middle">Asset</th>
+													<th class="align-middle">Brand / Model</th>
+													<th class="align-middle">S/N / P/N</th>
+													<th class="align-middle">PO No</th>
+													<th class="align-middle">QR Code</th>
+													<th class="text-center align-middle">Inventory Status</th>
+													<th class="text-center align-middle">Transfer Status</th>
+													<th class="text-center align-middle">Action</th>
 												</tr>
 											</thead>
 											<tbody>
 												@foreach ($inventories as $inventory)
 													<tr>
 														<td class="text-center">{{ $loop->iteration }}</td>
-														<td>{{ $inventory->inventory_no }}</td>
+														<td class="text-center">
+															{{ $inventory->inventory_no }}
+															<a href="{{ url('inventories/qrcode/' . $inventory->id) }}" class="btn btn-xs btn-secondary"><i
+																	class="fas fa-qrcode"></i> Generate</a>
+														</td>
 														<td>{{ $inventory->input_date }}</td>
 														<td>{{ $inventory->asset->asset_name }}</td>
 														<td>{{ $inventory->brand }} - {{ $inventory->model_asset }}</td>
 														<td>{{ $inventory->serial_no }} / {{ $inventory->part_no }}</td>
 														<td>{{ $inventory->po_no }}</td>
-														<td>{{ $inventory->qrcode }}</td>
+														<td class="text-center">
+															@if ($inventory->qrcode)
+																<a href="{{ url('inventories/print_qrcode/' . $inventory->id) }}" target="_blank">
+																	<img src="{{ asset('storage/qrcode/' . $inventory->qrcode) }}" alt="QR Code" width="100px">
+																</a>
+																<a href="{{ url('inventories/delete_qrcode/' . $inventory->id) }}" class="btn btn-xs btn-danger"
+																	onclick="return confirm('Are you sure to delete this qrcode?')">
+																	<i class="fas fa-trash"> Delete</i>
+																</a>
+															@endif
+														</td>
 														<td class="text-center">
 															@if ($inventory->inventory_status == 'Good')
 																<span class="badge badge-primary">Good</span>
 															@elseif ($inventory->inventory_status == 'Broken')
 																<span class="badge badge-danger">Broken</span>
-															@elseif ($inventory->inventory_status == 'Mutated')
-																<span class="badge badge-warning">Mutated</span>
-															@elseif ($inventory->inventory_status == 'Discarded')
+															@endif
+														</td>
+														<td class="text-center">
+															@if ($inventory->transfer_status == 'Available')
+																<span class="badge badge-success">Available</span>
+															@elseif ($inventory->transfer_status == 'Discarded')
 																<span class="badge badge-secondary">Discarded</span>
+															@elseif ($inventory->transfer_status == 'Mutated')
+																<span class="badge badge-warning">Mutated</span>
 															@endif
 														</td>
 														<td class="text-center">

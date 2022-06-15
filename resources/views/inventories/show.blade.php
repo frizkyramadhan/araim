@@ -50,6 +50,16 @@
 								</div>
 							</div><!-- /.card-header -->
 							<div class="card-body">
+								@if (session('success'))
+									<div class="alert alert-success alert-dismissible show fade">
+										<div class="alert-body">
+											<button class="close" data-dismiss="alert">
+												<span>&times;</span>
+											</button>
+											{{ session('success') }}
+										</div>
+									</div>
+								@endif
 								<div class="row">
 									<div class="col-md-6">
 										<div class="card card-primary">
@@ -226,6 +236,45 @@
 														<td>Remarks</td>
 														<td style="width: 5%">:</td>
 														<td><b>{{ $inventory->remarks }}</b></td>
+													</tr>
+												</table>
+											</div>
+											<!-- /.card-body -->
+										</div>
+										<div class="card card-secondary">
+											<div class="card-header">
+												<h3 class="card-title">QRCode</h3>
+												<div class="card-tools">
+													<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+														<i class="fas fa-minus"></i>
+													</button>
+												</div>
+											</div>
+											<div class="card-body text-center">
+												<table width=100% class="table table-borderless table-sm" style="padding: 0%">
+													@if ($inventory->qrcode)
+														<tr>
+															<td>
+																<img width="150px" src="{{ asset('storage/qrcode/' . $inventory->qrcode) }}">
+															</td>
+														</tr>
+													@endif
+													<tr>
+														<td>
+															@if ($inventory->qrcode)
+																<a href="{{ url('inventories/print_qrcode/' . $inventory->id) }}" target="_blank"
+																	class="btn btn-sm btn-primary">
+																	<i class="fas fa-print"></i> Print
+																</a>
+																<a href="{{ url('inventories/delete_qrcode/' . $inventory->id) }}" class="btn btn-sm btn-danger"
+																	onclick="return confirm('Are you sure to delete this qrcode?')">
+																	<i class="fas fa-trash"></i> Delete
+																</a>
+															@elseif (!$inventory->qrcode)
+																<a href="{{ url('inventories/qrcode/' . $inventory->id) }}" class="btn btn-sm btn-secondary"><i
+																		class="fas fa-qrcode"></i> Generate</a>
+															@endif
+														</td>
 													</tr>
 												</table>
 											</div>

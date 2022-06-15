@@ -42,7 +42,7 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-Route::group(['middleware' => 'check_role:admin,superuser' ], function() {
+Route::group(['middleware' => 'check_role:admin,superuser'], function () {
     Route::resource('departments', DepartmentController::class)->except(['show']);
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('positions', PositionController::class)->except(['show']);
@@ -52,7 +52,7 @@ Route::group(['middleware' => 'check_role:admin,superuser' ], function() {
     Route::get('employees/getEmployees', [EmployeeController::class, 'getEmployees'])->name('employees.getEmployees');
     Route::get('employees/json', [EmployeeController::class, 'json'])->name('employees.json');
     Route::resource('employees', EmployeeController::class);
-    
+
     Route::get('inventories/getInventories', [InventoryController::class, 'getInventories'])->name('inventories.getInventories');
     Route::get('inventories/json', [InventoryController::class, 'json'])->name('inventories.json');
     Route::get('inventories/create/{id}', [InventoryController::class, 'create']);
@@ -62,6 +62,10 @@ Route::group(['middleware' => 'check_role:admin,superuser' ], function() {
     Route::post('inventories/importProcess', [InventoryController::class, 'importProcess'])->name('inventories.importProcess');
     Route::get('inventories/transfer/{id}', [InventoryController::class, 'transfer'])->name('inventories.transfer');
     Route::patch('inventories/transferProcess/{id}', [InventoryController::class, 'transferProcess'])->name('inventories.transferProcess');
+    Route::get('inventories/qrcode/{id}', [InventoryController::class, 'qrcode'])->name('inventories.qrcode');
+    Route::get('inventories/delete_qrcode/{id}', [InventoryController::class, 'delete_qrcode'])->name('inventories.delete_qrcode');
+    Route::get('inventories/print_qrcode/{id}', [InventoryController::class, 'print_qrcode'])->name('inventories.print_qrcode');
+    Route::get('inventories/print_qrcode_employee/{id}', [InventoryController::class, 'print_qrcode_employee'])->name('inventories.print_qrcode_employee');
     Route::resource('inventories', InventoryController::class);
 
     Route::get('trackings', [TrackingController::class, 'index'])->name('trackings.index');
