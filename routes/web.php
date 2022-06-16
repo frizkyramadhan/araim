@@ -43,6 +43,8 @@ Route::middleware('auth')->group(function () {
     Route::get('inventories', [InventoryController::class, 'index'])->name('inventories.index');
     Route::get('inventories/getInventories', [InventoryController::class, 'getInventories'])->name('inventories.getInventories');
     Route::get('inventories/create', [InventoryController::class, 'create'])->name('inventories.create')->middleware('check_role:admin,superuser');
+    Route::get('inventories/import', [InventoryController::class, 'import'])->name('inventories.import')->middleware('check_role:admin,superuser');
+    Route::get('inventories/export', [InventoryController::class, 'export'])->name('inventories.export')->middleware('check_role:admin,superuser');
     Route::get('inventories/{inventory}', [InventoryController::class, 'show'])->name('inventories.show');
     Route::get('trackings', [TrackingController::class, 'index'])->name('trackings.index');
 });
@@ -61,9 +63,6 @@ Route::group(['middleware' => 'check_role:admin,superuser'], function () {
     Route::get('inventories/create/{id}', [InventoryController::class, 'create']);
     Route::post('inventories', [InventoryController::class, 'store'])->name('inventories.store');
     Route::get('inventories/json', [InventoryController::class, 'json'])->name('inventories.json');
-    Route::get('inventories/export', [InventoryController::class, 'export'])->name('inventories.export');
-    Route::get('inventories/import', [InventoryController::class, 'import'])->name('inventories.import');
-    Route::post('inventories/import', [InventoryController::class, 'import'])->name('inventories.import');
     Route::post('inventories/importProcess', [InventoryController::class, 'importProcess'])->name('inventories.importProcess');
     Route::get('inventories/transfer/{id}', [InventoryController::class, 'transfer'])->name('inventories.transfer');
     Route::patch('inventories/transferProcess/{id}', [InventoryController::class, 'transferProcess'])->name('inventories.transferProcess');

@@ -49,7 +49,7 @@ class InventoryImport implements ToModel, WithHeadingRow
             'input_date' => Date::excelToDateTimeObject($row['input_date']),
             'created_by' => $user->id ?? NULL,
             'reference_no' => $row['reference_no'],
-            'reference_date' => Date::excelToDateTimeObject($row['reference_date']),
+            'reference_date' => Date::excelToDateTimeObject($row['reference_date']) ?? '0000-00-00',
             'location' => $row['location'],
             'qrcode' => $row['qrcode'],
             'inventory_status' => $row['inventory_status'],
