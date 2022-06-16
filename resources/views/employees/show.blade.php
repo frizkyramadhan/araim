@@ -99,12 +99,12 @@
 													<th class="align-middle">Inventory No</th>
 													<th class="align-middle">Date</th>
 													<th class="align-middle">Asset</th>
-													<th class="align-middle">Brand / Model</th>
+													<th class="align-middle">Brand</th>
 													<th class="align-middle">S/N / P/N</th>
-													<th class="align-middle">PO No</th>
 													<th class="align-middle">QR Code</th>
 													<th class="text-center align-middle">Inventory Status</th>
 													<th class="text-center align-middle">Transfer Status</th>
+													<th class="align-middle">PO No</th>
 													<th class="text-center align-middle">Action</th>
 												</tr>
 											</thead>
@@ -121,7 +121,6 @@
 														<td>{{ $inventory->asset->asset_name }}</td>
 														<td>{{ $inventory->brand }} - {{ $inventory->model_asset }}</td>
 														<td>{{ $inventory->serial_no }} / {{ $inventory->part_no }}</td>
-														<td>{{ $inventory->po_no }}</td>
 														<td class="text-center">
 															@if ($inventory->qrcode)
 																<a href="{{ url('inventories/print_qrcode/' . $inventory->id) }}" target="_blank">
@@ -149,6 +148,7 @@
 																<span class="badge badge-warning">Mutated</span>
 															@endif
 														</td>
+														<td>{{ $inventory->po_no }}</td>
 														<td class="text-center">
 															<a title="Detail" class="btn btn-icon btn-success" href="{{ url('inventories/' . $inventory->id) }}"><i
 																	class="fas fa-info-circle"></i></a>

@@ -14,15 +14,16 @@ class CheckRole
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle($request, Closure $next, ... $roles) { 
+    public function handle($request, Closure $next, ...$roles)
+    {
 
-        if(empty($roles)) $roles = ['admin'];
-    
-        foreach($roles as $role) {
-            if($request->user()->level === $role) { 
-                return $next($request); 
+        if (empty($roles)) $roles = ['admin'];
+
+        foreach ($roles as $role) {
+            if ($request->user()->level === $role) {
+                return $next($request);
             }
-        } 
+        }
         return response()->view('errors.403', ['title' => '403 Error']);
     }
 }
