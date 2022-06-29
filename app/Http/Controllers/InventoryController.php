@@ -215,13 +215,79 @@ class InventoryController extends Controller
                     return '<span class="badge badge-primary">Good</span>';
                 } elseif ($inventories->inventory_status == 'Broken') {
                     return '<span class="badge badge-danger">Broken</span>';
-                } elseif ($inventories->inventory_status == 'Mutated') {
-                    return '<span class="badge badge-warning">Mutated</span>';
-                } elseif ($inventories->inventory_status == 'Discarded') {
+                }
+            })
+            ->addColumn('transfer_status', function ($inventories) {
+                if ($inventories->transfer_status == 'Available') {
+                    return '<span class="badge badge-success">Available</span>';
+                } elseif ($inventories->transfer_status == 'Discarded') {
                     return '<span class="badge badge-secondary">Discarded</span>';
+                } elseif ($inventories->transfer_status == 'Mutated') {
+                    return '<span class="badge badge-warning">Mutated</span>';
                 }
             })
             ->filter(function ($instance) use ($request) {
+                if (!empty($request->get('date1') && !empty($request->get('date2')))) {
+                    $instance->where(function ($w) use ($request) {
+                        $date1 = $request->get('date1');
+                        $date2 = $request->get('date2');
+                        $w->whereBetween('input_date', array($date1, $date2));
+                    });
+                }
+                if (!empty($request->get('inventory_no'))) {
+                    $instance->where(function ($w) use ($request) {
+                        $inventory_no = $request->get('inventory_no');
+                        $w->orWhere('inventory_no', 'LIKE', '%' . $inventory_no . '%');
+                    });
+                }
+                if (!empty($request->get('asset_name'))) {
+                    $instance->where(function ($w) use ($request) {
+                        $asset_name = $request->get('asset_name');
+                        $w->orWhere('asset_name', 'LIKE', '%' . $asset_name . '%');
+                    });
+                }
+                if (!empty($request->get('brand'))) {
+                    $instance->where(function ($w) use ($request) {
+                        $brand = $request->get('brand');
+                        $w->orWhere('brand', 'LIKE', '%' . $brand . '%');
+                    });
+                }
+                if (!empty($request->get('model_asset'))) {
+                    $instance->where(function ($w) use ($request) {
+                        $model_asset = $request->get('model_asset');
+                        $w->orWhere('model_asset', 'LIKE', '%' . $model_asset . '%');
+                    });
+                }
+                if (!empty($request->get('serial_no'))) {
+                    $instance->where(function ($w) use ($request) {
+                        $serial_no = $request->get('serial_no');
+                        $w->orWhere('serial_no', 'LIKE', '%' . $serial_no . '%');
+                    });
+                }
+                if (!empty($request->get('fullname'))) {
+                    $instance->where(function ($w) use ($request) {
+                        $fullname = $request->get('fullname');
+                        $w->orWhere('fullname', 'LIKE', '%' . $fullname . '%');
+                    });
+                }
+                if (!empty($request->get('project_code'))) {
+                    $instance->where(function ($w) use ($request) {
+                        $project_code = $request->get('project_code');
+                        $w->orWhere('project_code', 'LIKE', '%' . $project_code . '%');
+                    });
+                }
+                if (!empty($request->get('inventory_status'))) {
+                    $instance->where(function ($w) use ($request) {
+                        $inventory_status = $request->get('inventory_status');
+                        $w->orWhere('inventory_status', 'LIKE', '%' . $inventory_status . '%');
+                    });
+                }
+                if (!empty($request->get('transfer_status'))) {
+                    $instance->where(function ($w) use ($request) {
+                        $transfer_status = $request->get('transfer_status');
+                        $w->orWhere('transfer_status', 'LIKE', '%' . $transfer_status . '%');
+                    });
+                }
                 if (!empty($request->get('search'))) {
                     $instance->where(function ($w) use ($request) {
                         $search = $request->get('search');
@@ -229,14 +295,15 @@ class InventoryController extends Controller
                             ->orWhere('fullname', 'LIKE', "%$search%")
                             ->orWhere('project_code', 'LIKE', "%$search%")
                             ->orWhere('inventory_status', 'LIKE', "%$search%")
+                            ->orWhere('transfer_status', 'LIKE', "%$search%")
                             ->orWhere('brand', 'LIKE', "%$search%")
                             ->orWhere('inventory_no', 'LIKE', "%$search%")
                             ->orWhere('model_asset', 'LIKE', "%$search%");
                     });
                 }
-            })
+            }, true)
             ->addColumn('action', 'inventories.action')
-            ->rawColumns(['inventory_status', 'action'])
+            ->rawColumns(['inventory_status', 'transfer_status', 'action'])
             ->toJson();
     }
 

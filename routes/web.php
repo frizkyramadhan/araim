@@ -85,5 +85,14 @@ Route::group(['middleware' => 'check_role:admin,superuser'], function () {
 Route::middleware('check_role:admin')->group(function () {
     Route::resource('components', ComponentController::class)->except(['show']);
     Route::resource('users', UserController::class)->except(['show']);
-    Route::resource('basts', BastController::class);
+
+    Route::get('basts', [BastController::class, 'index'])->name('basts.index');
+    Route::get('basts/getInventories', [BastController::class, 'getInventories'])->name('basts.getInventories');
+    Route::get('basts/create', [BastController::class, 'create'])->name('basts.create');
+    Route::post('basts', [BastController::class, 'store'])->name('basts.store');
+    Route::get('basts/{bast_no}', [BastController::class, 'show'])->name('basts.show');
+    Route::get('basts/{bast_no}/edit', [BastController::class, 'edit'])->name('basts.edit');
+    Route::patch('basts/{bast_no}', [BastController::class, 'update'])->name('basts.update');
+    Route::get('basts/delete_item/{id}', [BastController::class, 'delete_item'])->name('basts.delete_item');
+    // Route::resource('basts', BastController::class);
 });

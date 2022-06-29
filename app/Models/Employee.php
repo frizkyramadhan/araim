@@ -27,4 +27,14 @@ class Employee extends Model
     {
         return $this->hasMany(Inventory::class);
     }
+
+    // public function receive()
+    // {
+    //     return $this->hasMany(Bast::class, 'bast_receive');
+    // }
+
+    // public function submit()
+    // {
+    //     return $this->hasMany(Bast::class, 'bast_submit');
+    // }
 }

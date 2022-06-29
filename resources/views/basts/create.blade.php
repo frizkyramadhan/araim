@@ -48,8 +48,21 @@
 								<div class="card-body">
 									<div class="tab-content p-0">
 										<div class="form-group row">
-											<input type="text" class="form-control @error('bast_no') is-invalid @enderror" name="bast_no"
-												placeholder="BAST No." value="{{ old('bast_no') }}" required>
+											<label class="col-sm-2 col-form-label">BAST No</label>
+											<div class="col-sm-10">
+												<input type="hidden" class="form-control @error('bast_no') is-invalid @enderror" name="bast_no"
+													placeholder="BAST No." value="{{ $bast_no }}" required readonly>
+												<input type="text" class="form-control @error('bast_reg') is-invalid @enderror" name="bast_reg"
+													placeholder="BAST No." value="{{ $bast_no }}/BAST/ITY/{{ $month }}/{{ $year }}" required
+													readonly>
+												@error('bast_reg')
+													<div class="error invalid-feedback">
+														{{ $message }}
+													</div>
+												@enderror
+											</div>
+										</div>
+										<div class="form-group row">
 											<label class="col-sm-2 col-form-label">Date</label>
 											<div class="col-sm-10">
 												<input type="date" class="form-control @error('bast_date') is-invalid @enderror" name="bast_date"
@@ -83,8 +96,8 @@
 										<div class="form-group row">
 											<label class="col-sm-2 col-form-label">Who Receive</label>
 											<div class="col-sm-10">
-												<select name="bast_receive" class="form-control @error('bast_receive') is-invalid @enderror select2bs4"
-													style="width: 100%;">
+												<select id="bast_receive" name="bast_receive"
+													class="form-control @error('bast_receive') is-invalid @enderror select2bs4" style="width: 100%;">
 													<option value="">-- Select Employee --</option>
 													@foreach ($receives as $receive)
 														<option value="{{ $receive->id }}" {{ old('bast_receive') == $receive->id ? 'selected' : '' }}>
@@ -105,32 +118,35 @@
 										</div>
 										<!-- /.card-header -->
 										<div class="card-body p-0">
-											<table class="table table-striped">
-												<thead>
-													<tr>
-														<th style="width: 10px">#</th>
-														<th>Inventory No</th>
-														<th>Asset</th>
-														<th>Brand</th>
-														<th>Model</th>
-														<th>S/N</th>
-														<th>Input Date</th>
-														<th>Status</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td><input type="checkbox" name="" id=""></td>
-														<td>Update software</td>
-														<td>Update software</td>
-														<td>Update software</td>
-														<td>Update software</td>
-														<td>Update software</td>
-														<td>Update software</td>
-														<td>Update software</td>
-													</tr>
-												</tbody>
-											</table>
+											@if (session('error'))
+												<div class="alert alert-error alert-dismissible show fade">
+													<div class="alert-body">
+														<button class="close" data-dismiss="alert">
+															<span>&times;</span>
+														</button>
+														{{ session('error') }}
+													</div>
+												</div>
+											@endif
+											<div class="table-responsive">
+												<table id="inventories" class="table table-sm table-striped">
+													<thead>
+														<tr>
+															<th class="align-middle" style="width: 10px">#</th>
+															<th class="align-middle">Inventory No</th>
+															<th class="align-middle">Asset</th>
+															<th class="align-middle">Brand</th>
+															<th class="align-middle">Model</th>
+															<th class="align-middle">S/N</th>
+															<th class="align-middle">Input Date</th>
+															<th class="align-middle">Inventory Status</th>
+															<th class="align-middle">Transfer Status</th>
+														</tr>
+													</thead>
+													<tbody>
+													</tbody>
+												</table>
+											</div>
 										</div>
 										<!-- /.card-body -->
 									</div>
@@ -174,5 +190,39 @@
 	   document.querySelector('.select2-search__field').focus();
 	  })
 	 })
+
+	 //  get inventory base on bast_receive
+	 $('#bast_receive').on('change', function() {
+	  var bast_receive = $(this).val();
+	  $.ajax({
+	   url: "{{ route('basts.getInventories') }}",
+	   type: "GET",
+	   data: {
+	    employee_id: bast_receive
+	   },
+	   success: function(inventories) {
+	    console.log(inventories);
+	    // clear tbody
+	    $('#inventories tbody').html('');
+	    // foreach inventories to inventory
+	    $.each(inventories, function(index, inventory) {
+	     var row = '<tr>';
+	     row += '<td><input type="checkbox" name="inventory_id[]" id="' + inventory.id + '" value="' + inventory.id +
+	      '"></td>';
+	     row += '<td>' + inventory.inventory_no + '</td>';
+	     row += '<td>' + inventory.asset_name + '</td>';
+	     row += '<td>' + inventory.brand + '</td>';
+	     row += '<td>' + inventory.model_asset + '</td>';
+	     row += '<td>' + inventory.serial_no + '</td>';
+	     row += '<td>' + inventory.input_date + '</td>';
+	     row += '<td>' + inventory.inventory_status + '</td>';
+	     row += '<td>' + inventory.transfer_status + '</td>';
+	     row += '</tr>';
+	     $('#inventories tbody').append(row);
+	     console.log(row);
+	    });
+	   }
+	  });
+	 });
 	</script>
 @endsection
