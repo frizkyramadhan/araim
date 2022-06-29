@@ -256,15 +256,9 @@ class BastController extends Controller
      * @param  \App\Models\Bast  $bast
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Bast $bast)
+    public function destroy($bast_no)
     {
-        //
+        DB::table('basts')->where('bast_no', $bast_no)->delete();
+        return back()->with('success', 'BAST deleted successfully');
     }
-
-    // public function delete_item($id)
-    // {
-    //     $bast = DB::table('basts')->where('id', $id)->first();
-    //     dd($bast);
-    //     return back()->with('success', 'Item deleted successfully');
-    // }
 }

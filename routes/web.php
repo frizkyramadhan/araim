@@ -94,5 +94,6 @@ Route::middleware('check_role:admin')->group(function () {
     Route::get('basts/{bast_no}/edit', [BastController::class, 'edit'])->name('basts.edit');
     Route::patch('basts/{bast_no}', [BastController::class, 'update'])->name('basts.update');
     Route::get('basts/delete_item/{id}', [BastController::class, 'delete_item'])->name('basts.delete_item');
+    Route::delete('basts/{bast_no}', [BastController::class, 'destroy'])->name('basts.destroy');
     // Route::resource('basts', BastController::class);
 });

@@ -98,7 +98,8 @@
 																	onsubmit="return confirm('Are you sure want to delete this data?')" class="d-inline">
 																	@method('delete')
 																	@csrf
-																	<button class="dropdown-item bg-danger" title="Delete"><i class="fas fa-times"></i> Delete</button>
+																	<button class="dropdown-item bg-danger" title="Delete"><i class="fas fa-times"></i>
+																		Delete</button>
 																</form>
 															</div>
 														</div>
