@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BapbController;
 use App\Http\Controllers\BastController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AssetController;
@@ -85,5 +86,24 @@ Route::group(['middleware' => 'check_role:admin,superuser'], function () {
 Route::middleware('check_role:admin')->group(function () {
     Route::resource('components', ComponentController::class)->except(['show']);
     Route::resource('users', UserController::class)->except(['show']);
-    Route::resource('basts', BastController::class);
+
+    Route::get('basts', [BastController::class, 'index'])->name('basts.index');
+    Route::get('basts/getInventories', [BastController::class, 'getInventories'])->name('basts.getInventories');
+    Route::get('basts/create', [BastController::class, 'create'])->name('basts.create');
+    Route::post('basts', [BastController::class, 'store'])->name('basts.store');
+    Route::get('basts/{bast_no}', [BastController::class, 'show'])->name('basts.show');
+    Route::get('basts/{bast_no}/edit', [BastController::class, 'edit'])->name('basts.edit');
+    Route::patch('basts/{bast_no}', [BastController::class, 'update'])->name('basts.update');
+    Route::get('basts/delete_item/{id}', [BastController::class, 'delete_item'])->name('basts.delete_item');
+    Route::delete('basts/{bast_no}', [BastController::class, 'destroy'])->name('basts.destroy');
+
+    Route::get('bapbs', [BapbController::class, 'index'])->name('bapbs.index');
+    Route::get('bapbs/getInventories', [BapbController::class, 'getInventories'])->name('bapbs.getInventories');
+    Route::get('bapbs/create', [BapbController::class, 'create'])->name('bapbs.create');
+    Route::post('bapbs', [BapbController::class, 'store'])->name('bapbs.store');
+    Route::get('bapbs/{bapb_no}', [BapbController::class, 'show'])->name('bapbs.show');
+    Route::get('bapbs/{bapb_no}/edit', [BapbController::class, 'edit'])->name('bapbs.edit');
+    Route::patch('bapbs/{bapb_no}', [BapbController::class, 'update'])->name('bapbs.update');
+    Route::get('bapbs/delete_item/{id}', [BapbController::class, 'delete_item'])->name('bapbs.delete_item');
+    Route::delete('bapbs/{bapb_no}', [BapbController::class, 'destroy'])->name('bapbs.destroy');
 });

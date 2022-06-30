@@ -20,11 +20,11 @@ class Bast extends Model
 
     public function receive()
     {
-        return $this->belongsTo(Employee::class, 'bast_receive');
+        return $this->belongsTo(Employee::class, 'bast_receive', 'id');
     }
-    
+
     public function submit()
     {
-        return $this->belongsTo(Employee::class, 'bast_submit');
+        return $this->belongsTo(Employee::class, 'bast_submit', 'id');
     }
 }

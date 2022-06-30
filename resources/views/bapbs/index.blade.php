@@ -36,7 +36,7 @@
 								<div class="card-tools">
 									<ul class="nav nav-pills ml-auto">
 										<li class="nav-item mr-2">
-											<a class="btn btn-warning" href="{{ url('basts/create') }}"><i class="fas fa-plus"></i>
+											<a class="btn btn-warning" href="{{ url('bapbs/create') }}"><i class="fas fa-plus"></i>
 												Add</a>
 										</li>
 									</ul>
@@ -75,26 +75,26 @@
 											</tr>
 										</thead>
 										<tbody>
-											@foreach ($basts as $bast)
+											@foreach ($bapbs as $bapb)
 												<tr>
 													<td class="text-center">{{ $loop->iteration }}</td>
-													<td>{{ $bast->bast_reg }}</td>
-													<td>{{ $bast->bast_date }}</td>
-													<td>{{ $bast->submit_name }}</td>
-													<td>{{ $bast->receive_name }}</td>
+													<td>{{ $bapb->bapb_reg }}</td>
+													<td>{{ $bapb->bapb_date }}</td>
+													<td>{{ $bapb->submit_name }}</td>
+													<td>{{ $bapb->receive_name }}</td>
 													<td class="text-center">
 														<div class="btn-group">
-															<a title="Detail" class="btn btn-icon btn-success" href="{{ url('basts/' . $bast->bast_no) }}"><i
+															<a title="Detail" class="btn btn-icon btn-success" href="{{ url('bapbs/' . $bapb->bapb_no) }}"><i
 																	class="fas fa-info-circle"></i></a>
 															<button type="button" class="btn btn-success dropdown-toggle dropdown-icon" data-toggle="dropdown">
 																<span class="sr-only">Toggle Dropdown</span>
 															</button>
 															<div class="dropdown-menu" role="menu">
-																<a class="dropdown-item" href="{{ url('basts/' . $bast->bast_no . '/edit') }}"><i
+																<a class="dropdown-item" href="{{ url('bapbs/' . $bapb->bapb_no . '/edit') }}"><i
 																		class="fas fa-pen-square"></i>
 																	Edit</a>
 																<div class="dropdown-divider"></div>
-																<form action="{{ url('basts/' . $bast->bast_no) }}" method="post"
+																<form action="{{ url('bapbs/' . $bapb->bapb_no) }}" method="post"
 																	onsubmit="return confirm('Are you sure want to delete this data?')" class="d-inline">
 																	@method('delete')
 																	@csrf

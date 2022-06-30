@@ -26,53 +26,53 @@ class EmployeeController extends Controller
     }
 
     public function getEmployees(Request $request)
-    {  
-        if($request->ajax()){
+    {
+        if ($request->ajax()) {
             $employees = Employee::leftJoin('projects', 'employees.project_id', '=', 'projects.id')
-                        ->leftJoin('positions', 'employees.position_id', '=', 'positions.id')
-                        ->leftJoin('departments', 'positions.department_id', '=', 'departments.id')
-                        ->select(['employees.*', 'projects.project_code','projects.project_name', 'positions.position_name', 'departments.dept_name'])
-                        ->orderBy('employees.nik', 'asc');
-                
+                ->leftJoin('positions', 'employees.position_id', '=', 'positions.id')
+                ->leftJoin('departments', 'positions.department_id', '=', 'departments.id')
+                ->select(['employees.*', 'projects.project_code', 'projects.project_name', 'positions.position_name', 'departments.dept_name'])
+                ->orderBy('employees.nik', 'asc');
+
             return DataTables::of($employees)
                 ->addIndexColumn()
-                ->addColumn('nik', function($employees){
+                ->addColumn('nik', function ($employees) {
                     return $employees->nik;
                 })
-                ->addColumn('fullname', function($employees){
+                ->addColumn('fullname', function ($employees) {
                     return $employees->fullname;
                 })
-                ->addColumn('position_name', function($employees){
+                ->addColumn('position_name', function ($employees) {
                     return $employees->position->position_name ?? 'null';
                 })
-                ->addColumn('project_code', function($employees){
+                ->addColumn('project_code', function ($employees) {
                     return $employees->project->project_code;
                 })
-                ->addColumn('status', function($employees){
-                    if ($employees->status == '1'){
+                ->addColumn('status', function ($employees) {
+                    if ($employees->status == '1') {
                         return '<span class="badge badge-success">Active</span>';
-                    } elseif ($employees->status == '0'){
+                    } elseif ($employees->status == '0') {
                         return '<span class="badge badge-danger">Inactive</span>';
                     }
                 })
                 ->filter(function ($instance) use ($request) {
                     if (!empty($request->get('search'))) {
-                            $instance->where(function($w) use($request){
+                        $instance->where(function ($w) use ($request) {
                             $search = $request->get('search');
                             $w->orWhere('nik', 'LIKE', "%$search%")
-                            ->orWhere('fullname', 'LIKE', "%$search%")
-                            ->orWhere('positions.position_name', 'LIKE', "%$search%")
-                            ->orWhere('projects.project_code', 'LIKE', "%$search%")
-                            ->orWhere('status', 'LIKE', "%$search%");
+                                ->orWhere('fullname', 'LIKE', "%$search%")
+                                ->orWhere('positions.position_name', 'LIKE', "%$search%")
+                                ->orWhere('projects.project_code', 'LIKE', "%$search%")
+                                ->orWhere('status', 'LIKE', "%$search%");
                         });
                     }
                 })
                 ->addColumn('action', 'employees.action')
-                ->addColumn('total', function($employees){
+                ->addColumn('total', function ($employees) {
                     $total = Inventory::where('employee_id', '=', $employees->id)->where('inventory_status', '=', 'Good')->count('id');
                     return $total;
                 })
-                ->rawColumns(['status','action'])
+                ->rawColumns(['status', 'action'])
                 ->toJson();
         }
     }
@@ -106,7 +106,7 @@ class EmployeeController extends Controller
             'project_id' => 'required',
             'position_id' => 'required',
             'email' => 'required|ends_with:@arka.co.id'
-        ],[
+        ], [
             'nik.required' => 'NIK is required',
             'nik.unique' => 'NIK is already taken',
             'fullname.required' => 'Fullname is required',
@@ -123,7 +123,6 @@ class EmployeeController extends Controller
         $employee->save();
 
         return redirect()->route('employees.index')->with('success', 'Employee has been added');
-
     }
 
     /**
@@ -140,7 +139,7 @@ class EmployeeController extends Controller
         $positions = Position::where('position_status', '=', '1')->orderBy('position_name', 'asc')->get();
         $inventories = Inventory::with('asset')->where('employee_id', '=', $employee->id)->orderBy('inventory_no', 'desc')->get();
 
-        return view('employees.show', compact('title', 'subtitle', 'employee', 'projects', 'positions','inventories'));
+        return view('employees.show', compact('title', 'subtitle', 'employee', 'projects', 'positions', 'inventories'));
     }
 
     /**
@@ -156,7 +155,7 @@ class EmployeeController extends Controller
         $projects = Project::where('project_status', '=', '1')->orderBy('project_code', 'asc')->get();
         $positions = Position::where('position_status', '=', '1')->orderBy('position_name', 'asc')->get();
 
-        return view('employees.edit', compact('title', 'subtitle', 'projects', 'positions','employee'));
+        return view('employees.edit', compact('title', 'subtitle', 'projects', 'positions', 'employee'));
     }
 
     /**
@@ -172,16 +171,16 @@ class EmployeeController extends Controller
             'fullname' => 'required',
             'project_id' => 'required',
             'position_id' => 'required'
-        ],[
+        ], [
             'fullname.required' => 'Fullname is required',
             'project_id.required' => 'Project is required',
             'position_id.required' => 'Position is required'
         ]);
 
-        if($request->nik != $employee->nik){
+        if ($request->nik != $employee->nik) {
             $request->validate([
                 'nik' => 'required|unique:employees'
-            ],[
+            ], [
                 'nik.required' => 'NIK is required',
                 'nik.unique' => 'NIK is already taken'
             ]);
@@ -214,50 +213,49 @@ class EmployeeController extends Controller
     }
 
     public function json(Request $request)
-    {  
-        
-            $employees = Employee::leftJoin('projects', 'employees.project_id', '=', 'projects.id')
-                        ->leftJoin('positions', 'employees.position_id', '=', 'positions.id')
-                        ->leftJoin('departments', 'positions.department_id', '=', 'departments.id')
-                        ->select(['employees.*', 'projects.project_code','projects.project_name', 'positions.position_name', 'departments.dept_name'])
-                        ->orderBy('employees.nik', 'asc');
-                
-            return DataTables::of($employees)
-                ->addIndexColumn()
-                ->addColumn('nik', function($employees){
-                    return $employees->nik;
-                })
-                ->addColumn('fullname', function($employees){
-                    return $employees->fullname;
-                })
-                ->addColumn('position_name', function($employees){
-                    return $employees->position->position_name ?? null;
-                })
-                ->addColumn('project_code', function($employees){
-                    return $employees->project->project_code;
-                })
-                ->addColumn('status', function($employees){
-                    if ($employees->status == '1'){
-                        return '<span class="badge badge-success">Active</span>';
-                    } elseif ($employees->status == '0'){
-                        return '<span class="badge badge-danger">Inactive</span>';
-                    }
-                })
-                ->filter(function ($instance) use ($request) {
-                    if (!empty($request->get('search'))) {
-                            $instance->where(function($w) use($request){
-                            $search = $request->get('search');
-                            $w->orWhere('nik', 'LIKE', "%$search%")
+    {
+
+        $employees = Employee::leftJoin('projects', 'employees.project_id', '=', 'projects.id')
+            ->leftJoin('positions', 'employees.position_id', '=', 'positions.id')
+            ->leftJoin('departments', 'positions.department_id', '=', 'departments.id')
+            ->select(['employees.*', 'projects.project_code', 'projects.project_name', 'positions.position_name', 'departments.dept_name'])
+            ->orderBy('employees.nik', 'asc');
+
+        return DataTables::of($employees)
+            ->addIndexColumn()
+            ->addColumn('nik', function ($employees) {
+                return $employees->nik;
+            })
+            ->addColumn('fullname', function ($employees) {
+                return $employees->fullname;
+            })
+            ->addColumn('position_name', function ($employees) {
+                return $employees->position->position_name ?? null;
+            })
+            ->addColumn('project_code', function ($employees) {
+                return $employees->project->project_code;
+            })
+            ->addColumn('status', function ($employees) {
+                if ($employees->status == '1') {
+                    return '<span class="badge badge-success">Active</span>';
+                } elseif ($employees->status == '0') {
+                    return '<span class="badge badge-danger">Inactive</span>';
+                }
+            })
+            ->filter(function ($instance) use ($request) {
+                if (!empty($request->get('search'))) {
+                    $instance->where(function ($w) use ($request) {
+                        $search = $request->get('search');
+                        $w->orWhere('nik', 'LIKE', "%$search%")
                             ->orWhere('fullname', 'LIKE', "%$search%")
                             ->orWhere('positions.position_name', 'LIKE', "%$search%")
                             ->orWhere('projects.project_code', 'LIKE', "%$search%")
                             ->orWhere('status', 'LIKE', "%$search%");
-                        });
-                    }
-                })
-                ->addColumn('action', 'employees.action')
-                ->rawColumns(['status','action'])
-                ->toJson();
-        
+                    });
+                }
+            })
+            ->addColumn('action', 'employees.action')
+            ->rawColumns(['status', 'action'])
+            ->toJson();
     }
 }

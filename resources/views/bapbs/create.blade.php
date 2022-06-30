@@ -36,26 +36,26 @@
 								<div class="card-tools">
 									<ul class="nav nav-pills ml-auto">
 										<li class="nav-item mr-2">
-											<a class="btn btn-warning" href="{{ url('basts') }}"><i class="fas fa-undo-alt"></i>
+											<a class="btn btn-warning" href="{{ url('bapbs') }}"><i class="fas fa-undo-alt"></i>
 												Back</a>
 										</li>
 									</ul>
 								</div>
 							</div><!-- /.card-header -->
 
-							<form class="form-horizontal" action="{{ url('basts/' . $bast->bast_no) }}" method="POST">
-								@method('PATCH')
+							<form class="form-horizontal" action="{{ url('bapbs') }}" method="POST">
 								@csrf
 								<div class="card-body">
 									<div class="tab-content p-0">
 										<div class="form-group row">
-											<label class="col-sm-2 col-form-label">BAST No</label>
+											<label class="col-sm-2 col-form-label">BAPB No</label>
 											<div class="col-sm-10">
-												<input type="hidden" class="form-control @error('bast_no') is-invalid @enderror" name="bast_no"
-													placeholder="BAST No." value="{{ $bast->bast_no }}" required readonly>
-												<input type="text" class="form-control @error('bast_reg') is-invalid @enderror" name="bast_reg"
-													placeholder="BAST No." value="{{ $bast->bast_reg }}" required readonly>
-												@error('bast_reg')
+												<input type="hidden" class="form-control @error('bapb_no') is-invalid @enderror" name="bapb_no"
+													placeholder="BAPB No." value="{{ $bapb_no }}" required readonly>
+												<input type="text" class="form-control @error('bapb_reg') is-invalid @enderror" name="bapb_reg"
+													placeholder="BAPB No." value="{{ $bapb_no }}/BAPB/ITY/{{ $month }}/{{ $year }}" required
+													readonly>
+												@error('bapb_reg')
 													<div class="error invalid-feedback">
 														{{ $message }}
 													</div>
@@ -65,9 +65,9 @@
 										<div class="form-group row">
 											<label class="col-sm-2 col-form-label">Date</label>
 											<div class="col-sm-10">
-												<input type="date" class="form-control @error('bast_date') is-invalid @enderror" name="bast_date"
-													value="{{ old('bast_date', $bast->bast_date) }}">
-												@error('bast_date')
+												<input type="date" class="form-control @error('bapb_date') is-invalid @enderror" name="bapb_date"
+													value="{{ old('bapb_date') }}">
+												@error('bapb_date')
 													<div class="error invalid-feedback">
 														{{ $message }}
 													</div>
@@ -77,17 +77,16 @@
 										<div class="form-group row">
 											<label class="col-sm-2 col-form-label">Who Submit</label>
 											<div class="col-sm-10">
-												<select name="bast_submit" class="form-control @error('bast_submit') is-invalid @enderror select2bs4"
+												<select name="bapb_submit" class="form-control @error('bapb_submit') is-invalid @enderror select2bs4"
 													style="width: 100%;">
 													<option value="">-- Select Employee --</option>
 													@foreach ($submits as $submit)
-														<option value="{{ $submit->id }}"
-															{{ old('bast_submit', $bast->bast_submit) == $submit->id ? 'selected' : '' }}>
+														<option value="{{ $submit->id }}" {{ old('bapb_submit') == $submit->id ? 'selected' : '' }}>
 															{{ $submit->fullname }} - {{ $submit->nik }}
 														</option>
 													@endforeach
 												</select>
-												@error('bast_submit')
+												@error('bapb_submit')
 													<div class="invalid-feedback">
 														{{ $message }}
 													</div>
@@ -97,18 +96,16 @@
 										<div class="form-group row">
 											<label class="col-sm-2 col-form-label">Who Receive</label>
 											<div class="col-sm-10">
-												<input type="hidden" name="bast_receive" value="{{ $bast->bast_receive }}">
-												<select id="bast_receive" class="form-control @error('bast_receive') is-invalid @enderror select2bs4"
-													style="width: 100%;" disabled>
+												<select id="bapb_receive" name="bapb_receive"
+													class="form-control @error('bapb_receive') is-invalid @enderror select2bs4" style="width: 100%;">
 													<option value="">-- Select Employee --</option>
 													@foreach ($receives as $receive)
-														<option value="{{ $receive->id }}"
-															{{ old('bast_receive', $bast->bast_receive) == $receive->id ? 'selected' : '' }}>
+														<option value="{{ $receive->id }}" {{ old('bapb_receive') == $receive->id ? 'selected' : '' }}>
 															{{ $receive->fullname }} - {{ $receive->nik }}
 														</option>
 													@endforeach
 												</select>
-												@error('bast_receive')
+												@error('bapb_receive')
 													<div class="invalid-feedback">
 														{{ $message }}
 													</div>
@@ -117,17 +114,17 @@
 										</div>
 
 										<div class="card-header">
-											<h3 class="card-title">Handed Over Inventory</h3>
+											<h3 class="card-title">List of Inventory</h3>
 										</div>
 										<!-- /.card-header -->
 										<div class="card-body p-0">
-											@if (session('success'))
-												<div class="alert alert-success alert-dismissible show fade">
+											@if (session('error'))
+												<div class="alert alert-error alert-dismissible show fade">
 													<div class="alert-body">
 														<button class="close" data-dismiss="alert">
 															<span>&times;</span>
 														</button>
-														{{ session('success') }}
+														{{ session('error') }}
 													</div>
 												</div>
 											@endif
@@ -147,69 +144,23 @@
 														</tr>
 													</thead>
 													<tbody>
-														@foreach ($bast_row as $rows)
-															<tr>
-																<td>
-																	<button type="submit" class="btn btn-sm btn-danger"
-																		onclick="return confirm('Are you sure to delete this item?')" value="deleteRow{{ $rows->bast_id }}"
-																		name="deleteRow{{ $rows->bast_id }}"><i class="fas fa-trash-alt"></i></button>
-																</td>
-																<td>{{ $rows->inventory_no }}</td>
-																<td>{{ $rows->asset_name }}</td>
-																<td>{{ $rows->brand }}</td>
-																<td>{{ $rows->model_asset }}</td>
-																<td>{{ $rows->serial_no }}</td>
-																<td>{{ $rows->input_date }}</td>
-																<td>{{ $rows->inventory_status }}</td>
-																<td>{{ $rows->transfer_status }}</td>
-															</tr>
-														@endforeach
 													</tbody>
 												</table>
 											</div>
 										</div>
 										<!-- /.card-body -->
-										<div class="card-header">
-											<h3 class="card-title">List of Inventory</h3>
-										</div>
-										<!-- /.card-header -->
-										<div class="card-body p-0">
-											<div class="table-responsive">
-												<table id="inventories" class="table table-sm table-striped">
-													<thead>
-														<tr>
-															<th class="align-middle" style="width: 10px">#</th>
-															<th class="align-middle">Inventory No</th>
-															<th class="align-middle">Asset</th>
-															<th class="align-middle">Brand</th>
-															<th class="align-middle">Model</th>
-															<th class="align-middle">S/N</th>
-															<th class="align-middle">Input Date</th>
-															<th class="align-middle">Inventory Status</th>
-															<th class="align-middle">Transfer Status</th>
-														</tr>
-													</thead>
-													<tbody>
-														@foreach ($inventories as $rows)
-															<tr>
-																<td>
-																	<input type="checkbox" name="inventory_id[]" id="{{ $rows->id }}" value="{{ $rows->id }}">
-																</td>
-																<td>{{ $rows->inventory_no }}</td>
-																<td>{{ $rows->asset_name }}</td>
-																<td>{{ $rows->brand }}</td>
-																<td>{{ $rows->model_asset }}</td>
-																<td>{{ $rows->serial_no }}</td>
-																<td>{{ $rows->input_date }}</td>
-																<td>{{ $rows->inventory_status }}</td>
-																<td>{{ $rows->transfer_status }}</td>
-															</tr>
-														@endforeach
-													</tbody>
-												</table>
+										<div class="form-group row">
+											<label class="col-sm-2 col-form-label">Duration</label>
+											<div class="col-sm-10">
+												<input type="text" placeholder="Days" class="form-control @error('duration') is-invalid @enderror"
+													name="duration" value="{{ old('duration') }}">
+												@error('duration')
+													<div class="error invalid-feedback">
+														{{ $message }}
+													</div>
+												@enderror
 											</div>
 										</div>
-										<!-- /.card-body -->
 									</div>
 								</div><!-- /.card-body -->
 								<div class="card-footer">
@@ -252,14 +203,14 @@
 	  })
 	 })
 
-	 //  get inventory base on bast_receive
-	 $('#bast_receive').on('change', function() {
-	  var bast_receive = $(this).val();
+	 //  get inventory base on bapb_receive
+	 $('#bapb_receive').on('change', function() {
+	  var bapb_receive = $(this).val();
 	  $.ajax({
-	   url: "{{ route('basts.getInventories') }}",
+	   url: "{{ route('bapbs.getInventories') }}",
 	   type: "GET",
 	   data: {
-	    employee_id: bast_receive
+	    employee_id: bapb_receive
 	   },
 	   success: function(inventories) {
 	    console.log(inventories);
