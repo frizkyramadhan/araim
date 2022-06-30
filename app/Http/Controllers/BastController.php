@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Bast;
 use App\Models\Employee;
-use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
