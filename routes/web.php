@@ -13,6 +13,7 @@ use App\Http\Controllers\PositionController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\ComponentController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\DepartmentController;
 
@@ -35,9 +36,8 @@ Route::post('login', [LoginController::class, 'authenticate']);
 Route::post('logout', [LoginController::class, 'logout']);
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', function () {
-        return view('dashboard', ['title' => 'Dashboard']);
-    });
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('dashboard/summary/{id}', [DashboardController::class, 'summary'])->name('dashboard.summary');
     Route::get('contact', function () {
         return view('contact', ['title' => 'Contact Us']);
     });
