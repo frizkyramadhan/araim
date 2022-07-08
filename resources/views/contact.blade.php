@@ -34,23 +34,24 @@
 				</div>
 				<div class="col-7">
 					<div class="form-group">
-						<label for="inputName">Name</label>
-						<input type="text" id="inputName" class="form-control" />
+						<label for="inputName">Eko</label>
+						<div class="col-5">Ext. 210 - Balikpapan</div>
 					</div>
 					<div class="form-group">
-						<label for="inputEmail">E-Mail</label>
-						<input type="email" id="inputEmail" class="form-control" />
+						<label for="inputEmail">Hendik</label>
+						<div class="col-5">Ext. 209 - Balikpapan</div>
 					</div>
 					<div class="form-group">
-						<label for="inputSubject">Subject</label>
-						<input type="text" id="inputSubject" class="form-control" />
+						<label for="inputSubject">Yanto</label>
+						<div class="col-5">Ext. 223 - Balikpapan</div>
 					</div>
 					<div class="form-group">
-						<label for="inputMessage">Message</label>
-						<textarea id="inputMessage" class="form-control" rows="4"></textarea>
+						<label for="inputMessage">Frizky</label>
+						<div class="col-5">Ext. 224 - Balikpapan</div>
 					</div>
 					<div class="form-group">
-						<input type="submit" class="btn btn-primary" value="Send message">
+						<label for="inputMessage">Erick</label>
+						<div class="col-5">Ext. 105 - Jakarta</div>
 					</div>
 				</div>
 			</div>

@@ -143,10 +143,6 @@
 																	<span class="badge badge-primary">Good</span>
 																@elseif ($inventory->inventory_status == 'Broken')
 																	<span class="badge badge-danger">Broken</span>
-																@elseif ($inventory->inventory_status == 'Mutated')
-																	<span class="badge badge-warning">Mutated</span>
-																@elseif ($inventory->inventory_status == 'Discarded')
-																	<span class="badge badge-secondary">Discarded</span>
 																@endif
 															</b></td>
 													</tr>
