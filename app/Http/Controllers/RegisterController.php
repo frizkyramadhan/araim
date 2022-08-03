@@ -13,7 +13,7 @@ class RegisterController extends Controller
         $title = 'Register';
         $subtitle = 'ARAIM v2.0';
 
-        return view('register', compact('title','subtitle'));
+        return view('register', compact('title', 'subtitle'));
     }
 
     public function store(Request $request)
@@ -24,7 +24,7 @@ class RegisterController extends Controller
             'password' => 'required|min:5',
             'level' => 'required',
             'user_status' => 'required',
-        ],[
+        ], [
             'name.required' => 'Full Name is required',
             'email.required' => 'Email is required',
             'password.required' => 'Password is required'
@@ -34,7 +34,6 @@ class RegisterController extends Controller
 
         User::create($validatedData);
 
-        return redirect('login')->with('success', 'Registration success! Please login.');
-
+        return redirect('login')->with('success', 'Registration success! Please contact IT to activate your account.');
     }
 }

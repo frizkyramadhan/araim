@@ -11,7 +11,7 @@ class LoginController extends Controller
     {
         $title = 'Login';
         $subtitle = 'ARAIM v2.0';
-        return view('login', compact('title','subtitle'));
+        return view('login', compact('title', 'subtitle'));
     }
 
     public function authenticate(Request $request)
@@ -19,12 +19,12 @@ class LoginController extends Controller
         $validatedData = $request->validate([
             'email' => 'required|email:dns|ends_with:@arka.co.id',
             'password' => 'required|min:5',
-        ],[
+        ], [
             'email.required' => 'Email is required',
             'password.required' => 'Password is required'
         ]);
 
-        if(Auth::attempt(['email' => $validatedData['email'], 'password' => $validatedData['password'], 'user_status' => 1])){
+        if (Auth::attempt(['email' => $validatedData['email'], 'password' => $validatedData['password'], 'user_status' => 1])) {
             $request->session()->regenerate();
             return redirect()->intended('/');
         } else {
