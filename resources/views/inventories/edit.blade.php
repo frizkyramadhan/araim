@@ -348,6 +348,28 @@
 															@enderror
 														</div>
 													</div>
+													<div class="form-group row">
+														<label class="col-sm-3 col-form-label">is active?</label>
+														<div class="col-sm-9">
+															<select name="is_active"
+																class="form-control @error('is_active') is-invalid @enderror select2bs4" style="width: 100%;"
+																tabindex="17">
+																<option value="1"
+																	{{ old('is_active', $inventory->is_active) == '1' ? 'selected' : '' }}>
+																	Yes
+																</option>
+																<option value="0"
+																	{{ old('is_active', $inventory->is_active) == '0' ? 'selected' : '' }}>
+																	No
+																</option>
+															</select>
+															@error('is_active')
+																<div class="error invalid-feedback">
+																	{{ $message }}
+																</div>
+															@enderror
+														</div>
+													</div>
 												</div>
 												<!-- /.card-body -->
 											</div>
@@ -371,7 +393,7 @@
 																	<th style="vertical-align: middle">Description</th>
 																	<th style="vertical-align: middle">Remarks</th>
 																	<th style="width: 40px"><button type="button" id="dynamic-ar" class="btn btn-outline-primary"
-																			tabindex="17"><i class="fas fa-plus"></i></button></th>
+																			tabindex="18"><i class="fas fa-plus"></i></button></th>
 																</tr>
 															</thead>
 															<tbody>

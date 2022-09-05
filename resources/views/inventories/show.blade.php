@@ -233,6 +233,17 @@
 														<td style="width: 5%">:</td>
 														<td><b>{{ $inventory->remarks }}</b></td>
 													</tr>
+													<tr>
+														<td>is active?</td>
+														<td style="width: 5%">:</td>
+														<td>
+															<b>@if ($inventory->is_active == 1)
+																<span class="badge badge-success">Yes</span>
+															@else
+																<span class="badge badge-danger">No</span>
+															@endif</b>
+														</td>
+													</tr>
 												</table>
 											</div>
 											<!-- /.card-body -->

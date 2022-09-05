@@ -375,6 +375,7 @@ class InventoryController extends Controller
         $inventory->location = $data['location'];
         $inventory->inventory_status = $data['inventory_status'];
         $inventory->transfer_status = "Available";
+        $inventory->is_active = "1";
 
         $inventory->save();
 
@@ -485,6 +486,7 @@ class InventoryController extends Controller
             'reference_date' => $request->reference_date,
             'location' => $request->location,
             'inventory_status' => $request->inventory_status,
+            'is_active' => $request->is_active,
         ]);
 
         $data = $request->all();
