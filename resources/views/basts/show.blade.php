@@ -38,6 +38,9 @@
 											<a class="btn btn-primary" href="{{ url('basts/' . $bast->bast_no . '/edit') }}"><i
 													class="fas fa-pen-square"></i>
 												Edit</a>
+											<a class="btn btn-success" href="{{ url('basts/' . $bast->bast_no . '/print') }}"><i
+													class="fas fa-print"></i>
+												Print</a>
 											<a class="btn btn-warning text-dark" href="{{ url('basts') }}"><i class="fas fa-undo-alt"></i>
 												Back</a>
 										</li>

@@ -96,7 +96,6 @@
 										<div class="card card-success">
 											<div class="card-header">
 												<h3 class="card-title">Asset Detail</h3>
-
 												<div class="card-tools">
 													<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
 														<i class="fas fa-minus"></i>
@@ -288,10 +287,10 @@
 											<!-- /.card-body -->
 										</div>
 									</div>
-									<div class="col-md-12">
+									<div class="col-md-6">
 										<div class="card card-info">
 											<div class="card-header">
-												<h3 class="card-title">Specification <label class="text-danger text-sm">*if available</label></h3>
+												<h3 class="card-title">Specification</h3>
 												<div class="card-tools">
 													<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
 														<i class="fas fa-minus"></i>
@@ -333,6 +332,24 @@
 										</div>
 										<!-- /.card-body -->
 									</div>
+									<div class="col-md-6">										
+										<div class="card card-light">
+											<div class="card-header">
+												<h3 class="card-title">Repair History from IT WO</h3>
+												<div class="card-tools">
+													<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+														<i class="fas fa-minus"></i>
+													</button>
+												</div>
+											</div>
+											<div class="card-body">
+												<div class="table-responsive" id="repair-history">
+													
+												</div>
+											</div>
+										</div>
+										<!-- /.card-body -->
+									</div>
 								</div>
 							</div>
 						</div>
@@ -344,4 +361,61 @@
 		</div><!-- /.container-fluid -->
 	</section>
 	<!-- /.content -->
+@endsection
+
+@section('scripts')
+<script>
+	$(document).ready(function() {
+		$('#repair-history').html('');
+		$.ajax({
+			url: 'http://localhost/arka-rest-server/api/repairv2',
+			type: 'get',
+			datatype: 'json',
+			data: {
+				'arka-key': 'arka123',
+				'id': {{ $inventory->id }}
+			},
+			success: function(result) {
+				console.log(result);
+				if (result.status == true) {
+					let repair = result.data;
+					var trHTML = '';
+					trHTML +=
+						`<table width=100% class="table table-striped table-hover">
+						<tr>
+							<th>Date</th>
+							<th>Component</th>
+							<th>Damage</th>
+							<th>Cost</th>
+						</tr>`;
+					$.each(repair, function(i, data) {
+						trHTML +=
+							`<tr>
+						<td>` + data.date_repair + `</td>
+						<td>` + data.component_name + ` ` + data.specification + `</td>
+						<td>` + data.damage + `</td>
+						<td><div align="right">` + data.cost + `</div></td>
+					</tr>`;
+					});
+
+					// get sum of cost damage across all objects in array
+					var total = repair.reduce(function(prev, cur) {
+						return prev + parseInt(cur.cost);
+					}, 0);
+					trHTML += `<tr>
+								<td colspan="3"><div align="right"><b>Total</b></div></td>
+								<td><div align="right"><b>` + total + `</b></td>
+					</tr>`;
+					trHTML += `</table>`;
+					$('#repair-history').append(trHTML);
+				} else {
+					$('#repair-history').html(`
+				<div>
+					<h4 class="text-center">` + result.message + `</h4>
+				</div>`);
+				}
+			}
+		});
+	});
+</script>
 @endsection

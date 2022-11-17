@@ -23,8 +23,9 @@ class LoginController extends Controller
             'email.required' => 'Email is required',
             'password.required' => 'Password is required'
         ]);
-
         if (Auth::attempt(['email' => $validatedData['email'], 'password' => $validatedData['password'], 'user_status' => 1])) {
+            // $user = Auth::user();
+            // dd($user);
             $request->session()->regenerate();
             return redirect()->intended('/');
         } else {

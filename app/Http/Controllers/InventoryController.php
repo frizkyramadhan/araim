@@ -35,8 +35,9 @@ class InventoryController extends Controller
         $subtitle = 'List of inventories';
         $assets = Asset::where('asset_status', '1')->orderBy('asset_name', 'asc')->get();
         $projects = Project::where('project_status', '1')->orderBy('project_code', 'asc')->get();
+        $departments = Department::where('dept_status', '1')->orderBy('dept_name', 'asc')->get();
 
-        return view('inventories.index', compact('title', 'subtitle', 'assets', 'projects'));
+        return view('inventories.index', compact('title', 'subtitle', 'assets', 'projects', 'departments'));
     }
 
     public function getInventories(Request $request)
@@ -47,7 +48,7 @@ class InventoryController extends Controller
                 ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
                 ->leftJoin('departments', 'inventories.department_id', '=', 'departments.id')
                 ->leftJoin('users', 'inventories.created_by', '=', 'users.id')
-                ->select(['inventories.id', 'inventories.inventory_no', 'inventories.input_date', 'inventories.brand', 'inventories.model_asset', 'inventories.serial_no', 'inventories.inventory_status', 'inventories.transfer_status', 'projects.project_code', 'departments.dept_name', 'assets.asset_name', 'employees.fullname', 'users.name'])
+                ->select(['inventories.id', 'inventories.inventory_no', 'inventories.input_date', 'inventories.brand', 'inventories.model_asset', 'inventories.serial_no', 'inventories.location', 'inventories.quantity', 'inventories.inventory_status', 'inventories.transfer_status', 'projects.project_code', 'departments.dept_name', 'assets.asset_name', 'employees.fullname', 'users.name'])
                 ->orderBy('inventories.id', 'desc');
 
             return DataTables::of($inventories)
@@ -75,6 +76,12 @@ class InventoryController extends Controller
                 })
                 ->addColumn('project_code', function ($inventories) {
                     return $inventories->project_code;
+                })
+                ->addColumn('location', function ($inventories) {
+                    return $inventories->location;
+                })
+                ->addColumn('quantity', function ($inventories) {
+                    return $inventories->quantity;
                 })
                 ->addColumn('inventory_status', function ($inventories) {
                     if ($inventories->inventory_status == 'Good') {
@@ -142,6 +149,12 @@ class InventoryController extends Controller
                             $w->orWhere('project_code', 'LIKE', '%' . $project_code . '%');
                         });
                     }
+                    if (!empty($request->get('dept_name'))) {
+                        $instance->where(function ($w) use ($request) {
+                            $dept_name = $request->get('dept_name');
+                            $w->orWhere('dept_name', 'LIKE', '%' . $dept_name . '%');
+                        });
+                    }
                     if (!empty($request->get('inventory_status'))) {
                         $instance->where(function ($w) use ($request) {
                             $inventory_status = $request->get('inventory_status');
@@ -181,7 +194,7 @@ class InventoryController extends Controller
             ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
             ->leftJoin('departments', 'inventories.department_id', '=', 'departments.id')
             ->leftJoin('users', 'inventories.created_by', '=', 'users.id')
-            ->select(['inventories.id', 'inventories.inventory_no', 'inventories.input_date', 'inventories.brand', 'inventories.model_asset', 'inventories.serial_no', 'inventories.inventory_status', 'projects.project_code', 'departments.dept_name', 'assets.asset_name', 'employees.fullname', 'users.name'])
+            ->select(['inventories.id', 'inventories.inventory_no', 'inventories.input_date', 'inventories.brand', 'inventories.model_asset', 'inventories.serial_no', 'inventories.location', 'inventories.quantity', 'inventories.inventory_status', 'inventories.transfer_status', 'projects.project_code', 'departments.dept_name', 'assets.asset_name', 'employees.fullname', 'users.name'])
             ->orderBy('inventories.id', 'desc');
 
         return DataTables::of($inventories)
@@ -209,6 +222,12 @@ class InventoryController extends Controller
             })
             ->addColumn('project_code', function ($inventories) {
                 return $inventories->project_code;
+            })
+            ->addColumn('location', function ($inventories) {
+                return $inventories->location;
+            })
+            ->addColumn('quantity', function ($inventories) {
+                return $inventories->quantity;
             })
             ->addColumn('inventory_status', function ($inventories) {
                 if ($inventories->inventory_status == 'Good') {
@@ -535,8 +554,8 @@ class InventoryController extends Controller
 
     public function transferProcess($id, Request $request)
     {
-
         $inventory = Inventory::find($id);
+        // dd($inventory->quantity);
         $qty = $inventory->quantity;
         $qty_new = $qty - $request->quantity;
 
@@ -564,33 +583,33 @@ class InventoryController extends Controller
         ]);
         // store new data
         $data = $request->all();
-        $inventory = new Inventory();
-        $inventory->inventory_no = $data['inventory_no'];
-        $inventory->input_date = $data['input_date'];
-        $inventory->asset_id = $data['asset_id'];
-        $inventory->employee_id = $data['employee_id'];
-        $inventory->project_id = $data['project_id'];
-        $inventory->department_id = $data['department_id'];
-        $inventory->brand = $data['brand'];
-        $inventory->model_asset = $data['model_asset'];
-        $inventory->serial_no = $data['serial_no'];
-        $inventory->part_no = $data['part_no'];
-        $inventory->po_no = $data['po_no'];
-        $inventory->quantity = $data['quantity'];
-        $inventory->remarks = $data['remarks'];
-        $inventory->created_by = auth()->user()->id;
-        $inventory->reference_no = $data['reference_no'];
-        $inventory->reference_date = $data['reference_date'];
-        $inventory->location = $data['location'];
-        $inventory->inventory_status = $data['inventory_status'];
-        $inventory->transfer_status = 'Available';
-        $inventory->save();
+        $new_inventory = new Inventory();
+        $new_inventory->inventory_no = $data['inventory_no'];
+        $new_inventory->input_date = $data['input_date'];
+        $new_inventory->asset_id = $data['asset_id'];
+        $new_inventory->employee_id = $data['employee_id'];
+        $new_inventory->project_id = $data['project_id'];
+        $new_inventory->department_id = $data['department_id'];
+        $new_inventory->brand = $data['brand'];
+        $new_inventory->model_asset = $data['model_asset'];
+        $new_inventory->serial_no = $data['serial_no'];
+        $new_inventory->part_no = $data['part_no'];
+        $new_inventory->po_no = $data['po_no'];
+        $new_inventory->quantity = $data['quantity'];
+        $new_inventory->remarks = $data['remarks'];
+        $new_inventory->created_by = auth()->user()->id;
+        $new_inventory->reference_no = $data['reference_no'];
+        $new_inventory->reference_date = $data['reference_date'];
+        $new_inventory->location = $data['location'];
+        $new_inventory->inventory_status = $data['inventory_status'];
+        $new_inventory->transfer_status = 'Available';
+        $new_inventory->save();
 
         $check = Arr::exists($data, 'component_id');
         if ($check == true) {
             foreach ($data['component_id'] as $component => $value) {
                 $components = array(
-                    'inventory_id' => $inventory->id,
+                    'inventory_id' => $new_inventory->id,
                     'component_id' => $data['component_id'][$component],
                     'specification' => $data['specification'][$component],
                     'spec_remarks' => $data['spec_remarks'][$component],
@@ -600,7 +619,7 @@ class InventoryController extends Controller
             }
         }
 
-        return redirect('inventories/' . $inventory->id)->with('success', 'Inventory successfully transferred!');
+        return redirect('inventories/' . $new_inventory->id)->with('success', 'Inventory successfully transferred!');
     }
 
     public function export()

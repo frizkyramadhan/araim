@@ -153,6 +153,20 @@
 												</div>
 												<div class="col-3">
 													<div class="form-group">
+														<label class=" form-control-label">Department</label>
+														<select name="dept_name" class="form-control select2bs4" id="dept_name" style="width: 100%;">
+															<option value="">- All -</option>
+															@foreach ($departments as $department => $data)
+																<option value="{{ $data->dept_name }}"
+																	{{ request('dept_name') == $data->dept_name ? 'selected' : '' }}>
+																	{{ $data->dept_name }}
+																</option>
+															@endforeach
+														</select>
+													</div>
+												</div>
+												<div class="col-3">
+													<div class="form-group">
 														<label class=" form-control-label">Inventory Status</label>
 														<select name="inventory_status" class="form-control" id="inventory_status">
 															<option value="">- All -</option>
@@ -195,6 +209,8 @@
 												<th>S/N</th>
 												<th>PIC</th>
 												<th class="text-center">Project Asset</th>
+												<th class="text-center">Location</th>
+												<th class="text-center">Qty</th>
 												<th class="text-center">Inventory Status</th>
 												<th class="text-center">Transfer Status</th>
 												<th class="text-center">Action</th>
@@ -277,6 +293,7 @@
 	      d.serial_no = $('#serial_no').val(),
 	      d.fullname = $('#fullname').val(),
 	      d.project_code = $('#project_code').val(),
+	      d.dept_name = $('#dept_name').val(),
 	      d.inventory_status = $('#inventory_status').val(),
 	      d.transfer_status = $('#transfer_status').val(),
 	      d.search = $("input[type=search][aria-controls=example1]").val()
@@ -322,6 +339,15 @@
 	    orderable: false,
 	    className: 'text-center'
 	   }, {
+	    data: "location",
+	    name: "location",
+	    orderable: false,
+	   }, {
+	    data: "quantity",
+	    name: "quantity",
+	    orderable: false,
+	    className: 'text-center'
+	   }, {
 	    data: "inventory_status",
 	    name: "inventory_status",
 	    className: "text-center",
@@ -341,20 +367,20 @@
 	   fixedColumns: true,
 	  })
 	  $(
-	    '#date1, #date2, #asset_name, #project_code, #inventory_no, #brand, #model_asset, #serial_no, #fullname, #inventory_status, #transfer_status'
+	    '#date1, #date2, #asset_name, #project_code, #inventory_no, #brand, #model_asset, #serial_no, #fullname, #dept_name, #inventory_status, #transfer_status'
 	   )
 	   .keyup(function() {
 	    table.draw();
 	   });
-	  $('#date1, #date2, #asset_name, #project_code, #inventory_status, #transfer_status').change(function() {
+	  $('#date1, #date2, #asset_name, #project_code, #dept_name, #inventory_status, #transfer_status').change(function() {
 	   table.draw();
 	  });
 	  $('#btn-reset').click(function() {
 	   $(
-	     '#date1, #date2, #asset_name, #project_code, #inventory_no, #brand, #model_asset, #serial_no, #fullname, #inventory_status, #transfer_status'
+	     '#date1, #date2, #asset_name, #project_code, #inventory_no, #brand, #model_asset, #serial_no, #fullname, #dept_name, #inventory_status, #transfer_status'
 	    )
 	    .val('');
-	   $('#date1, #date2, #asset_name, #project_code, #inventory_status, #transfer_status').change();
+	   $('#date1, #date2, #asset_name, #project_code, #dept_name, #inventory_status, #transfer_status').change();
 	  });
 	 });
 	</script>

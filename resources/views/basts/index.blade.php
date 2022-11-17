@@ -93,6 +93,9 @@
 																<a class="dropdown-item" href="{{ url('basts/' . $bast->bast_no . '/edit') }}"><i
 																		class="fas fa-pen-square"></i>
 																	Edit</a>
+																<a class="dropdown-item" href="{{ url('basts/' . $bast->bast_no . '/print') }}"><i
+																		class="fas fa-print"></i>
+																	Print</a>
 																<div class="dropdown-divider"></div>
 																<form action="{{ url('basts/' . $bast->bast_no) }}" method="post"
 																	onsubmit="return confirm('Are you sure want to delete this data?')" class="d-inline">

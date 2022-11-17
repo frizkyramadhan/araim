@@ -260,4 +260,26 @@ class BastController extends Controller
         DB::table('basts')->where('bast_no', $bast_no)->delete();
         return back()->with('success', 'BAST deleted successfully');
     }
+
+    public function print($bast_no)
+    {
+        $title = 'BAST';
+        $subtitle = 'Berita Acara Serah Terima';
+        $bast = DB::table('basts')
+            ->leftJoin('employees as submit', 'basts.bast_submit', '=', 'submit.id')
+            ->leftJoin('positions as pos_submit', 'submit.position_id', '=', 'pos_submit.id')
+            ->leftJoin('employees as receive', 'basts.bast_receive', '=', 'receive.id')
+            ->leftJoin('positions as pos_receive', 'receive.position_id', '=', 'pos_receive.id')
+            ->select('basts.bast_no', 'basts.bast_reg', 'bast_date', 'receive.fullname as receive_name', 'receive.nik as receive_nik', 'pos_receive.position_name as receive_pos', 'submit.fullname as submit_name', 'submit.nik as submit_nik', 'pos_submit.position_name as submit_pos')
+            ->where('bast_no', '=', $bast_no)
+            ->orderBy('bast_no', 'desc')->first();
+        $bast_row = DB::table('basts')
+            ->leftJoin('inventories', 'basts.inventory_id', '=', 'inventories.id')
+            ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+            ->select('basts.bast_no', 'inventories.*', 'assets.asset_name')
+            ->where('bast_no', '=', $bast_no)
+            ->get();
+        // dd($bast, $bast_row);
+        return view('basts.print', compact('title', 'subtitle', 'bast', 'bast_row'));
+    }
 }

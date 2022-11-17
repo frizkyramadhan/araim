@@ -266,4 +266,26 @@ class BapbController extends Controller
         DB::table('bapbs')->where('bapb_no', $bapb_no)->delete();
         return back()->with('success', 'BAPB deleted successfully');
     }
+
+    public function print($bapb_no)
+    {
+        $title = 'BAPB';
+        $subtitle = 'Berita Acara Peminjaman Barang';
+        $bapb = DB::table('bapbs')
+            ->leftJoin('employees as submit', 'bapbs.bapb_submit', '=', 'submit.id')
+            ->leftJoin('positions as pos_submit', 'submit.position_id', '=', 'pos_submit.id')
+            ->leftJoin('employees as receive', 'bapbs.bapb_receive', '=', 'receive.id')
+            ->leftJoin('positions as pos_receive', 'receive.position_id', '=', 'pos_receive.id')
+            ->select('bapbs.*', 'receive.fullname as receive_name', 'receive.nik as receive_nik', 'pos_receive.position_name as receive_pos', 'submit.fullname as submit_name', 'submit.nik as submit_nik', 'pos_submit.position_name as submit_pos')
+            ->where('bapb_no', '=', $bapb_no)
+            ->orderBy('bapb_no', 'desc')->first();
+        $bapb_row = DB::table('bapbs')
+            ->leftJoin('inventories', 'bapbs.inventory_id', '=', 'inventories.id')
+            ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+            ->select('bapbs.bapb_no', 'inventories.*', 'assets.asset_name')
+            ->where('bapb_no', '=', $bapb_no)
+            ->get();
+        // dd($bapb, $bapb_row);
+        return view('bapbs.print', compact('title', 'subtitle', 'bapb', 'bapb_row'));
+    }
 }
