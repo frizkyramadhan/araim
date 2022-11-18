@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Asset;
+use App\Models\Image;
 use App\Models\Project;
 use App\Models\Employee;
 use App\Models\Department;
@@ -44,5 +45,10 @@ class Inventory extends Model
     public function bast()
     {
         return $this->hasMany(Bast::class);
+    }
+
+    public function image()
+    {
+        return $this->hasMany(Image::class);
     }
 }

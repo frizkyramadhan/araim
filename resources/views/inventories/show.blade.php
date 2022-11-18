@@ -59,6 +59,15 @@
 											{{ session('success') }}
 										</div>
 									</div>
+								@elseif (count($errors) > 0)
+								<div class="alert alert-danger">
+									<strong>Whoops!</strong> There were some problems with your input.<br><br>
+									<ul>
+										@foreach ($errors->all() as $error)
+												<li>{{ $error }}</li>
+										@endforeach
+									</ul>
+								</div>
 								@endif
 								<div class="row">
 									<div class="col-md-6">
@@ -350,6 +359,49 @@
 										</div>
 										<!-- /.card-body -->
 									</div>
+									<div class="col-12">
+										<div class="card card-dark">
+											<div class="card-header">
+												<h4 class="card-title">Images</h4>
+											</div>
+											<div class="card-body">
+												<div class="container">
+													<div class="row justify-content-between">
+														<div class="col-6">
+															<div class="row">
+																<form class="form-horizontal" action="{{ url('inventories/addImages/' . $inventory->id) }}" method="POST" enctype="multipart/form-data">
+																@csrf
+																	<div class="form-group">
+																		<div class="input-group">
+																			<div>
+																				<input type="file" name="filename[]" multiple>
+																			</div>
+																			<div class="input-group-append">
+																				<button type="submit" class="btn btn-sm btn-primary">Submit</button>
+																			</div>
+																		</div>
+																	</div>
+																</form>
+															</div>
+														</div>
+														<div class="col-6 text-right">
+															<a href="{{ url('inventories/deleteImages/' . $inventory->inventory_no) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete all images?');"><i class="fas fa-trash"></i> Delete All</a>
+														</div>
+													</div>
+												</div>
+												<div class="row">
+												@foreach ($images as $image)
+													<div class="col-sm-2 text-center">
+														<a href="{{ asset('images/'.$image->inventory_no.'/'.$image->filename) }}" data-toggle="lightbox" data-title="{{ $image->filename }}" data-gallery="gallery">
+															<img src="{{ asset('images/'.$image->inventory_no.'/'.$image->filename) }}" class="img-fluid mb-2" alt="{{ $image->filename }}"/>
+														</a>
+														<a href="{{ url('inventories/deleteImage/' . $image->id) }}" class="btn btn-danger btn-sm mb-2" onclick="return confirm('Are you sure you want to delete this image?');"><i class="fas fa-trash"></i> Delete</a>
+													</div>
+												@endforeach
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -364,6 +416,19 @@
 @endsection
 
 @section('scripts')
+<!-- Ekko Lightbox -->
+<script src="{{ asset('assets/plugins/ekko-lightbox/ekko-lightbox.min.js') }}"></script>
+<script>
+  $(function () {
+    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+      event.preventDefault();
+      $(this).ekkoLightbox({
+        alwaysShowClose: true
+      });
+    });
+  })
+</script>
+
 <script>
 	$(document).ready(function() {
 		$('#repair-history').html('');

@@ -14,7 +14,8 @@
 	<link rel="stylesheet" href="{{ asset('assets/dist/css/adminlte.min.css') }}">
 	<!-- pace-progress -->
 	<link rel="stylesheet" href="{{ asset('assets/plugins/pace-progress/themes/black/pace-theme-flat-top.css') }}">
-
+  <!-- Ekko Lightbox -->
+  <link rel="stylesheet" href="{{ asset('assets/plugins/ekko-lightbox/ekko-lightbox.css') }}">
 	@yield('styles')
 
 </head>

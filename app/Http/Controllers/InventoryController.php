@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
+use App\Models\Image;
 use App\Models\Project;
 use App\Models\Employee;
 use App\Models\Component;
@@ -21,6 +22,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class InventoryController extends Controller
 {
@@ -431,9 +434,10 @@ class InventoryController extends Controller
         $subtitle = 'Detail Inventory';
         $inventory = Inventory::with('employee', 'asset', 'project', 'department')->find($inventory->id);
         $specifications = Specification::with('component')->where('inventory_id', $inventory->id)->get();
+        $images = DB::table('images')->where('inventory_no', $inventory->inventory_no)->get();
         // dd($specifications->toArray());
 
-        return view('inventories.show', compact('title', 'subtitle', 'inventory', 'specifications'));
+        return view('inventories.show', compact('title', 'subtitle', 'inventory', 'specifications', 'images'));
     }
 
     /**
@@ -711,5 +715,64 @@ class InventoryController extends Controller
             ->orderBy('inventories.id', 'desc')
             ->get();
         return view('inventories.qrcode', compact('title', 'inventories', 'tag'));
+    }
+
+    public function addImages($id, Request $request)
+    {
+        $inventory = Inventory::find($id);
+
+        $this->validate($request, [
+            'filename' => 'required',
+            'filename.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+        ]);
+
+        if ($request->hasfile('filename')) {
+            $directories = Storage::directories('public/images/' . $inventory->inventory_no);
+            if (count($directories) == 0) {
+                $path = public_path() . '/images/' . $inventory->inventory_no;
+                File::makeDirectory($path, $mode = 0777, true, true);
+            }
+            foreach ($request->file('filename') as $image) {
+                $name = $image->getClientOriginalName();
+                $image->move(public_path() . '/images/' . $inventory->inventory_no, $name);
+
+                $image = new Image();
+                $image->filename = $name;
+                $image->inventory_no = $inventory->inventory_no;
+
+                $image->save();
+            }
+
+            return back()->with('success', 'Images uploaded successfully');
+        } else {
+            return back()->with('error', 'Images failed to upload');
+        }
+    }
+
+    public function deleteImage($id)
+    {
+        $image = Image::find($id);
+        // delete image
+        $img = public_path('images/' . $image->inventory_no . '/' . $image->filename);
+        if (file_exists($img)) {
+            unlink($img);
+            Image::where('id', $image->id)->delete();
+        }
+
+        return back()->with('success', 'Image successfully deleted!');
+    }
+
+    public function deleteImages($inventory_no)
+    {
+        $images = Image::where('inventory_no', $inventory_no)->get();
+        foreach ($images as $image) {
+            // delete image
+            $img = public_path('images/' . $image->inventory_no . '/' . $image->filename);
+            if (file_exists($img)) {
+                unlink($img);
+                Image::where('id', $image->id)->delete();
+            }
+        }
+        return back()->with('success', 'All images successfully deleted!');
     }
 }

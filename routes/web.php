@@ -76,6 +76,9 @@ Route::group(['middleware' => 'check_role:admin,superuser'], function () {
     Route::patch('inventories/{inventory}', [InventoryController::class, 'update'])->name('inventories.update');
     Route::delete('inventories/{inventory}', [InventoryController::class, 'destroy'])->name('inventories.destroy');
 
+    Route::post('inventories/addImages/{id}', [InventoryController::class, 'addImages'])->name('inventories.addImages');
+    Route::get('inventories/deleteImage/{id}', [InventoryController::class, 'deleteImage'])->name('inventories.deleteImage');
+    Route::get('inventories/deleteImages/{inventory_no}', [InventoryController::class, 'deleteImages'])->name('inventories.deleteImages');
     // dipindah ke middleware auth (role user read only data inventory)
     // Route::get('inventories/getInventories', [InventoryController::class, 'getInventories'])->name('inventories.getInventories');
     // Route::get('inventories', [InventoryController::class, 'index'])->name('inventories.index');
