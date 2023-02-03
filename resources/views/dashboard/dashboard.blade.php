@@ -150,6 +150,17 @@
 						</div>
 						<!-- /.card-body -->
 					</div>
+					<div class="card card-success">
+						<div class="card-header">
+							<h3 class="card-title">Activity Logs</h3>
+						</div>
+						<div class="card-body">
+							<div class="form-group">
+								<a href="{{url('dashboard/logs')}}" class="btn btn-block btn-warning"><b>Check Activity Log!</b></a>
+							</div>
+						</div>
+						<!-- /.card-body -->
+					</div>
 					<!-- /.card -->
 				</section>
 				<!-- right col -->

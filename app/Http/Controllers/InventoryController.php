@@ -490,27 +490,50 @@ class InventoryController extends Controller
             'model_asset' => 'required',
         ]);
 
-        Inventory::where('id', $inventory->id)->update([
-            'inventory_no' => $request->inventory_no,
-            'input_date' => $request->input_date,
-            'asset_id' => $request->asset_id,
-            'employee_id' => $request->employee_id,
-            'project_id' => $request->project_id,
-            'department_id' => $request->department_id,
-            'brand' => $request->brand,
-            'model_asset' => $request->model_asset,
-            'serial_no' => $request->serial_no,
-            'part_no' => $request->part_no,
-            'po_no' => $request->po_no,
-            'quantity' => $request->quantity,
-            'remarks' => $request->remarks,
-            'created_by' => auth()->user()->id,
-            'reference_no' => $request->reference_no,
-            'reference_date' => $request->reference_date,
-            'location' => $request->location,
-            'inventory_status' => $request->inventory_status,
-            'is_active' => $request->is_active,
-        ]);
+        $inventory = Inventory::find($inventory->id);
+        $inventory->inventory_no = $request->inventory_no;
+        $inventory->input_date = $request->input_date;
+        $inventory->asset_id = $request->asset_id;
+        $inventory->employee_id = $request->employee_id;
+        $inventory->project_id = $request->project_id;
+        $inventory->department_id = $request->department_id;
+        $inventory->brand = $request->brand;
+        $inventory->model_asset = $request->model_asset;
+        $inventory->serial_no = $request->serial_no;
+        $inventory->part_no = $request->part_no;
+        $inventory->po_no = $request->po_no;
+        $inventory->quantity = $request->quantity;
+        $inventory->remarks = $request->remarks;
+        $inventory->created_by = auth()->user()->id;
+        $inventory->reference_no = $request->reference_no;
+        $inventory->reference_date = $request->reference_date;
+        $inventory->location = $request->location;
+        $inventory->inventory_status = $request->inventory_status;
+        $inventory->is_active = $request->is_active;
+        $inventory->save();
+
+
+        // Inventory::where('id', $inventory->id)->update([
+        //     'inventory_no' => $request->inventory_no,
+        //     'input_date' => $request->input_date,
+        //     'asset_id' => $request->asset_id,
+        //     'employee_id' => $request->employee_id,
+        //     'project_id' => $request->project_id,
+        //     'department_id' => $request->department_id,
+        //     'brand' => $request->brand,
+        //     'model_asset' => $request->model_asset,
+        //     'serial_no' => $request->serial_no,
+        //     'part_no' => $request->part_no,
+        //     'po_no' => $request->po_no,
+        //     'quantity' => $request->quantity,
+        //     'remarks' => $request->remarks,
+        //     'created_by' => auth()->user()->id,
+        //     'reference_no' => $request->reference_no,
+        //     'reference_date' => $request->reference_date,
+        //     'location' => $request->location,
+        //     'inventory_status' => $request->inventory_status,
+        //     'is_active' => $request->is_active,
+        // ]);
 
         $data = $request->all();
         $check = Arr::exists($data, 'component_id');
@@ -538,7 +561,8 @@ class InventoryController extends Controller
     public function destroy(Inventory $inventory)
     {
         Specification::where('inventory_id', $inventory->id)->delete();
-        Inventory::where('id', $inventory->id)->delete();
+        Inventory::find($inventory->id)->delete();
+        // Inventory::where('id', $inventory->id)->delete();
         return redirect()->route('inventories.index')->with('success', 'Inventory successfully deleted!');
     }
 

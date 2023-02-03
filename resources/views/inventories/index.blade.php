@@ -189,24 +189,24 @@
                   </div>
                 </div>
               </div>
-              <div class="tab-content p-0">
-                <table id="example1" class="table table-sm table-bordered table-striped">
+              <div class="table-responsive">
+                <table id="example1" width="100%" class="table table-sm table-bordered table-striped">
                   <thead>
                     <tr>
-                      <th class="text-center">No</th>
-                      <th>Inventory No</th>
-                      <th>Date</th>
-                      <th>Asset</th>
-                      <th>Brand</th>
-                      <th>Model</th>
-                      <th>S/N</th>
-                      <th>PIC</th>
+                      <th class="align-middle text-center">No</th>
+                      <th class="align-middle">Inventory No</th>
+                      <th class="align-middle">Date</th>
+                      <th class="align-middle">Asset</th>
+                      <th class="align-middle">Brand</th>
+                      <th class="align-middle">Model</th>
+                      <th class="align-middle">S/N</th>
+                      <th class="align-middle">PIC</th>
                       <th class="text-center">Project Asset</th>
-                      <th class="text-center">Location</th>
-                      <th class="text-center">Qty</th>
-                      <th class="text-center">Inventory Status</th>
-                      <th class="text-center">Transfer Status</th>
-                      <th class="text-center">Action</th>
+                      <th class="align-middle text-center">Location</th>
+                      <th class="align-middle text-center">Qty</th>
+                      <th class="align-middle text-center">Inventory Status</th>
+                      <th class="align-middle text-center">Transfer Status</th>
+                      <th class="align-middle text-center">Action</th>
                     </tr>
                   </thead>
                 </table>
@@ -264,7 +264,7 @@
   $(function() {
     var table = $("#example1").DataTable({
       responsive: true
-      , autoWidth: false
+      , autoWidth: true
       , lengthChange: true
       , lengthMenu: [
         [10, 25, 50, 100, -1]

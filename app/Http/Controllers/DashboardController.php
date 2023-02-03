@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\Models\Activity;
 
 class DashboardController extends Controller
 {
@@ -58,5 +59,27 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboard.summary', compact('title', 'subtitle', 'summary'));
+    }
+
+    public function logs()
+    {
+        $title = 'Activity Logs';
+        $subtitle = 'Activity Logs';
+
+        $logs = Activity::join('users', 'activity_log.causer_id', '=', 'users.id')
+            ->select('activity_log.*', 'users.name')
+            ->orderBy('activity_log.id', 'desc')
+            ->get();
+
+        return view('dashboard.log', compact('title', 'subtitle', 'logs'));
+    }
+
+    public function json()
+    {
+        $logs = Activity::join('users', 'activity_log.causer_id', '=', 'users.id')
+            ->select('activity_log.*', 'users.name')
+            ->orderBy('activity_log.id', 'desc')
+            ->get();
+        return $logs;
     }
 }

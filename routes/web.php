@@ -38,6 +38,8 @@ Route::post('logout', [LoginController::class, 'logout']);
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('dashboard/summary/{id}', [DashboardController::class, 'summary'])->name('dashboard.summary');
+    Route::get('dashboard/logs', [DashboardController::class, 'logs'])->name('dashboard.logs');
+    Route::get('dashboard/json', [DashboardController::class, 'json'])->name('dashboard.json');
     Route::get('contact', function () {
         return view('contact', ['title' => 'Contact Us']);
     });
