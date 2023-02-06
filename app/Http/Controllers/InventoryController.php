@@ -339,7 +339,12 @@ class InventoryController extends Controller
         $title = 'Inventories';
         $subtitle = 'Add Inventory';
         $employees = Employee::where('status', '1')->orderBy('fullname', 'asc')->get();
-        $assets = Asset::where('asset_status', '1')->orderBy('asset_name', 'asc')->get();
+        $assets = Asset::join('categories', 'categories.id', '=', 'assets.category_id')
+            ->select('assets.*', 'categories.category_name')
+            ->where('asset_status', '1')
+            ->orderBy('category_name', 'asc')
+            ->orderBy('asset_name', 'asc')
+            ->get();
         $projects = Project::where('project_status', '1')->orderBy('project_code', 'asc')->get();
         $departments = Department::where('dept_status', '1')->orderBy('dept_name', 'asc')->get();
         $components = Component::where('component_status', '1')->orderBy('component_name', 'asc')->get();
@@ -451,7 +456,12 @@ class InventoryController extends Controller
         $title = 'Inventories';
         $subtitle = 'Edit Inventory';
         $employees = Employee::where('status', '1')->orderBy('fullname', 'asc')->get();
-        $assets = Asset::where('asset_status', '1')->orderBy('asset_name', 'asc')->get();
+        $assets = Asset::join('categories', 'categories.id', '=', 'assets.category_id')
+            ->select('assets.*', 'categories.category_name')
+            ->where('asset_status', '1')
+            ->orderBy('category_name', 'asc')
+            ->orderBy('asset_name', 'asc')
+            ->get();
         $projects = Project::where('project_status', '1')->orderBy('project_code', 'asc')->get();
         $departments = Department::where('dept_status', '1')->orderBy('dept_name', 'asc')->get();
         $components = Component::where('component_status', '1')->orderBy('component_name', 'asc')->get();
@@ -511,29 +521,6 @@ class InventoryController extends Controller
         $inventory->inventory_status = $request->inventory_status;
         $inventory->is_active = $request->is_active;
         $inventory->save();
-
-
-        // Inventory::where('id', $inventory->id)->update([
-        //     'inventory_no' => $request->inventory_no,
-        //     'input_date' => $request->input_date,
-        //     'asset_id' => $request->asset_id,
-        //     'employee_id' => $request->employee_id,
-        //     'project_id' => $request->project_id,
-        //     'department_id' => $request->department_id,
-        //     'brand' => $request->brand,
-        //     'model_asset' => $request->model_asset,
-        //     'serial_no' => $request->serial_no,
-        //     'part_no' => $request->part_no,
-        //     'po_no' => $request->po_no,
-        //     'quantity' => $request->quantity,
-        //     'remarks' => $request->remarks,
-        //     'created_by' => auth()->user()->id,
-        //     'reference_no' => $request->reference_no,
-        //     'reference_date' => $request->reference_date,
-        //     'location' => $request->location,
-        //     'inventory_status' => $request->inventory_status,
-        //     'is_active' => $request->is_active,
-        // ]);
 
         $data = $request->all();
         $check = Arr::exists($data, 'component_id');
