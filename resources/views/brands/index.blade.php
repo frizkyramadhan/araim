@@ -36,68 +36,62 @@
               <div class="card-tools">
                 <ul class="nav nav-pills ml-auto">
                   <li class="nav-item mr-2">
-                    <a class="btn btn-warning" href="{{ url('/') }}"><i class="fas fa-undo-alt"></i>
-                      Back</a>
+                    <a class="btn btn-warning" href="{{ url('brands/create') }}"><i class="fas fa-plus"></i>
+                      Add</a>
                   </li>
                 </ul>
               </div>
             </div><!-- /.card-header -->
             <div class="card-body">
+              @if (session('success'))
+              <div class="alert alert-success alert-dismissible show fade">
+                <div class="alert-body">
+                  <button class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                  </button>
+                  {{ session('success') }}
+                </div>
+              </div>
+              @elseif (session('error'))
+              <div class="alert alert-error alert-dismissible show fade">
+                <div class="alert-body">
+                  <button class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                  </button>
+                  {{ session('error') }}
+                </div>
+              </div>
+              @endif
               <div class="tab-content p-0">
                 <table id="example1" class="table table-sm table-bordered table-striped">
                   <thead>
                     <tr>
-                      <th>No</th>
-                      <th>Log Date</th>
-                      <th>Log Name</th>
-                      <th>Description</th>
-                      <th>Properties</th>
-                      <th>Causer</th>
+                      <th class="text-center">No</th>
+                      <th>Brand Name</th>
+                      <th class="text-center">Status</th>
                       <th class="text-center">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    @foreach ($logs as $log)
+                    @foreach ($brands as $brand)
                     <tr>
-                      <td>{{ $loop->iteration }}</td>
-                      <td>{{ date('d F Y', strtotime($log->created_at)) }}</td>
-                      <td>{{ $log->log_name }}</td>
-                      <td>
-                        @if($log->description == 'created')
-                        <span class="badge badge-info">{{ $log->description }}</span>
-                        @elseif($log->description == 'updated')
-                        <span class="badge badge-success">{{ $log->description }}</span>
-                        @elseif($log->description == 'deleted')
-                        <span class="badge badge-danger">{{ $log->description }}</span>
-                        @endif
-                      </td>
-                      <td>
-                        @if($log->description == 'updated')
-                        @foreach ($log->properties as $property)
-                        Inventory No: <b>{{ $property['inventory_no'] ?? '-' }}</b><br>
-                        Employee: {{ $property['employee.fullname'] ?? '-' }}<br>
-                        Project: {{ $property['project.project_code'] ?? '-' }}<br>
-                        Department: {{ $property['department.dept_name'] ?? '-' }}<br>
-                        Asset: {{ $property['asset.asset_name'] ?? '-' }}<br>
-                        Quantity: {{ $property['quantity'] ?? '-' }}<br>
-                        Inventory Status: {{ $property['inventory_status'] ?? '-' }}<br>
-                        Transfer Status: {{ $property['transfer_status'] ?? '-' }}<br><br>
-                        @endforeach
+                      <td class="text-center">{{ $loop->iteration }}</td>
+                      <td>{{ $brand->brand_name }}</td>
+                      <td class="text-center">
+                        @if ($brand->brand_status == 1)
+                        <span class="badge badge-success">Active</span>
                         @else
-                        @foreach ($log->properties as $property)
-                        Inventory No: <b>{{ $property['inventory_no'] ?? '-' }}</b><br>
-                        Employee: {{ $property['employee.fullname'] ?? '-' }}<br>
-                        Project: {{ $property['project.project_code'] ?? '-' }}<br>
-                        Department: {{ $property['department.dept_name'] ?? '-' }}<br>
-                        Asset: {{ $property['asset.asset_name'] ?? '-' }}<br>
-                        Quantity: {{ $property['quantity'] ?? '-' }}<br>
-                        Inventory Status: {{ $property['inventory_status'] ?? '-' }}<br>
-                        Transfer Status: {{ $property['transfer_status'] ?? '-' }}<br>
-                        @endforeach
+                        <span class="badge badge-danger">Inactive</span>
                         @endif
                       </td>
-                      <td>{{ $log->name ?? '' }}</td>
-                      <td class="text-center"><a title="Detail" class="btn btn-sm btn-icon btn-success" href="{{ url('inventories/' . $log->subject_id) }}" target="blank"><i class="fas fa-info-circle"></i> Detail</a></td>
+                      <td class="text-center">
+                        <a class="btn btn-icon btn-primary" href="{{ url('brands/' . $brand->id . '/edit') }}"><i class="fas fa-pen-square"></i></a>
+                        <form action="{{ url('brands/' . $brand->id) }}" method="post" onsubmit="return confirm('Are you sure want to delete this data?')" class="d-inline">
+                          @method('delete')
+                          @csrf
+                          <button class="btn btn-icon btn-danger"><i class="fas fa-times"></i></button>
+                        </form>
+                      </td>
                     </tr>
                     @endforeach
                   </tbody>
@@ -132,11 +126,11 @@
 <script src="{{ asset('assets/plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/jszip/jszip.min.js') }}"></script>
-{{-- <script src="{{ asset('assets/plugins/pdfmake/pdfmake.min.js') }}"></script>
-<script src="{{ asset('assets/plugins/pdfmake/vfs_fonts.js') }}"></script> --}}
+<script src="{{ asset('assets/plugins/pdfmake/pdfmake.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/pdfmake/vfs_fonts.js') }}"></script>
 <script src="{{ asset('assets/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
-{{-- <script src="{{ asset('assets/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script> --}}
+<script src="{{ asset('assets/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 <!-- Page specific script -->
 <script>
   $(function() {
@@ -144,7 +138,7 @@
       "responsive": true
       , "lengthChange": false
       , "autoWidth": false
-      , "buttons": ["copy", "csv", "excel", "print"]
+      , "buttons": ["copy", "csv", "excel", "pdf", "print"]
     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
   });
 

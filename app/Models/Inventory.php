@@ -4,8 +4,10 @@ namespace App\Models;
 
 use App\Models\Asset;
 use App\Models\Image;
+use App\Models\Brand;
 use App\Models\Project;
 use App\Models\Employee;
+use App\Models\Location;
 use App\Models\Department;
 use App\Models\Specification;
 use Spatie\Activitylog\LogOptions;
@@ -50,6 +52,16 @@ class Inventory extends Model
     public function employee()
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
     }
 
     public function specification()

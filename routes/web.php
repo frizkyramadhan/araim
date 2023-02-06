@@ -5,6 +5,7 @@ use App\Http\Controllers\BapbController;
 use App\Http\Controllers\BastController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CategoryController;
@@ -58,6 +59,7 @@ Route::group(['middleware' => 'check_role:admin,superuser'], function () {
     Route::resource('positions', PositionController::class)->except(['show']);
     Route::resource('projects', ProjectController::class)->except(['show']);
     Route::resource('assets', AssetController::class)->except(['show']);
+    Route::resource('brands', BrandController::class)->except(['show']);
 
     Route::get('employees/getEmployees', [EmployeeController::class, 'getEmployees'])->name('employees.getEmployees');
     Route::get('employees/json', [EmployeeController::class, 'json'])->name('employees.json');

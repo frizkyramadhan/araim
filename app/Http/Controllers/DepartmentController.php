@@ -19,7 +19,7 @@ class DepartmentController extends Controller
         $departments = Department::orderBy('dept_name', 'asc')->get();
         return view('departments.index', compact('title', 'subtitle', 'departments'));
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -78,7 +78,7 @@ class DepartmentController extends Controller
         $title = "Departments";
         $subtitle = "Edit Department";
         $department = Department::find($department->id);
-        return view('departments.edit', compact('title', 'subtitle','department'));
+        return view('departments.edit', compact('title', 'subtitle', 'department'));
     }
 
     /**
@@ -90,20 +90,22 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, Department $department)
     {
-        $request->validate([
-            'dept_name' => 'required',
-            'dept_status' => 'required',
-        ],
-        [
-            'dept_name.required' => 'Department name is required',
-            'dept_status.required' => 'Department status is required',
-        ]);
+        $request->validate(
+            [
+                'dept_name' => 'required',
+                'dept_status' => 'required',
+            ],
+            [
+                'dept_name.required' => 'Department name is required',
+                'dept_status.required' => 'Department status is required',
+            ]
+        );
 
         Department::where('id', $department->id)->update([
             'dept_name' => $request->dept_name,
             'dept_status' => $request->dept_status,
         ]);
-        
+
         return redirect()->route('departments.index')->with('success', 'Department updated successfully');
     }
 
