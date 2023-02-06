@@ -85,8 +85,8 @@
         @endcan
         @cannot('user')
         <li class="nav-header">MASTER DATA</li>
-        <li class="nav-item {{ Request::is('assets*') || Request::is('brands*') || Request::is('categories*') || Request::is('components*') ? 'menu-open' : '' }}">
-          <a href="#" class="nav-link {{ Request::is('assets*') || Request::is('brands*') || Request::is('categories*') || Request::is('components*') ? 'active' : '' }}">
+        <li class="nav-item {{ Request::is('assets*') || Request::is('brands*') || Request::is('categories*') || Request::is('locations*') || Request::is('components*') ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link {{ Request::is('assets*') || Request::is('brands*') || Request::is('categories*') || Request::is('locations*') || Request::is('components*') ? 'active' : '' }}">
             <i class="nav-icon fas fa-boxes"></i>
             <p>
               Item Master Data
@@ -110,6 +110,12 @@
               <a href="{{ url('categories') }}" class="nav-link {{ Request::is('categories*') ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Categories</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url('locations') }}" class="nav-link {{ Request::is('locations*') ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Locations</p>
               </a>
             </li>
             @can('admin')

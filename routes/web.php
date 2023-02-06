@@ -10,6 +10,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\TrackingController;
@@ -57,6 +58,7 @@ Route::group(['middleware' => 'check_role:admin,superuser'], function () {
     Route::resource('departments', DepartmentController::class)->except(['show']);
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('positions', PositionController::class)->except(['show']);
+    Route::resource('locations', LocationController::class)->except(['show']);
     Route::resource('projects', ProjectController::class)->except(['show']);
     Route::resource('assets', AssetController::class)->except(['show']);
     Route::resource('brands', BrandController::class)->except(['show']);
