@@ -11,11 +11,11 @@ use Yajra\DataTables\DataTables;
 
 class EmployeeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {
+        $this->middleware('check_role:admin,superuser');
+    }
+
     public function index()
     {
         $title = 'Employees';
@@ -137,7 +137,11 @@ class EmployeeController extends Controller
         $subtitle = 'Detail Employee';
         $projects = Project::where('project_status', '=', '1')->orderBy('project_code', 'asc')->get();
         $positions = Position::where('position_status', '=', '1')->orderBy('position_name', 'asc')->get();
-        $inventories = Inventory::with('asset')->where('employee_id', '=', $employee->id)->orderBy('inventory_no', 'desc')->get();
+        $inventories = Inventory::leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+            ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
+            ->select(['inventories.*', 'assets.asset_name', 'brands.brand_name'])
+            ->where('employee_id', '=', $employee->id)
+            ->orderBy('inventory_no', 'desc')->get();
 
         return view('employees.show', compact('title', 'subtitle', 'employee', 'projects', 'positions', 'inventories'));
     }

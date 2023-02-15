@@ -7,11 +7,11 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {
+        $this->middleware('check_role:admin,superuser');
+    }
+
     public function index()
     {
         $title = 'Categories';
@@ -51,7 +51,6 @@ class CategoryController extends Controller
         $category->save();
 
         return redirect()->route('categories.index')->with('success', 'Category added successfully');
-
     }
 
     /**
@@ -76,7 +75,7 @@ class CategoryController extends Controller
         $title = 'Categories';
         $subtitle = 'Edit Categories';
 
-        return view('categories.edit', compact('title', 'subtitle','category'));
+        return view('categories.edit', compact('title', 'subtitle', 'category'));
     }
 
     /**

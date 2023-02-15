@@ -8,18 +8,18 @@ use Illuminate\Http\Request;
 
 class AssetController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {
+        $this->middleware('check_role:admin,superuser');
+    }
+
     public function index()
     {
         $title = "Assets";
         $subtitle = "List of assets";
         $assets = Asset::with('category')
             ->orderBy(Category::select('category_name')->whereColumn('categories.id', 'assets.category_id'))
-            ->orderBy('asset_name','asc')
+            ->orderBy('asset_name', 'asc')
             ->get();
 
         return view('assets.index', compact('title', 'subtitle', 'assets'));
@@ -34,7 +34,7 @@ class AssetController extends Controller
     {
         $title = "Assets";
         $subtitle = "Add Asset";
-        $categories = Category::where('category_status','=','1')->orderBy('category_name', 'asc')->get();
+        $categories = Category::where('category_status', '=', '1')->orderBy('category_name', 'asc')->get();
 
         return view('assets.create', compact('title', 'subtitle', 'categories'));
     }
@@ -81,7 +81,7 @@ class AssetController extends Controller
     {
         $title = "Assets";
         $subtitle = "Edit Asset";
-        $categories = Category::where('category_status','=','1')->orderBy('category_name', 'asc')->get();
+        $categories = Category::where('category_status', '=', '1')->orderBy('category_name', 'asc')->get();
 
         return view('assets.edit', compact('title', 'subtitle', 'asset', 'categories'));
     }
@@ -98,17 +98,17 @@ class AssetController extends Controller
         $request->validate([
             'asset_name' => 'required',
             'category_id' => 'required',
-        ],[
+        ], [
             'asset_name.required' => 'Asset name is required',
             'category_id.required' => 'Category is required',
         ]);
-        
+
         Asset::where('id', $asset->id)
             ->update([
                 'asset_name' => $request->asset_name,
                 'category_id' => $request->category_id,
                 'asset_status' => $request->asset_status,
-        ]);
+            ]);
 
         return redirect()->route('assets.index')->with('success', 'Asset updated successfully');
     }

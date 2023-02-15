@@ -49,7 +49,7 @@
               <div class="card-body">
                 <div class="tab-content p-0">
                   <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">iya Name</label>
+                    <label class="col-sm-2 col-form-label">Brand Name</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control @error('brand_name') is-invalid @enderror" name="brand_name" value="{{ old('brand_name', $brand->brand_name) }}" placeholder="Brand Name">
                       @error('brand_name')

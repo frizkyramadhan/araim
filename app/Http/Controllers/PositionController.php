@@ -8,20 +8,20 @@ use Illuminate\Http\Request;
 
 class PositionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {
+        $this->middleware('check_role:admin,superuser');
+    }
+
     public function index()
     {
         $title = "Positions";
         $subtitle = "List of positions";
         $positions = Position::with('department')
             ->orderBy(Department::select('dept_name')->whereColumn('departments.id', 'positions.department_id'))
-            ->orderBy('position_name','asc')
+            ->orderBy('position_name', 'asc')
             ->get();
-        
+
         return view('positions.index', compact('title', 'subtitle', 'positions'));
     }
 
@@ -34,8 +34,8 @@ class PositionController extends Controller
     {
         $title = "Positions";
         $subtitle = "Add Positions";
-        $departments = Department::where('dept_status', '=' ,'1')->orderBy('dept_name', 'asc')->get();
-        
+        $departments = Department::where('dept_status', '=', '1')->orderBy('dept_name', 'asc')->get();
+
         return view('positions.create', compact('title', 'subtitle', 'departments'));
     }
 
@@ -50,7 +50,7 @@ class PositionController extends Controller
         $request->validate([
             'position_name' => 'required|unique:positions',
             'department_id' => 'required',
-        ],[
+        ], [
             'position_name.required' => 'Position name is required',
             'position_name.unique' => 'Position name already exists',
             'department_id.required' => 'Department is required',
@@ -62,7 +62,6 @@ class PositionController extends Controller
         $position->save();
 
         return redirect()->route('positions.index')->with('success', 'Position added successfully');
-
     }
 
     /**
@@ -86,7 +85,7 @@ class PositionController extends Controller
     {
         $title = "Positions";
         $subtitle = "Edit Positions";
-        $departments = Department::where('dept_status', '=' ,'1')->orderBy('dept_name', 'asc')->get();
+        $departments = Department::where('dept_status', '=', '1')->orderBy('dept_name', 'asc')->get();
 
         return view('positions.edit', compact('title', 'subtitle', 'departments', 'position'));
     }
@@ -105,7 +104,7 @@ class PositionController extends Controller
             'position_status' => 'required',
         ];
 
-        if($request->position_name != $position->position_name){
+        if ($request->position_name != $position->position_name) {
             $rules['position_name'] = 'required|unique:positions';
         }
 
@@ -125,7 +124,7 @@ class PositionController extends Controller
     public function destroy(Position $position)
     {
         Position::where('id', $position->id)->delete();
-        
+
         return redirect()->route('positions.index')->with('success', 'Position deleted successfully');
     }
 }

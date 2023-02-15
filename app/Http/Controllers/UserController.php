@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {
+        $this->middleware('check_role:admin');
+    }
+
     public function index()
     {
         $title = 'Users';
@@ -50,7 +50,7 @@ class UserController extends Controller
             'password' => 'required|min:5',
             'level' => 'required',
             'user_status' => 'required',
-        ],[
+        ], [
             'name.required' => 'Name is required',
             'email.required' => 'Email is required',
             'password.required' => 'Password is required'
@@ -59,7 +59,7 @@ class UserController extends Controller
         $validatedData['password'] = Hash::make($validatedData['password']);
 
         User::create($validatedData);
-        
+
         return redirect('users')->with('success', 'User added successfully!');
     }
 
@@ -100,11 +100,11 @@ class UserController extends Controller
     {
         $this->validate($request, [
             'name' => 'required'
-        ],[
+        ], [
             'name.required' => 'Name is required',
             'email.required' => 'Email is required'
         ]);
-        
+
         $input = $request->all();
         $user = User::find($id);
 
@@ -112,14 +112,14 @@ class UserController extends Controller
             $rules['email'] = 'required|email:dns|unique:users|ends_with:@arka.co.id';
         }
 
-        if(!empty($input['password'])){ 
+        if (!empty($input['password'])) {
             $input['password'] = Hash::make($input['password']);
-        }else{
-            $input = Arr::except($input,array('password'));    
+        } else {
+            $input = Arr::except($input, array('password'));
         }
 
         $user->update($input);
-        
+
         return redirect('users')->with('success', 'User edited successfully');
     }
 

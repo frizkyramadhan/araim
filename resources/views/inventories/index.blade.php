@@ -111,7 +111,15 @@
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label">Brand</label>
-                          <input type="text" class="form-control" name="brand" id="brand" value="{{ request('brand') }}">
+                          {{-- <input type="text" class="form-control" name="brand" id="brand" value="{{ request('brand') }}"> --}}
+                          <select name="brand_name" class="form-control select2bs4" id="brand_name" style="width: 100%;">
+                            <option value="">- All -</option>
+                            @foreach ($brands as $brand => $data)
+                            <option value="{{ $data->brand_name }}" {{ request('brand_name') == $data->brand_name ? 'selected' : '' }}>
+                              {{ $data->brand_name }}
+                            </option>
+                            @endforeach
+                          </select>
                         </div>
                       </div>
                       <div class="col-3">
@@ -281,7 +289,7 @@
             , d.date2 = $('#date2').val()
             , d.inventory_no = $('#inventory_no').val()
             , d.asset_name = $('#asset_name').val()
-            , d.brand = $('#brand').val()
+            , d.brand_name = $('#brand_name').val()
             , d.model_asset = $('#model_asset').val()
             , d.serial_no = $('#serial_no').val()
             , d.fullname = $('#fullname').val()
@@ -311,8 +319,8 @@
         , name: "asset_name"
         , orderable: false
       , }, {
-        data: "brand"
-        , name: "brand"
+        data: "brand_name"
+        , name: "brand_name"
         , orderable: false
       , }, {
         data: "model_asset"
@@ -360,20 +368,20 @@
       , fixedColumns: true
     , })
     $(
-        '#date1, #date2, #asset_name, #project_code, #inventory_no, #brand, #model_asset, #serial_no, #fullname, #dept_name, #inventory_status, #transfer_status'
+        '#date1, #date2, #asset_name, #project_code, #inventory_no, #brand_name, #model_asset, #serial_no, #fullname, #dept_name, #inventory_status, #transfer_status'
       )
       .keyup(function() {
         table.draw();
       });
-    $('#date1, #date2, #asset_name, #project_code, #dept_name, #inventory_status, #transfer_status').change(function() {
+    $('#date1, #date2, #asset_name, #brand_name, #project_code, #dept_name, #inventory_status, #transfer_status').change(function() {
       table.draw();
     });
     $('#btn-reset').click(function() {
       $(
-          '#date1, #date2, #asset_name, #project_code, #inventory_no, #brand, #model_asset, #serial_no, #fullname, #dept_name, #inventory_status, #transfer_status'
+          '#date1, #date2, #asset_name, #project_code, #inventory_no, #brand_name, #model_asset, #serial_no, #fullname, #dept_name, #inventory_status, #transfer_status'
         )
         .val('');
-      $('#date1, #date2, #asset_name, #project_code, #dept_name, #inventory_status, #transfer_status').change();
+      $('#date1, #date2, #asset_name, #project_code, #dept_name, #brand_name, #inventory_status, #transfer_status').change();
     });
   });
 

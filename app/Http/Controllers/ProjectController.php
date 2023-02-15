@@ -7,18 +7,18 @@ use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {
+        $this->middleware('check_role:admin,superuser');
+    }
+
     public function index()
     {
         $title = 'Projects';
         $subtitle = 'List of Projects';
         $projects = Project::orderBy('project_code', 'asc')->get();
 
-        return view('projects.index', compact('title','subtitle','projects'));
+        return view('projects.index', compact('title', 'subtitle', 'projects'));
     }
 
     /**
@@ -31,7 +31,7 @@ class ProjectController extends Controller
         $title = 'Projects';
         $subtitle = 'Add Projects';
 
-        return view('projects.create', compact('title','subtitle'));
+        return view('projects.create', compact('title', 'subtitle'));
     }
 
     /**
@@ -76,9 +76,8 @@ class ProjectController extends Controller
     {
         $title = 'Projects';
         $subtitle = 'Edit Projects';
-        
-        return view('projects.edit', compact('title','subtitle','project'));
 
+        return view('projects.edit', compact('title', 'subtitle', 'project'));
     }
 
     /**
@@ -100,7 +99,7 @@ class ProjectController extends Controller
             'project_name' => $request->project_name,
             'project_status' => $request->project_status
         ]);
-        
+
         return redirect()->route('projects.index')->with('success', 'Project updated successfully');
     }
 
