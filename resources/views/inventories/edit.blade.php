@@ -35,8 +35,13 @@
               <div class="card-tools">
                 <ul class="nav nav-pills ml-auto">
                   <li class="nav-item mr-2">
+                    @if ($employee_id == null)
                     <a class="btn btn-warning text-dark" href="{{ url('inventories/' . $inventory->id) }}"><i class="fas fa-undo-alt"></i>
                       Back</a>
+                    @else
+                    <a class="btn btn-warning text-dark" href="{{ url('inventories/' . $inventory->id.'/'.$employee->id) }}"><i class="fas fa-undo-alt"></i>
+                      Back</a>
+                    @endif
                   </li>
                 </ul>
               </div>
@@ -45,6 +50,7 @@
             <form class="form-horizontal" action="{{ url('inventories/' . $inventory->id) }}" method="POST">
               @method('PATCH')
               @csrf
+              <input type="hidden" name="id_employee" value="{{ $employee_id }}">
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-6">
@@ -72,6 +78,7 @@
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">PIC</label>
                           <div class="col-sm-9">
+                            @if ($employee_id == null)
                             <select name="employee_id" class="form-control @error('employee_id') is-invalid @enderror select2bs4" style="width: 100%;" tabindex="1">
                               @foreach ($employees as $employee)
                               <option value="{{ $employee->id }}" {{ old('employee_id', $inventory->employee_id) == $employee->id ? 'selected' : '' }}>
@@ -79,6 +86,10 @@
                               </option>
                               @endforeach
                             </select>
+                            @else
+                            <input type="text" class="form-control @error('employee_id') is-invalid @enderror" value="{{ $employee->fullname }}" readonly>
+                            <input type="hidden" class="form-control @error('employee_id') is-invalid @enderror" value="{{ $employee->id }}" name="employee_id" readonly>
+                            @endif
                             @error('employee_id')
                             <div class="invalid-feedback">
                               {{ $message }}
@@ -131,8 +142,15 @@
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Brand</label>
                           <div class="col-sm-9">
-                            <input type="text" class="form-control @error('brand') is-invalid @enderror" name="brand" value="{{ old('brand', $inventory->brand) }}" tabindex="4">
-                            @error('brand')
+                            {{-- <input type="text" class="form-control @error('brand') is-invalid @enderror" name="brand" value="{{ old('brand', $inventory->brand) }}" tabindex="4"> --}}
+                            <select name="brand_id" class="form-control @error('brand_id') is-invalid @enderror select2bs4" style="width: 100%;" tabindex="4">
+                              @foreach ($brands as $brand)
+                              <option value="{{ $brand->id }}" {{ old('brand_id', $inventory->brand_id) == $brand->id ? 'selected' : '' }}>
+                                {{ $brand->brand_name }}
+                              </option>
+                              @endforeach
+                            </select>
+                            @error('brand_id')
                             <div class="error invalid-feedback">
                               {{ $message }}
                             </div>
@@ -256,7 +274,14 @@
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Location</label>
                           <div class="col-sm-9">
-                            <input type="text" class="form-control @error('location') is-invalid @enderror" name="location" value="{{ old('location', $inventory->location) }}" tabindex="12">
+                            {{-- <input type="text" class="form-control @error('location') is-invalid @enderror" name="location" value="{{ old('location', $inventory->location) }}" tabindex="12"> --}}
+                            <select name="location_id" class="form-control @error('location_id') is-invalid @enderror select2bs4" style="width: 100%;" tabindex="12">
+                              @foreach ($locations as $location)
+                              <option value="{{ $location->id }}" {{ old('location_id', $inventory->location_id) == $location->id ? 'selected' : '' }}>
+                                {{ $location->location_name }}
+                              </option>
+                              @endforeach
+                            </select>
                             @error('location')
                             <div class="error invalid-feedback">
                               {{ $message }}

@@ -7,11 +7,11 @@ use Illuminate\Http\Request;
 
 class BrandController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {
+        $this->middleware('check_role:admin,superuser');
+    }
+
     public function index()
     {
         $title = "Brands";
@@ -54,6 +54,23 @@ class BrandController extends Controller
         $brand->save();
 
         return redirect()->route('brands.index')->with('success', 'Brand added successfully');
+    }
+
+    public function storeFromInventory(Request $request)
+    {
+        $request->validate([
+            'brand_name' => 'required|unique:brands',
+        ], [
+            'brand_name.required' => 'Brand name is required',
+            'brand_name.unique' => 'Brand name already exists',
+        ]);
+
+        $brand = new Brand();
+        $brand->brand_name = $request->brand_name;
+        $brand->brand_status = 1;
+        $brand->save();
+
+        return redirect()->back()->with('success', 'Brand added successfully');
     }
 
     /**

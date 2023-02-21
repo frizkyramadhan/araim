@@ -35,9 +35,9 @@ Route::post('register', [RegisterController::class, 'store']);
 
 Route::get('login', [LoginController::class, 'index'])->name('login')->middleware('guest');
 Route::post('login', [LoginController::class, 'authenticate']);
-Route::post('logout', [LoginController::class, 'logout']);
 
-Route::middleware('auth')->group(function () {
+
+Route::group(['middleware' => ['auth']], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('dashboard/summary/{id}', [DashboardController::class, 'summary'])->name('dashboard.summary');
     Route::get('dashboard/logs', [DashboardController::class, 'logs'])->name('dashboard.logs');
@@ -45,29 +45,37 @@ Route::middleware('auth')->group(function () {
     Route::get('contact', function () {
         return view('contact', ['title' => 'Contact Us']);
     });
-    Route::get('inventories', [InventoryController::class, 'index'])->name('inventories.index');
+    Route::post('logout', [LoginController::class, 'logout']);
+
     Route::get('inventories/getInventories', [InventoryController::class, 'getInventories'])->name('inventories.getInventories');
-    Route::get('inventories/create', [InventoryController::class, 'create'])->name('inventories.create')->middleware('check_role:admin,superuser');
-    Route::get('inventories/import', [InventoryController::class, 'import'])->name('inventories.import')->middleware('check_role:admin,superuser');
-    Route::get('inventories/export', [InventoryController::class, 'export'])->name('inventories.export')->middleware('check_role:admin,superuser');
+    Route::get('inventories', [InventoryController::class, 'index'])->name('inventories.index');
+    Route::get('inventories/export', [InventoryController::class, 'export'])->name('inventories.export');
+    Route::get('inventories/import', [InventoryController::class, 'import'])->name('inventories.import');
+    Route::get('inventories/create', [InventoryController::class, 'create'])->name('inventories.create');
+    Route::get('inventories/create/{employee_id}', [InventoryController::class, 'create'])->name('inventories.create');
     Route::get('inventories/{inventory}', [InventoryController::class, 'show'])->name('inventories.show');
     Route::get('trackings', [TrackingController::class, 'index'])->name('trackings.index');
-});
 
-Route::group(['middleware' => 'check_role:admin,superuser'], function () {
+    // role admin & superuser
     Route::resource('departments', DepartmentController::class)->except(['show']);
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('positions', PositionController::class)->except(['show']);
-    Route::resource('locations', LocationController::class)->except(['show']);
     Route::resource('projects', ProjectController::class)->except(['show']);
     Route::resource('assets', AssetController::class)->except(['show']);
+
+    Route::post('locations/storeFromInventory', [LocationController::class, 'storeFromInventory'])->name('locations.storeFromInventory');
+    Route::resource('locations', LocationController::class)->except(['show']);
+
+    Route::post('brands/storeFromInventory', [BrandController::class, 'storeFromInventory'])->name('brands.storeFromInventory');
     Route::resource('brands', BrandController::class)->except(['show']);
 
     Route::get('employees/getEmployees', [EmployeeController::class, 'getEmployees'])->name('employees.getEmployees');
     Route::get('employees/json', [EmployeeController::class, 'json'])->name('employees.json');
     Route::resource('employees', EmployeeController::class);
 
-    Route::get('inventories/create/{id}', [InventoryController::class, 'create']);
+    Route::get('inventories/edit/{inventory}', [InventoryController::class, 'edit'])->name('inventories.edit');
+    Route::delete('inventories/{inventory}', [InventoryController::class, 'destroy'])->name('inventories.destroy');
+
     Route::post('inventories', [InventoryController::class, 'store'])->name('inventories.store');
     Route::get('inventories/json', [InventoryController::class, 'json'])->name('inventories.json');
     Route::post('inventories/importProcess', [InventoryController::class, 'importProcess'])->name('inventories.importProcess');
@@ -77,22 +85,17 @@ Route::group(['middleware' => 'check_role:admin,superuser'], function () {
     Route::get('inventories/delete_qrcode/{id}', [InventoryController::class, 'delete_qrcode'])->name('inventories.delete_qrcode');
     Route::get('inventories/print_qrcode/{id}', [InventoryController::class, 'print_qrcode'])->name('inventories.print_qrcode');
     Route::get('inventories/print_qrcode_employee/{id}', [InventoryController::class, 'print_qrcode_employee'])->name('inventories.print_qrcode_employee');
-
-    Route::get('inventories/{inventory}/edit', [InventoryController::class, 'edit'])->name('inventories.edit');
+    Route::get('inventories/{inventory}/{employee_id}', [InventoryController::class, 'show'])->name('inventories.show');
+    Route::get('inventories/edit/{inventory}/{id}', [InventoryController::class, 'edit'])->name('inventories.edit');
     Route::patch('inventories/{inventory}', [InventoryController::class, 'update'])->name('inventories.update');
-    Route::delete('inventories/{inventory}', [InventoryController::class, 'destroy'])->name('inventories.destroy');
+    Route::delete('inventories/{inventory}/{id}', [InventoryController::class, 'destroy'])->name('inventories.destroy');
 
     Route::post('inventories/addImages/{id}', [InventoryController::class, 'addImages'])->name('inventories.addImages');
     Route::get('inventories/deleteImage/{id}', [InventoryController::class, 'deleteImage'])->name('inventories.deleteImage');
     Route::get('inventories/deleteImages/{inventory_no}', [InventoryController::class, 'deleteImages'])->name('inventories.deleteImages');
-    // dipindah ke middleware auth (role user read only data inventory)
-    // Route::get('inventories/getInventories', [InventoryController::class, 'getInventories'])->name('inventories.getInventories');
-    // Route::get('inventories', [InventoryController::class, 'index'])->name('inventories.index');
-    // Route::get('inventories/{inventory}', [InventoryController::class, 'show'])->name('inventories.show');
-    // Route::get('trackings', [TrackingController::class, 'index'])->name('trackings.index');
-});
 
-Route::middleware('check_role:admin')->group(function () {
+
+    // role admin only
     Route::resource('components', ComponentController::class)->except(['show']);
     Route::resource('users', UserController::class)->except(['show']);
 

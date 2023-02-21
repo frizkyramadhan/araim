@@ -7,11 +7,11 @@ use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {
+        $this->middleware('check_role:admin,superuser');
+    }
+
     public function index()
     {
         $title = "Locations";
@@ -54,6 +54,23 @@ class LocationController extends Controller
         $location->save();
 
         return redirect()->route('locations.index')->with('success', 'Location added successfully');
+    }
+
+    public function storeFromInventory(Request $request)
+    {
+        $request->validate([
+            'location_name' => 'required|unique:locations',
+        ], [
+            'location_name.required' => 'Location name is required',
+            'location_name.unique' => 'Location name already exists',
+        ]);
+
+        $location = new Location();
+        $location->location_name = $request->location_name;
+        $location->location_status = 1;
+        $location->save();
+
+        return redirect()->back()->with('success', 'Location added successfully');
     }
 
     /**

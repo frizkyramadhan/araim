@@ -7,11 +7,12 @@ use Illuminate\Http\Request;
 
 class ComponentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
+    public function __construct()
+    {
+        $this->middleware('check_role:admin');
+    }
+
     public function index()
     {
         $title = 'Components';
@@ -75,7 +76,7 @@ class ComponentController extends Controller
         $title = 'Components';
         $subtitle = 'Edit Components';
 
-        return view('components.edit', compact('title', 'subtitle' ,'component'));
+        return view('components.edit', compact('title', 'subtitle', 'component'));
     }
 
     /**

@@ -12,7 +12,7 @@ class Category extends Model
 
     protected $guarded = [];
 
-    public function assets()
+    public function asset()
     {
         return $this->hasMany(Assets::class);
     }

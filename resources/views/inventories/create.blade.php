@@ -35,8 +35,13 @@
               <div class="card-tools">
                 <ul class="nav nav-pills ml-auto">
                   <li class="nav-item mr-2">
+                    @if ($employee_id == null)
                     <a class="btn btn-warning text-dark" href="{{ url('inventories') }}"><i class="fas fa-undo-alt"></i>
                       Back</a>
+                    @else
+                    <a class="btn btn-warning text-dark" href="{{ url('employees/'. $employee_id) }}"><i class="fas fa-undo-alt"></i>
+                      Back</a>
+                    @endif
                   </li>
                 </ul>
               </div>
@@ -46,6 +51,16 @@
               @csrf
               <input type="hidden" name="id_employee" value="{{ $employee_id }}">
               <div class="card-body">
+                @if (session('success'))
+                <div class="alert alert-success alert-dismissible show fade">
+                  <div class="alert-body">
+                    <button class="close" data-dismiss="alert">
+                      <span>&times;</span>
+                    </button>
+                    {{ session('success') }}
+                  </div>
+                </div>
+                @endif
                 <div class="row">
                   <div class="col-md-6">
                     <div class="card card-primary">
@@ -72,6 +87,7 @@
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">PIC</label>
                           <div class="col-sm-9">
+                            @if ($employee_id == null)
                             <select name="employee_id" class="form-control @error('employee_id') is-invalid @enderror select2bs4" style="width: 100%;" tabindex="1">
                               @foreach ($employees as $employee)
                               <option value="{{ $employee->id }}" {{ old('employee_id', $employee_id) == $employee->id ? 'selected' : '' }}>
@@ -79,6 +95,10 @@
                               </option>
                               @endforeach
                             </select>
+                            @else
+                            <input type="text" class="form-control @error('employee_id') is-invalid @enderror" value="{{ $employee->fullname }}" readonly>
+                            <input type="hidden" class="form-control @error('employee_id') is-invalid @enderror" value="{{ $employee->id }}" name="employee_id" readonly>
+                            @endif
                             @error('employee_id')
                             <div class="invalid-feedback">
                               {{ $message }}
@@ -132,8 +152,16 @@
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Brand</label>
                           <div class="col-sm-9">
-                            <input type="text" class="form-control @error('brand') is-invalid @enderror" name="brand" value="{{ old('brand') }}" tabindex="4">
-                            @error('brand')
+                            {{-- <input type="text" class="form-control @error('brand') is-invalid @enderror" name="brand" value="{{ old('brand') }}" tabindex="4"> --}}
+                            <select id="brand_id" name="brand_id" class="form-control @error('brand_id') is-invalid @enderror select2bs4" style="width: 100%;" tabindex="4">
+                              @foreach ($brands as $brand)
+                              <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                                {{ $brand->brand_name }}
+                              </option>
+                              @endforeach
+                              <option value="newBrand">- Define New -</option>
+                            </select>
+                            @error('brand_id')
                             <div class="error invalid-feedback">
                               {{ $message }}
                             </div>
@@ -255,8 +283,16 @@
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Location</label>
                           <div class="col-sm-9">
-                            <input type="text" class="form-control @error('location') is-invalid @enderror" name="location" value="{{ old('location') }}" tabindex="12">
-                            @error('location')
+                            {{-- <input type="text" class="form-control @error('location') is-invalid @enderror" name="location" value="{{ old('location') }}" tabindex="12"> --}}
+                            <select id="location_id" name="location_id" class="form-control @error('location_id') is-invalid @enderror select2bs4" style="width: 100%;" tabindex="12">
+                              @foreach ($locations as $location)
+                              <option value="{{ $location->id }}" {{ old('location_id') == $location->id ? 'selected' : '' }}>
+                                {{ $location->location_name }}
+                              </option>
+                              @endforeach
+                              <option value="newLocation">- Define New -</option>
+                            </select>
+                            @error('location_id')
                             <div class="error invalid-feedback">
                               {{ $message }}
                             </div>
@@ -366,6 +402,74 @@
   </div><!-- /.container-fluid -->
 </section>
 <!-- /.content -->
+
+<div class="modal fade" id="newBrandModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Add Brand</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-text="true">&times;</span>
+        </button>
+      </div>
+      <form class="form-horizontal" action="{{ url('brands/storeFromInventory') }}" method="POST">
+        @csrf
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="inputName">Brand</label>
+            <input type="text" class="form-control @error('brand_name') is-invalid @enderror" name="brand_name" value="{{ old('brand_name') }}" placeholder="Brand Name">
+            @error('brand_name')
+            <div class="error invalid-feedback">
+              {{ $message }}
+            </div>
+            @enderror
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal fade" id="newLocationModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Add Location</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-text="true">&times;</span>
+        </button>
+      </div>
+      <form class="form-horizontal" action="{{ url('locations/storeFromInventory') }}" method="POST">
+        @csrf
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="inputName">Location</label>
+            <input type="text" class="form-control @error('location_name') is-invalid @enderror" name="location_name" value="{{ old('location_name') }}" placeholder="Location Name">
+            @error('location_name')
+            <div class="error invalid-feedback">
+              {{ $message }}
+            </div>
+            @enderror
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 @endsection
 
 @section('styles')
@@ -390,6 +494,22 @@
     $(document).on('select2:open', () => {
       document.querySelector('.select2-search__field').focus();
     })
+
+    //brand modal
+    $('#brand_id').change(function() {
+      var opval = $(this).val();
+      if (opval == "newBrand") {
+        $('#newBrandModal').modal("show");
+      }
+    });
+
+    //location modal
+    $('#location_id').change(function() {
+      var opval = $(this).val();
+      if (opval == "newLocation") {
+        $('#newLocationModal').modal("show");
+      }
+    });
   })
 
   //  specification

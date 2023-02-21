@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 class BapbController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {
+        $this->middleware('check_role:admin');
+    }
+
     public function index()
     {
         $title = 'BAPB';
