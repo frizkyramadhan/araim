@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\api\InventoryApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,4 +19,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('inventories/qrcodeJson/{id}', [InventoryController::class, 'qrcodeJson'])->name('inventories.qrcodeJson');
+Route::get('inventories/qrcode_json/{id}', [InventoryApiController::class, 'qrcode_json'])->name('inventories.qrcode_json');

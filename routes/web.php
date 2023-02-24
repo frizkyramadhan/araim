@@ -36,6 +36,7 @@ Route::post('register', [RegisterController::class, 'store']);
 Route::get('login', [LoginController::class, 'index'])->name('login')->middleware('guest');
 Route::post('login', [LoginController::class, 'authenticate']);
 
+Route::get('inventories/qrcodeJson/{id}', [InventoryController::class, 'qrcodeJson'])->name('inventories.qrcodeJson');
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');

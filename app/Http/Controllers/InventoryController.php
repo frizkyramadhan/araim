@@ -36,6 +36,7 @@ class InventoryController extends Controller
     public function __construct()
     {
         // set middleware for admin and superuser that can access this controller but for user just can access index
+        $this->middleware('guest')->only('qrcodeJson');
         $this->middleware('auth');
         $this->middleware('check_role:admin,superuser', ['except' => ['index', 'getInventories', 'show']]);
     }
@@ -760,7 +761,8 @@ class InventoryController extends Controller
         //     "Merk = " . $inventory->brand_name . "\n" .
         //     "Lokasi = " . $inventory->location_name . "\n";
 
-        $content = URL::route('inventories.qrcodeJson', $inventory->id);
+        // $content = URL::route('inventories.qrcodeJson', $inventory->id);
+        $content = 'http://127.0.0.1:8080/api/inventories/qrcode/' . $inventory->id;
 
         $result = Builder::create()
             ->writer(new PngWriter())
@@ -899,7 +901,9 @@ class InventoryController extends Controller
 
     public function qrcodeJson($id)
     {
-        $inventory = Inventory::leftJoin('employees', 'inventories.employee_id', '=', 'employees.id')
+        // $qrcode = Inventory::find($id);
+
+        $qrcode = Inventory::leftJoin('employees', 'inventories.employee_id', '=', 'employees.id')
             ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
             ->leftJoin('categories', 'assets.category_id', '=', 'categories.id')
             ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
@@ -907,18 +911,47 @@ class InventoryController extends Controller
             ->leftJoin('departments', 'inventories.department_id', '=', 'departments.id')
             ->leftJoin('locations', 'inventories.location_id', '=', 'locations.id')
             ->select('inventories.*', 'employees.nik', 'employees.fullname', 'assets.asset_name', 'brands.brand_name', 'projects.project_code', 'projects.project_name', 'departments.dept_name', 'locations.location_name', 'categories.category_name')
-            ->find($id);
+            ->where('inventories.id', $id)
+            ->first();
 
-        $xml = new SimpleXMLElement('<inventory/>');
-        $item = $xml->addChild('item');
-        $item->addChild('inventory_no', $inventory->inventory_no);
-        $item->addChild('asset_name', $inventory->asset_name);
-        $item->addChild('category_name', $inventory->category_name);
-        $item->addChild('location_name', $inventory->location_name);
-        $item->addChild('person_in_charge', $inventory->fullname);
+        // make validation if the query is null
+        if ($qrcode == null) {
+            return response()->json([
+                'message' => 'Data not found'
+            ], 404);
+        } else {
+            return response()->json(
+                [
+                    'message' => 'Data found',
+                    'data' => $qrcode
+                ],
+                200
+            );
+        }
 
-        // return response()->json($inventory);
-        return response($xml->asXML(), 200)
-            ->header('Content-Type', 'application/xml');
+
+        // $xml = new SimpleXMLElement('<inventory/>');
+        // $item = $xml->addChild('item');
+        // $item->addChild('inventory_no', $inventory->inventory_no);
+        // $item->addChild('asset', $inventory->asset_name);
+        // $item->addChild('category', $inventory->category_name);
+        // $item->addChild('brand', $inventory->brand_name);
+        // $item->addChild('model', $inventory->model_asset);
+        // $item->addChild('sn', $inventory->serial_no);
+        // $item->addChild('pn', $inventory->part_no);
+        // $item->addChild('qty', $inventory->quantity);
+        // $item->addChild('inventory_status', $inventory->inventory_status);
+        // $item->addChild('transfer_status', $inventory->transfer_status);
+        // $item->addChild('project_code', $inventory->project_code);
+        // $item->addChild('project_name', $inventory->project_name);
+        // $item->addChild('department', $inventory->dept_name);
+        // $item->addChild('location_name', $inventory->location_name);
+        // $item->addChild('pic', $inventory->fullname);
+        // $item->addChild('nik', $inventory->nik);
+        // $item->addChild('input_date', date('d-M-Y', strtotime($inventory->input_date)));
+
+        // // return response()->json($inventory);
+        // return response($xml->asXML(), 200)
+        //     ->header('Content-Type', 'application/xml');
     }
 }
