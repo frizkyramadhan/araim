@@ -24,15 +24,14 @@ use Illuminate\Support\Facades\DB;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\File;
-use Maatwebsite\Excel\Facades\Excel;
 use Endroid\QrCode\Encoding\Encoding;
 use Illuminate\Support\Facades\Storage;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
-use Illuminate\Support\Facades\URL;
 
 class InventoryController extends Controller
 {
+
     public function __construct()
     {
         // set middleware for admin and superuser that can access this controller but for user just can access index
@@ -394,7 +393,7 @@ class InventoryController extends Controller
             'department_id' => 'required',
             'inventory_status' => 'required',
             'brand_id' => 'required',
-            // 'brand' => 'required',
+            'location_id' => 'required',
             'model_asset' => 'required',
             'quantity' => 'required'
         ]);
@@ -526,7 +525,7 @@ class InventoryController extends Controller
             'department_id' => 'required',
             'inventory_status' => 'required',
             'brand_id' => 'required',
-            // 'brand' => 'required',
+            'location_id' => 'required',
             'model_asset' => 'required',
         ]);
 
@@ -780,9 +779,12 @@ class InventoryController extends Controller
 
         $result->saveToFile(public_path('../storage/app/public/qrcode/qr-' . $inventory->id . '.png'));
 
+        // set dissableLogging() to prevent log
+        $inventory->disableLogging();
         $inventory->update([
             'qrcode' => 'qr-' . $inventory->id . '.png',
         ]);
+
 
         // return redirect('inventories/' . $inventory->id)->with('success', 'QR Code successfully generated!');
         return back()->with('success', 'QR Code successfully generated!');
@@ -796,6 +798,7 @@ class InventoryController extends Controller
         $qrcode = public_path('../storage/app/public/qrcode/' . $inventory->qrcode);
         if (file_exists($qrcode)) {
             unlink($qrcode);
+            $inventory->disableLogging();
             $inventory->update([
                 'qrcode' => null,
             ]);

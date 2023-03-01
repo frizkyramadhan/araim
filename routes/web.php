@@ -43,6 +43,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('dashboard/summary/{id}', [DashboardController::class, 'summary'])->name('dashboard.summary');
     Route::get('dashboard/logs', [DashboardController::class, 'logs'])->name('dashboard.logs');
     Route::get('dashboard/json', [DashboardController::class, 'json'])->name('dashboard.json');
+    Route::get('dashboard/getLogs', [DashboardController::class, 'getLogs'])->name('dashboard.getLogs');
     Route::get('contact', function () {
         return view('contact', ['title' => 'Contact Us']);
     });

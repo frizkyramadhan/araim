@@ -282,7 +282,7 @@
                               </option>
                               @endforeach
                             </select>
-                            @error('location')
+                            @error('location_id')
                             <div class="error invalid-feedback">
                               {{ $message }}
                             </div>

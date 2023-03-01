@@ -43,8 +43,66 @@
               </div>
             </div><!-- /.card-header -->
             <div class="card-body">
-              <div class="tab-content p-0">
-                <table id="example1" class="table table-sm table-bordered table-striped">
+              <div class="card card-primary">
+                <div class="card-header">
+                  <h4 class="card-title w-100">
+                    <a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
+                      <i class="fas fa-filter"></i> Filter
+                    </a>
+                  </h4>
+                </div>
+                <div id="collapseOne" class="collapse" data-parent="#accordion">
+                  <div class="card-body">
+                    <div class="row form-group">
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class=" form-control-label">From</label>
+                          <input type="date" class="form-control" name="date1" id="date1" value="{{ request('date1') }}">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class=" form-control-label">To</label>
+                          <input type="date" class="form-control" name="date2" id="date2" value="{{ request('date2') }}">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Log Name</label>
+                          <input type="text" class="form-control" name="log_name" id="log_name" value="{{ request('log_name') }}">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Description</label>
+                          <input type="text" class="form-control" name="description" id="description" value="{{ request('description') }}">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Properties</label>
+                          <input type="text" class="form-control" name="properties" id="properties" value="{{ request('properties') }}">
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Causer</label>
+                          <input type="text" class="form-control" name="name" id="name" value="{{ request('name') }}">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class=" form-control-label">&nbsp;</label>
+                          <button id="btn-reset" type="button" class="btn btn-danger btn-block">Reset</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table id="example1" width="100%" class="table table-sm table-bordered table-striped">
                   <thead>
                     <tr>
                       <th>No</th>
@@ -56,51 +114,6 @@
                       <th class="text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    @foreach ($logs as $log)
-                    <tr>
-                      <td>{{ $loop->iteration }}</td>
-                      <td>{{ date('d F Y', strtotime($log->created_at)) }}</td>
-                      <td>{{ $log->log_name }}</td>
-                      <td>
-                        @if($log->description == 'created')
-                        <span class="badge badge-info">{{ $log->description }}</span>
-                        @elseif($log->description == 'updated')
-                        <span class="badge badge-success">{{ $log->description }}</span>
-                        @elseif($log->description == 'deleted')
-                        <span class="badge badge-danger">{{ $log->description }}</span>
-                        @endif
-                      </td>
-                      <td>
-                        @if($log->description == 'updated')
-                        @foreach ($log->properties as $property)
-                        Inventory No: <b>{{ $property['inventory_no'] ?? '-' }}</b><br>
-                        Employee: {{ $property['employee.fullname'] ?? '-' }}<br>
-                        Project: {{ $property['project.project_code'] ?? '-' }}<br>
-                        Department: {{ $property['department.dept_name'] ?? '-' }}<br>
-                        Asset: {{ $property['asset.asset_name'] ?? '-' }}<br>
-                        Quantity: {{ $property['quantity'] ?? '-' }}<br>
-                        Inventory Status: {{ $property['inventory_status'] ?? '-' }}<br>
-                        Transfer Status: {{ $property['transfer_status'] ?? '-' }}<br><br>
-                        @endforeach
-                        @else
-                        @foreach ($log->properties as $property)
-                        Inventory No: <b>{{ $property['inventory_no'] ?? '-' }}</b><br>
-                        Employee: {{ $property['employee.fullname'] ?? '-' }}<br>
-                        Project: {{ $property['project.project_code'] ?? '-' }}<br>
-                        Department: {{ $property['department.dept_name'] ?? '-' }}<br>
-                        Asset: {{ $property['asset.asset_name'] ?? '-' }}<br>
-                        Quantity: {{ $property['quantity'] ?? '-' }}<br>
-                        Inventory Status: {{ $property['inventory_status'] ?? '-' }}<br>
-                        Transfer Status: {{ $property['transfer_status'] ?? '-' }}<br>
-                        @endforeach
-                        @endif
-                      </td>
-                      <td>{{ $log->name ?? '' }}</td>
-                      <td class="text-center"><a title="Detail" class="btn btn-sm btn-icon btn-success" href="{{ url('inventories/' . $log->subject_id) }}" target="blank"><i class="fas fa-info-circle"></i> Detail</a></td>
-                    </tr>
-                    @endforeach
-                  </tbody>
                 </table>
               </div>
             </div><!-- /.card-body -->
@@ -138,7 +151,7 @@
 <script src="{{ asset('assets/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
 {{-- <script src="{{ asset('assets/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script> --}}
 <!-- Page specific script -->
-<script>
+{{-- <script>
   $(function() {
     $("#example1").DataTable({
       "responsive": true
@@ -146,6 +159,87 @@
       , "autoWidth": false
       , "buttons": ["copy", "csv", "excel", "print"]
     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+  });
+
+</script> --}}
+
+<script>
+  $(function() {
+    var table = $("#example1").DataTable({
+      responsive: true
+      , autoWidth: true
+      , lengthChange: true
+      , lengthMenu: [
+        [10, 25, 50, 100, -1]
+        , ['10', '25', '50', '100', 'Show all']
+      ]
+      , dom: 'lBrtpi'
+      , buttons: ["copy", "csv", "excel"]
+      , processing: true
+      , serverSide: true
+      , ajax: {
+        url: "{{ route('dashboard.getLogs') }}"
+        , data: function(d) {
+          d.date1 = $('#date1').val()
+            , d.date2 = $('#date2').val()
+            , d.log_name = $('#log_name').val()
+            , d.description = $('#description').val()
+            , d.properties = $('#properties').val()
+            , d.name = $('#name').val()
+            , d.search = $("input[type=search][aria-controls=example1]").val()
+          console.log(d);
+        }
+      }
+      , columns: [{
+        data: 'DT_RowIndex'
+        , orderable: false
+        , searchable: false
+        , className: 'text-center'
+      }, {
+        data: "created_at"
+        , name: "created_at"
+        , orderable: false
+      , }, {
+        data: "log_name"
+        , name: "log_name"
+        , orderable: false
+      , }, {
+        data: "description"
+        , name: "description"
+        , orderable: false
+      , }, {
+        data: "properties"
+        , name: "properties"
+        , orderable: false
+      , }, {
+        data: "name"
+        , name: "name"
+        , orderable: false
+      , }, {
+        data: "action"
+        , name: "action"
+        , orderable: false
+        , searchable: false
+        , className: "text-center"
+      }]
+      , fixedColumns: true
+    , })
+    $(
+        '#date1, #date2, #log_name, #description, #name, #properties'
+      )
+      .keyup(function() {
+        table.draw();
+      });
+    $('#date1, #date2, #log_name, #description, #name, #properties').change(function() {
+      table.draw();
+    });
+    $('#btn-reset').click(function() {
+      $(
+          '#date1, #date2, #log_name, #description, #name, #properties'
+        )
+        .val('');
+      $('#date1, #date2, #log_name, #description, #name, #properties').change();
+    });
   });
 
 </script>

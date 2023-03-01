@@ -16,7 +16,7 @@ class CreateEmployeesTable extends Migration
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->integer('nik');
-            $table->string('name');
+            $table->string('fullname');
             $table->foreignId('position_id')->references('id')->on('positions');
             $table->foreignId('project_id')->references('id')->on('projects');
             $table->string('email')->nullable();

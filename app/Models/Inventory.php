@@ -25,18 +25,19 @@ class Inventory extends Model
         'properties' => 'collection' // casting the JSON database column
     ];
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->useLogName('Inventory')
-            ->logOnly(['id', 'inventory_no', 'employee.fullname', 'asset.asset_name', 'project.project_code', 'project.project_name', 'department.dept_name', 'brand', 'model_asset', 'serial_no', 'part_no', 'po_no', 'quantity', 'remarks', 'input_date', 'reference_no', 'reference_date', 'location', 'inventory_status', 'transfer_status', 'is_active', 'created_at', 'updated_at'])
-            // ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
-    }
-
     public function asset()
     {
         return $this->belongsTo(Asset::class);
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
     }
 
     public function project()
@@ -54,15 +55,6 @@ class Inventory extends Model
         return $this->belongsTo(Employee::class);
     }
 
-    public function location()
-    {
-        return $this->belongsTo(Location::class);
-    }
-
-    public function brand()
-    {
-        return $this->belongsTo(Brand::class, 'brand_id', 'id', 'inner');
-    }
 
     public function specification()
     {
@@ -77,5 +69,15 @@ class Inventory extends Model
     public function image()
     {
         return $this->hasMany(Image::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('Inventory')
+            // ->logAll()
+            ->logOnly(['id', 'inventory_no', 'employee.fullname', 'asset.asset_name', 'project.project_code', 'project.project_name', 'department.dept_name', 'brand.brand_name', 'model_asset', 'serial_no', 'part_no', 'po_no', 'quantity', 'remarks', 'input_date', 'reference_no', 'reference_date', 'location.location_name', 'inventory_status', 'transfer_status', 'is_active', 'created_at', 'updated_at'])
+            // ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

@@ -19,6 +19,7 @@ class CreateSpecificationsTable extends Migration
             $table->foreignId('component_id')->references('id')->on('components');
             $table->string('specification');
             $table->string('spec_remarks')->nullable();
+            $table->string('spec_status')->nullable();
             $table->timestamps();
         });
     }

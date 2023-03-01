@@ -14,6 +14,6 @@ class Brand extends Model
 
     public function inventory()
     {
-        return $this->hasMany(Inventory::class);
+        return $this->hasMany(Inventory::class, 'id');
     }
 }
