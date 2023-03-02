@@ -342,11 +342,6 @@ class InventoryController extends Controller
             ->toJson();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create($employee_id = null)
     {
         $title = 'Inventories';
@@ -374,12 +369,6 @@ class InventoryController extends Controller
         return view('inventories.create', compact('title', 'subtitle', 'employees', 'employee', 'assets', 'brands', 'projects', 'departments', 'locations', 'components', 'inv_no', 'year', 'month', 'employee_id'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $id_employee = $request->input('id_employee');
@@ -446,12 +435,6 @@ class InventoryController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Inventory  $inventory
-     * @return \Illuminate\Http\Response
-     */
     public function show(Inventory $inventory, $employee_id = null)
     {
         $title = 'Inventories';
@@ -497,13 +480,6 @@ class InventoryController extends Controller
         return view('inventories.edit', compact('title', 'subtitle', 'employees', 'employee', 'employee_id', 'assets', 'brands', 'projects', 'departments', 'locations', 'components', 'inventory', 'specifications'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Inventory  $inventory
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Inventory $inventory)
     {
         $id_employee = $request->input('id_employee');
@@ -575,12 +551,6 @@ class InventoryController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Inventory  $inventory
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Inventory $inventory, $employee_id = null)
     {
         $images = Image::where('inventory_no', $inventory->inventory_no)->get();

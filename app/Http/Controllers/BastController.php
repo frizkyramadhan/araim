@@ -35,7 +35,9 @@ class BastController extends Controller
             $inventories = DB::table('inventories')
                 ->leftJoin('employees', 'inventories.employee_id', '=', 'employees.id')
                 ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
-                ->select('inventories.*', 'employees.nik', 'employees.fullname', 'assets.asset_name')
+                ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
+                ->leftJoin('locations', 'inventories.location_id', '=', 'locations.id')
+                ->select('inventories.*', 'employees.nik', 'employees.fullname', 'assets.asset_name', 'brands.brand_name', 'locations.location_name')
                 ->where('employees.id', $employee_id)
                 ->orderBy('inventories.id', 'desc')
                 ->get();
@@ -126,7 +128,8 @@ class BastController extends Controller
         $bast_row = DB::table('basts')
             ->leftJoin('inventories', 'basts.inventory_id', '=', 'inventories.id')
             ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
-            ->select('basts.bast_no', 'inventories.*', 'assets.asset_name')
+            ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
+            ->select('basts.bast_no', 'inventories.*', 'assets.asset_name', 'brands.brand_name')
             ->where('bast_no', '=', $bast_no)
             ->get();
         // dd($bast, $bast_row);
@@ -167,18 +170,20 @@ class BastController extends Controller
 
         $inventories = DB::table('inventories')
             ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+            ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
             ->leftJoin('employees', 'inventories.employee_id', '=', 'employees.id')
             ->leftJoin('basts', 'basts.inventory_id', '=', 'inventories.id')
-            ->select('inventories.*', 'assets.asset_name', 'basts.inventory_id')
+            ->select('inventories.*', 'assets.asset_name', 'basts.inventory_id', 'brands.brand_name')
             ->where('employees.id', '=', $bast->bast_receive)
             ->orderBy('inventories.id', 'desc')
             ->distinct()->get();
 
         $bast_row = DB::table('inventories')
             ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+            ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
             ->leftJoin('employees', 'inventories.employee_id', '=', 'employees.id')
             ->leftJoin('basts', 'basts.inventory_id', '=', 'inventories.id')
-            ->select('inventories.*', 'assets.asset_name', 'basts.inventory_id', 'basts.bast_no', 'basts.id as bast_id')
+            ->select('inventories.*', 'assets.asset_name', 'basts.inventory_id', 'basts.bast_no', 'basts.id as bast_id', 'brands.brand_name')
             ->where('employees.id', '=', $bast->bast_receive)
             ->where('basts.bast_no', '=', $bast_no)
             ->orderBy('inventories.id', 'desc')
@@ -276,7 +281,8 @@ class BastController extends Controller
         $bast_row = DB::table('basts')
             ->leftJoin('inventories', 'basts.inventory_id', '=', 'inventories.id')
             ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
-            ->select('basts.bast_no', 'inventories.*', 'assets.asset_name')
+            ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
+            ->select('basts.bast_no', 'inventories.*', 'assets.asset_name', 'brands.brand_name')
             ->where('bast_no', '=', $bast_no)
             ->get();
         // dd($bast, $bast_row);
