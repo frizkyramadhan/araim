@@ -37,7 +37,7 @@
 																<h4>{{ $tracking->inventory_no }} - {{ $tracking->asset_name }}</h4>
 																<p class="mb-0">{{ $tracking->nik }} - {{ $tracking->fullname }} |
 																	{{ $tracking->p_code_emp }} - {{ $tracking->p_name_emp }}</p>
-																<p class="mb-0">{{ $tracking->brand }} - {{ $tracking->model_asset }} |
+																<p class="mb-0">{{ $tracking->brand_name }} - {{ $tracking->model_asset }} |
 																	{{ $tracking->serial_no }} - {{ $tracking->part_no }} | {{ $tracking->remarks }} | Qty :
 																	{{ $tracking->quantity }}</p>
 															</div>
@@ -88,7 +88,7 @@
 																			<tr>
 																				<td>Location</td>
 																				<td>:</td>
-																				<td>{{ $tracking->location }}</td>
+																				<td>{{ $tracking->location_name }}</td>
 																			</tr>
 																		</table>
 																	</div>

@@ -259,7 +259,7 @@
                         <tr>
                           <td>Brand</td>
                           <td style="width: 5%">:</td>
-                          <td><b>{{ $inventory->brand }}</b></td>
+                          <td><b>{{ $inventory->brand->brand_name ?? null }}</b></td>
                         </tr>
                         <tr>
                           <td>Model</td>
@@ -337,7 +337,7 @@
                         <tr>
                           <td>Location</td>
                           <td style="width: 5%">:</td>
-                          <td><b>{{ $inventory->location }}</b></td>
+                          <td><b>{{ $inventory->location->location_name }}</b></td>
                         </tr>
                       </table>
                     </div>

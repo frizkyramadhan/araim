@@ -26,8 +26,10 @@ class TrackingController extends Controller
             ->leftJoin('projects as p2', 'employees.project_id', '=', 'p2.id')
             ->leftJoin('departments', 'inventories.department_id', '=', 'departments.id')
             ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+            ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
+            ->leftJoin('locations', 'inventories.location_id', '=', 'locations.id')
             ->leftJoin('categories', 'assets.category_id', '=', 'categories.id')
-            ->select('inventories.*', 'assets.asset_name', 'categories.category_name', 'p1.project_code as p_code_asset', 'p1.project_name as p_name_asset', 'p2.project_code as p_code_emp', 'p2.project_name as p_name_emp', 'employees.nik', 'employees.fullname', 'departments.dept_name')
+            ->select('inventories.*', 'assets.asset_name', 'categories.category_name', 'p1.project_code as p_code_asset', 'p1.project_name as p_name_asset', 'p2.project_code as p_code_emp', 'p2.project_name as p_name_emp', 'employees.nik', 'employees.fullname', 'departments.dept_name', 'brands.brand_name', 'locations.location_name')
             ->when($request->search, function ($query) use ($request) {
                 return $query->where('inventories.inventory_no', 'like', '%' . $request->search . '%')->orWhere('inventories.serial_no', 'like', '%' . $request->search . '%');
             })

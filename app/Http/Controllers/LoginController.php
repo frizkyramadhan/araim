@@ -17,7 +17,7 @@ class LoginController extends Controller
     public function authenticate(Request $request)
     {
         $validatedData = $request->validate([
-            'email' => 'required|email:dns|ends_with:@arka.co.id',
+            'email' => 'required|ends_with:@arka.co.id',
             'password' => 'required|min:5',
         ], [
             'email.required' => 'Email is required',
@@ -25,7 +25,7 @@ class LoginController extends Controller
         ]);
         if (Auth::attempt(['email' => $validatedData['email'], 'password' => $validatedData['password'], 'user_status' => 1])) {
             // $user = Auth::user();
-            // dd($user);
+            // dd($validatedData);
             $request->session()->regenerate();
             return redirect()->intended('/');
         } else {

@@ -438,56 +438,58 @@
 
 <script>
   $(document).ready(function() {
-        $('#repair-history').html('');
-        $.ajax({
-              url: 'http://localhost/arka-rest-server/api/repairv2'
-              , type: 'get'
-              , datatype: 'json'
-              , data: {
-                'arka-key': 'arka123'
-                , 'id': <?= $inventory -> id ?>
+    $('#repair-history').html('');
+    var id = `{{ $inventory->id }}`;
+    $.ajax({
+      url: 'http://192.168.33.37/arka-rest-server/api/repairv2'
+      , type: 'get'
+      , datatype: 'json'
+      , data: {
+        'arka-key': 'arka123'
+        , 'id': id
       }
       , success: function(result) {
-        console.log(result);
         if (result.status == true) {
           let repair = result.data;
-          var trHTML = '';
+          console.log(repair);
+          var trHTML = "";
           trHTML +=
-            `<table width=100% class="table table-striped table-hover">
-						<tr>
-							<th>Date</th>
-							<th>Component</th>
-							<th>Damage</th>
-							<th>Cost</th>
-						</tr>
-                `;
+            `<div class="table-responsive">
+              <table width=100% class="table table-striped table-hover">
+                <tr>
+                  <th>Date</th>
+                  <th>Component</th>
+                  <th>Damage</th>
+                  <th>Cost</th>
+                </tr>`;
           $.each(repair, function(i, data) {
             trHTML +=
-              ` < tr >
-                <td>` + data.date_repair + `</td> <
-                td > ` + data.component_name + `
-                ` + data.specification + ` < /td> <
-                td > ` + data.damage + ` < /td> <
-                td > <div align="right">` + data.cost + `</div> < /td> < /
-                tr > `;
-      });
+              `<tr>
+                <td>` + data.date_repair + `</td>
+                <td>` + data.component_name + ` ` + data.specification + `</td>
+                <td>` + data.damage + `</td>
+                <td><div align="right">` + data.cost + `</div></td>
+              </tr>`;
+          });
 
-    // get sum of cost damage across all objects in array
-    var total = repair.reduce(function(prev, cur) {
-      return prev + parseInt(cur.cost);
-    }, 0); trHTML += ` < tr >
-                <td colspan="3"><div align="right"><b>Total</b></div></td> <
-                td > <div align="right"><b>` + total + `</b></td>
-					</tr>`; trHTML += `</table>`; $('#repair-history').append(trHTML);
-  }
-  else {
-    $('#repair-history').html(`
+          // get sum of cost damage across all objects in array
+          var total = repair.reduce(function(prev, cur) {
+            return prev + parseInt(cur.cost);
+          }, 0);
+          trHTML += `<tr>
+                      <td colspan="3"><div align="right"><b>Total</b></div></td>
+                      <td><div align="right"><b>` + total + `</b></td>
+					          </tr>`;
+          trHTML += `</table></div>`;
+          $('#repair-history').append(trHTML);
+        } else {
+          $('#repair-history').html(`
 				<div>
 					<h4 class="text-center">` + result.message + `</h4>
 				</div>`);
-  }
-  }
-  });
+        }
+      }
+    });
   });
 
 </script>

@@ -581,7 +581,7 @@ class InventoryController extends Controller
         $departments = Department::where('dept_status', '1')->orderBy('dept_name', 'asc')->get();
         $locations = Location::where('location_status', '1')->orderBy('location_name', 'asc')->get();
 
-        $inventory = Inventory::with('employee', 'asset', 'project', 'department')->find($id);
+        $inventory = Inventory::with('employee', 'asset', 'project', 'department','brand','location')->find($id);
         $specifications = Specification::with('component')->where('inventory_id', $id)->get();
 
         return view('inventories.transfer', compact('title', 'subtitle', 'employees', 'inventory', 'specifications', 'projects', 'departments', 'locations'));
@@ -589,14 +589,15 @@ class InventoryController extends Controller
 
     public function transferProcess($id, Request $request)
     {
-        $inventory = Inventory::find($id);
-
         $request->validate([
             'input_date' => 'required',
             'employee_id' => 'required',
             'remarks' => 'required',
         ]);
 
+        $data = $request->all();
+        
+        $inventory = Inventory::find($id);
         $qty = $inventory->quantity;
         $qty_new = $qty - $request->quantity;
 
@@ -619,7 +620,7 @@ class InventoryController extends Controller
 
 
         // store new data
-        $data = $request->all();
+        
         $new_inventory = new Inventory();
         $new_inventory->inventory_no = $data['inventory_no'];
         $new_inventory->input_date = $data['input_date'];
@@ -628,7 +629,7 @@ class InventoryController extends Controller
         $new_inventory->project_id = $data['project_id'];
         $new_inventory->department_id = $data['department_id'];
         $new_inventory->brand_id = $data['brand_id'];
-        $new_inventory->brand = $data['brand'];
+        // $new_inventory->brand = $data['brand'];
         $new_inventory->model_asset = $data['model_asset'];
         $new_inventory->serial_no = $data['serial_no'];
         $new_inventory->part_no = $data['part_no'];
@@ -731,7 +732,7 @@ class InventoryController extends Controller
         //     "Lokasi = " . $inventory->location_name . "\n";
 
         // $content = URL::route('inventories.qrcodeJson', $inventory->id);
-        $content = 'http://127.0.0.1:8080/api/inventories/qrcode/' . $inventory->id;
+        $content = 'http://10.10.110.97/arka-api/api/inventories/qrcode/' . $inventory->id;
 
         $result = Builder::create()
             ->writer(new PngWriter())
