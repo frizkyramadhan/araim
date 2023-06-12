@@ -72,20 +72,20 @@ class Inventory extends Model
     }
 
     // spatie/activity-logs v3 for php < 8
-    // protected static $logName = 'Inventory';
+    protected static $logName = 'Inventory';
 
-    // protected static $logAttributes = ['id', 'inventory_no', 'employee.fullname', 'asset.asset_name', 'project.project_code', 'project.project_name', 'department.dept_name', 'brand.brand_name', 'model_asset', 'serial_no', 'part_no', 'po_no', 'quantity', 'remarks', 'input_date', 'reference_no', 'reference_date', 'location.location_name', 'inventory_status', 'transfer_status', 'is_active', 'created_at', 'updated_at'];
+    protected static $logAttributes = ['id', 'inventory_no', 'employee.fullname', 'asset.asset_name', 'project.project_code', 'project.project_name', 'department.dept_name', 'brand.brand_name', 'model_asset', 'serial_no', 'part_no', 'po_no', 'quantity', 'remarks', 'input_date', 'reference_no', 'reference_date', 'location.location_name', 'inventory_status', 'transfer_status', 'is_active', 'created_at', 'updated_at'];
 
-    // protected static $submitEmptyLogs = false;
+    protected static $submitEmptyLogs = false;
 
     // spatie/activity-logs v4 for php 8 up
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->useLogName('Inventory')
-            // ->logAll()
-            ->logOnly(['id', 'inventory_no', 'employee.fullname', 'asset.asset_name', 'project.project_code', 'project.project_name', 'department.dept_name', 'brand.brand_name', 'model_asset', 'serial_no', 'part_no', 'po_no', 'quantity', 'remarks', 'input_date', 'reference_no', 'reference_date', 'location.location_name', 'inventory_status', 'transfer_status', 'is_active', 'created_at', 'updated_at'])
-            // ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
-    }
+    // public function getActivitylogOptions(): LogOptions
+    // {
+    //     return LogOptions::defaults()
+    //         ->useLogName('Inventory')
+    //         // ->logAll()
+    //         ->logOnly(['id', 'inventory_no', 'employee.fullname', 'asset.asset_name', 'project.project_code', 'project.project_name', 'department.dept_name', 'brand.brand_name', 'model_asset', 'serial_no', 'part_no', 'po_no', 'quantity', 'remarks', 'input_date', 'reference_no', 'reference_date', 'location.location_name', 'inventory_status', 'transfer_status', 'is_active', 'created_at', 'updated_at'])
+    //         // ->logOnlyDirty()
+    //         ->dontSubmitEmptyLogs();
+    // }
 }

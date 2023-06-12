@@ -19,7 +19,6 @@
         </form>
       </div>
     </div>
-
     @if ($request->search)
     @if ($trackings->count() > 0)
     @foreach ($trackings as $tracking)
