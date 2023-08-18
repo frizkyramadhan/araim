@@ -338,7 +338,10 @@ if ($hari == "Monday"){
   <table width="100%" border="0" cellspacing="15" class="emp">
     <tr>
       <td>
-        <div align="center"><i>Nb: Berita Acara Serah Terima( asli) yang telah ditanda tangani dikirim kembali Ke HO Balikpapan</i></div>
+        <div align="center">
+          <i>Nb: Berita Acara Serah Terima( asli) yang telah ditanda tangani dikirim kembali Ke HO Balikpapan</i><br>
+          <i>Penambahan, modifikasi, dan pemindahan aset tanpa seizin Departemen Accounting & IT, akan diberikan laporan ketidaksesuaian dan diberikan sanksi sesuai dengan peraturan perusahaan.</i>
+        </div>
       </td>
     </tr>
   </table>
