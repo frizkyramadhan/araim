@@ -581,7 +581,7 @@ class InventoryController extends Controller
         $departments = Department::where('dept_status', '1')->orderBy('dept_name', 'asc')->get();
         $locations = Location::where('location_status', '1')->orderBy('location_name', 'asc')->get();
 
-        $inventory = Inventory::with('employee', 'asset', 'project', 'department','brand','location')->find($id);
+        $inventory = Inventory::with('employee', 'asset', 'project', 'department', 'brand', 'location')->find($id);
         $specifications = Specification::with('component')->where('inventory_id', $id)->get();
 
         return view('inventories.transfer', compact('title', 'subtitle', 'employees', 'inventory', 'specifications', 'projects', 'departments', 'locations'));
@@ -596,7 +596,7 @@ class InventoryController extends Controller
         ]);
 
         $data = $request->all();
-        
+
         $inventory = Inventory::find($id);
         $qty = $inventory->quantity;
         $qty_new = $qty - $request->quantity;
@@ -620,7 +620,7 @@ class InventoryController extends Controller
 
 
         // store new data
-        
+
         $new_inventory = new Inventory();
         $new_inventory->inventory_no = $data['inventory_no'];
         $new_inventory->input_date = $data['input_date'];
