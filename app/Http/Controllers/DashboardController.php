@@ -59,7 +59,7 @@ class DashboardController extends Controller
         $asset = Asset::find($id);
         $title = 'Summary - ' . $asset->asset_name;
         $subtitle = 'Summary - ' . $asset->asset_name;
-        $summary = Inventory::with('asset', 'project', 'department', 'employee')
+        $summary = Inventory::with('asset', 'project', 'department', 'employee', 'brand')
             ->where('inventories.asset_id', '=', $id)
             ->where('inventories.inventory_status', '=', 'Good')
             ->where('inventories.transfer_status', '=', 'Available')

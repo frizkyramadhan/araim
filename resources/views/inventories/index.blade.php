@@ -297,7 +297,6 @@
             , d.dept_name = $('#dept_name').val()
             , d.inventory_status = $('#inventory_status').val()
             , d.transfer_status = $('#transfer_status').val()
-            , d.search = $("input[type=search][aria-controls=example1]").val()
           console.log(d);
         }
       }

@@ -386,6 +386,7 @@
                                 <th style="vertical-align: middle">Component</th>
                                 <th style="vertical-align: middle">Description</th>
                                 <th style="vertical-align: middle">Remarks</th>
+                                <th style="vertical-align: middle">Status</th>
                                 <th style="width: 40px"><button type="button" id="dynamic-ar" class="btn btn-outline-primary" tabindex="18"><i class="fas fa-plus"></i></button></th>
                               </tr>
                             </thead>
@@ -395,6 +396,15 @@
                                 <td>{{ $spec->component->component_name }}</td>
                                 <td>{{ $spec->specification }}</td>
                                 <td>{{ $spec->spec_remarks }}</td>
+                                <td>@if ($spec->spec_status == 'Available')
+                                  <span class="badge badge-success">{{ $spec->spec_status }}</span>
+                                  @elseif ($spec->spec_status == 'Discarded')
+                                  <span class="badge badge-secondary">{{ $spec->spec_status }}</span>
+                                  @elseif ($spec->spec_status == 'Mutated')
+                                  <span class="badge badge-warning">{{ $spec->spec_status }}</span>
+                                  @elseif ($spec->spec_status == 'Broken')
+                                  <span class="badge badge-danger">{{ $spec->spec_status }}</span>
+                                  @endif</td>
                                 <td>
                                   <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure to delete this record?')" value="deleteRow{{ $spec->id }}" name="deleteRow{{ $spec->id }}"><i class="fas fa-trash-alt"></i></button>
                                 </td>
@@ -473,7 +483,10 @@
 				<input type="text" class="form-control" name="spec_remarks[]" required tabindex="20">
 			</td>
 			<td>
-				<button type="button" class="btn btn-outline-danger remove-input-field" tabindex="21"><i class="fas fa-trash-alt"></i></button>
+				<input type="text" class="form-control" name="spec_status[]" required tabindex="21">
+			</td>
+			<td>
+				<button type="button" class="btn btn-outline-danger remove-input-field" tabindex="22"><i class="fas fa-trash-alt"></i></button>
 			</td>
 		</tr>`;
     $("#dynamicAddRemove").append(tr);

@@ -76,7 +76,7 @@
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">No</label>
                           <div class="col-sm-9">
-                            <input type="text" class="form-control @error('inventory_no') is-invalid @enderror" name="inventory_no" value="{{ $year }}{{ $month }}{{ $inv_no }}" readonly>
+                            <input type="text" class="form-control @error('inventory_no') is-invalid @enderror" name="inventory_no" value={{ $inv_no }} readonly>
                             @error('inventory_no')
                             <div class="error invalid-feedback">
                               {{ $message }}

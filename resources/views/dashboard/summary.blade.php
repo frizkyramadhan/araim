@@ -64,7 +64,7 @@
 												<tr>
 													<td class="text-center">{{ $loop->iteration }}</td>
 													<td><a href="{{ url('inventories/' . $row->id) }}">{{ $row->inventory_no }}</a></td>
-													<td>{{ $row->brand }}</td>
+													<td>{{ $row->brand->brand_name }}</td>
 													<td>{{ $row->model_asset }}</td>
 													<td>{{ $row->serial_no }}</td>
 													<td>{{ $row->employee->fullname ?? '' }}</td>

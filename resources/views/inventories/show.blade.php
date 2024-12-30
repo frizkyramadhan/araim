@@ -336,6 +336,8 @@
                                 <span class="badge badge-secondary">{{ $spec->spec_status }}</span>
                                 @elseif ($spec->spec_status == 'Mutated')
                                 <span class="badge badge-warning">{{ $spec->spec_status }}</span>
+                                @elseif ($spec->spec_status == 'Broken')
+                                <span class="badge badge-danger">{{ $spec->spec_status }}</span>
                                 @endif
                               </td>
                             </tr>
@@ -441,7 +443,7 @@
     $('#repair-history').html('');
     var id = `{{ $inventory->id }}`;
     $.ajax({
-      url: 'http://192.168.33.37/arka-rest-server/api/repairv2'
+      url: 'http://192.168.32.37/arka-rest-server/api/repairv2'
       , type: 'get'
       , datatype: 'json'
       , data: {

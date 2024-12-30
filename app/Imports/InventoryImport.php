@@ -10,11 +10,14 @@ use App\Models\Employee;
 use App\Models\Location;
 use App\Models\Inventory;
 use App\Models\Department;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsErrors;
+use Maatwebsite\Excel\Concerns\WithUpserts;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
@@ -58,59 +61,68 @@ class InventoryImport implements
         $location = $this->locations->where('location_name', $row['location_name'])->first();
         $user = $this->users->where('name', $row['created_by'])->first();
 
-        // dd($row['nik'], $row['fullname'], $employee, $asset, $project, $department, $brand, $location, $user);
+        // Prepare data for insert or update
+        $data = [
+            'inventory_no' => $row['inventory_no'],
+            'employee_id' => $employee->id ?? NULL,
+            'asset_id' => $asset->id ?? NULL,
+            'project_id' => $project->id ?? NULL,
+            'department_id' => $department->id ?? NULL,
+            'brand_id' => $brand->id ?? NULL,
+            'model_asset' => $row['model_asset'] ?? NULL,
+            'serial_no' => $row['serial_no'] ?? NULL,
+            'part_no' => $row['part_no'] ?? NULL,
+            'po_no' => $row['po_no'] ?? NULL,
+            'quantity' => $row['quantity'] ?? NULL,
+            'remarks' => $row['remarks'] ?? NULL,
+            'input_date' => $row['input_date'] == NULL ? NULL : Date::excelToDateTimeObject($row['input_date']),
+            'created_by' => $user->id ?? NULL,
+            'reference_no' => $row['reference_no'] ?? NULL,
+            'reference_date' => $row['reference_date'] == NULL ? NULL : Date::excelToDateTimeObject($row['reference_date']),
+            'location_id' => $location->id ?? NULL,
+            'qrcode' => $row['qrcode'] ?? NULL,
+            'inventory_status' => $row['inventory_status'] ?? NULL,
+            'transfer_status' => $row['transfer_status'] ?? NULL,
+            'is_active' => $row['is_active'] ?? NULL,
+        ];
 
-        $inventory = new Inventory();
-        $inventory->id = $row['id'];
-        $inventory->inventory_no = $row['inventory_no'];
-        $inventory->employee_id = $employee->id ?? NULL;
-        // $inventory->employee_id = $row['employee_id'];
-        $inventory->asset_id = $asset->id ?? NULL;
-        $inventory->project_id = $project->id ?? NULL;
-        $inventory->department_id = $department->id ?? NULL;
-        $inventory->brand_id = $brand->id ?? NULL;
-        $inventory->model_asset = $row['model_asset'] ?? NULL;
-        $inventory->serial_no = $row['serial_no'] ?? NULL;
-        $inventory->part_no = $row['part_no'] ?? NULL;
-        $inventory->po_no = $row['po_no'] ?? NULL;
-        $inventory->quantity = $row['quantity'] ?? NULL;
-        $inventory->remarks = $row['remarks'] ?? NULL;
-        if ($row['input_date'] == NULL) {
-            $inventory->input_date = NULL;
-        } else {
-            $inventory->input_date = Date::excelToDateTimeObject($row['input_date']);
-        }
-        $inventory->created_by = $user->id ?? NULL;
-        $inventory->reference_no = $row['reference_no'] ?? NULL;
-        if ($row['reference_date'] == NULL) {
-            $inventory->reference_date = NULL;
-        } else {
-            $inventory->reference_date = Date::excelToDateTimeObject($row['reference_date']);
-        }
-        $inventory->location_id = $location->id ?? NULL;
-        $inventory->qrcode = $row['qrcode'] ?? NULL;
-        $inventory->inventory_status = $row['inventory_status'] ?? NULL;
-        $inventory->transfer_status = $row['transfer_status'] ?? NULL;
-        $inventory->is_active = $row['is_active'] ?? NULL;
-        $inventory->save();
+        // Update or create inventory record
+        $inventory = Inventory::updateOrCreate(
+            ['id' => $row['id']],
+            $data
+        );
     }
 
     public function rules(): array
     {
         return [
-            '*.id' => ['required', 'unique:inventories,id'],
+            'id' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $exists = Inventory::where('id', $value)->exists();
+                    $rule = $exists ? 'exists:inventories,id' : 'unique:inventories,id';
+
+                    $validator = Validator::make([$attribute => $value], [
+                        $attribute => $rule,
+                    ]);
+
+                    if ($validator->fails()) {
+                        $fail($validator->errors()->first($attribute));
+                    }
+                }
+            ],
             '*.nik' => ['required', 'exists:employees,nik'],
             '*.fullname' => ['required'],
             '*.asset_name' => ['required', 'exists:assets,asset_name'],
-            // '*.project_code' => ['exists:projects,project_code'],
-            // '*.brand_name' => ['exists:brands,brand_name'],
-            // '*.model_asset' => ['required'],
+            '*.project_code' => ['exists:projects,project_code'],
+            '*.dept_name' => ['exists:departments,dept_name'],
+            '*.brand_name' => ['exists:brands,brand_name'],
+            '*.model_asset' => ['required'],
             '*.quantity' => ['required'],
             '*.inventory_status' => ['required'],
             '*.transfer_status' => ['required'],
-            // '*.location_name' => ['exists:locations,location_name'],
+            '*.location_name' => ['exists:locations,location_name'],
         ];
-        // }
     }
 
     public function batchSize(): int
