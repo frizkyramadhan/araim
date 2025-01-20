@@ -222,6 +222,9 @@
                               <option value="Broken" {{ old('inventory_status') == 'Broken' ? 'selected' : '' }}>
                                 Broken
                               </option>
+                              <option value="Lost" {{ old('inventory_status') == 'Lost' ? 'selected' : '' }}>
+                                Lost
+                              </option>
                             </select>
                             @error('inventory_status')
                             <div class="error invalid-feedback">

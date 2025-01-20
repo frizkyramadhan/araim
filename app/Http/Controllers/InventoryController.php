@@ -73,7 +73,7 @@ class InventoryController extends Controller
             if (empty($categories)) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Anda tidak memiliki akses ke kategori manapun. Silahkan hubungi Administrator untuk mengatur akses Anda.'
+                    'message' => 'You do not have access to any category. Please contact the Administrator to set up your access.'
                 ]);
             }
 
@@ -169,6 +169,8 @@ class InventoryController extends Controller
                         return '<span class="badge badge-primary">Good</span>';
                     } elseif ($inventories->inventory_status == 'Broken') {
                         return '<span class="badge badge-danger">Broken</span>';
+                    } elseif ($inventories->inventory_status == 'Lost') {
+                        return '<span class="badge badge-dark">Lost</span>';
                     }
                 })
                 ->addColumn('transfer_status', function ($inventories) {
@@ -288,6 +290,8 @@ class InventoryController extends Controller
                     return '<span class="badge badge-primary">Good</span>';
                 } elseif ($inventories->inventory_status == 'Broken') {
                     return '<span class="badge badge-danger">Broken</span>';
+                } elseif ($inventories->inventory_status == 'Lost') {
+                    return '<span class="badge badge-dark">Lost</span>';
                 }
             })
             ->addColumn('transfer_status', function ($inventories) {
@@ -385,8 +389,13 @@ class InventoryController extends Controller
         $inventory->reference_date = $data['reference_date'];
         $inventory->location_id = $data['location_id'];
         // $inventory->location = $data['location'];
-        $inventory->inventory_status = $data['inventory_status'];
-        $inventory->transfer_status = "Available";
+        if ($data['inventory_status'] == 'Lost') {
+            $inventory->inventory_status = "Lost";
+            $inventory->transfer_status = "Discarded";
+        } else {
+            $inventory->inventory_status = $data['inventory_status'];
+            $inventory->transfer_status = "Available";
+        }
         $inventory->is_active = "1";
 
         $inventory->save();
@@ -503,6 +512,7 @@ class InventoryController extends Controller
         $inventory->location_id = $request->location_id;
         // $inventory->location = $request->location;
         $inventory->inventory_status = $request->inventory_status;
+        $inventory->transfer_status = $request->transfer_status;
         $inventory->is_active = $request->is_active;
         $inventory->save();
 

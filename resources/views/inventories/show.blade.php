@@ -160,6 +160,8 @@
                               <span class="badge badge-primary">Good</span>
                               @elseif ($inventory->inventory_status == 'Broken')
                               <span class="badge badge-danger">Broken</span>
+                              @elseif ($inventory->inventory_status == 'Lost')
+                              <span class="badge badge-dark">Lost</span>
                               @endif
                             </b></td>
                         </tr>

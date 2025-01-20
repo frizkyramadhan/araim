@@ -173,6 +173,7 @@
                             <option value="">- All -</option>
                             <option value="Good">Good</option>
                             <option value="Broken">Broken</option>
+                            <option value="Lost">Lost</option>
                           </select>
                         </div>
                       </div>

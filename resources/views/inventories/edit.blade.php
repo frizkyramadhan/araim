@@ -212,6 +212,9 @@
                               <option value="Broken" {{ old('inventory_status', $inventory->inventory_status) == 'Broken' ? 'selected' : '' }}>
                                 Broken
                               </option>
+                              <option value="Lost" {{ old('inventory_status', $inventory->inventory_status) == 'Lost' ? 'selected' : '' }}>
+                                Lost
+                              </option>
                             </select>
                             @error('inventory_status')
                             <div class="error invalid-feedback">
@@ -221,6 +224,27 @@
                           </div>
                         </div>
                         {{-- @endcan --}}
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Transfer Status</label>
+                          <div class="col-sm-9">
+                            <select name="transfer_status" class="form-control @error('transfer_status') is-invalid @enderror select2bs4" style="width: 100%;" tabindex="9">
+                              <option value="Available" {{ old('transfer_status', $inventory->transfer_status) == 'Available' ? 'selected' : '' }}>
+                                Available
+                              </option>
+                              <option value="Mutated" {{ old('transfer_status', $inventory->transfer_status) == 'Mutated' ? 'selected' : '' }}>
+                                Mutated
+                              </option>
+                              <option value="Discarded" {{ old('transfer_status', $inventory->transfer_status) == 'Discarded' ? 'selected' : '' }}>
+                                Discarded
+                              </option>
+                            </select>
+                            @error('transfer_status')
+                            <div class="error invalid-feedback">
+                              {{ $message }}
+                            </div>
+                            @enderror
+                          </div>
+                        </div>
                       </div>
                       <!-- /.card-body -->
                     </div>
