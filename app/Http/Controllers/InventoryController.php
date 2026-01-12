@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\Brand;
 use App\Models\Image;
+use App\Models\User;
 use SimpleXMLElement;
 use App\Models\Project;
 use App\Models\Employee;
@@ -43,7 +44,8 @@ class InventoryController extends Controller
 
     private function getAuthUser()
     {
-        return auth()->user()->load('categories');
+        $userId = auth()->id();
+        return $userId ? User::with('categories')->find($userId) : null;
     }
 
     public function index()
@@ -436,9 +438,13 @@ class InventoryController extends Controller
 
         $specifications = Specification::with('component')->where('inventory_id', $inventory->id)->get();
         $images = DB::table('images')->where('inventory_no', $inventory->inventory_no)->get();
+        $basts = DB::table('basts')
+            ->where('inventory_id', $inventory->id)
+            ->select('basts.*')
+            ->get();
         // dd($inventory->asset);
 
-        return view('inventories.show', compact('title', 'subtitle', 'inventory', 'specifications', 'images', 'employee_id'));
+        return view('inventories.show', compact('title', 'subtitle', 'inventory', 'specifications', 'images', 'basts', 'employee_id'));
     }
 
 

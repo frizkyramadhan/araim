@@ -339,11 +339,7 @@ if ($hari == "Monday"){
     <tr>
       <td>
         <div align="center">
-<<<<<<< HEAD
           <i>Nb: Berita Acara Serah Terima (asli) yang telah ditanda tangani dikirim kembali Ke HO Balikpapan.</i><br>
-=======
-          <i>Nb: Berita Acara Serah Terima( asli) yang telah ditanda tangani dikirim kembali Ke HO Balikpapan</i><br>
->>>>>>> ae09824820eb6ce6ef44d05524a5abd2909cf3a9
           <i>Penambahan, modifikasi, dan pemindahan aset tanpa seizin Departemen Accounting & IT, akan diberikan laporan ketidaksesuaian dan diberikan sanksi sesuai dengan peraturan perusahaan.</i>
         </div>
       </td>
