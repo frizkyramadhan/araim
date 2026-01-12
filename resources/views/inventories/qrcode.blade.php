@@ -19,10 +19,7 @@
         align-content: center;
         width: 2.35cm;
         height: 1.5cm;
-        margin-top: 0px;
-        margin-left: 0px;
-        margin-right: 0px;
-        margin-bottom: 0px;
+        margin: 0;
       }
     }
 

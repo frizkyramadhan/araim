@@ -44,7 +44,9 @@ class InventoryExport implements
             ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
             ->leftJoin('departments', 'inventories.department_id', '=', 'departments.id')
             ->leftJoin('users', 'inventories.created_by', '=', 'users.id')
-            ->select(['inventories.id', 'inventory_no', 'employees.nik', 'employees.fullname', 'asset_name', 'project_code', 'dept_name', 'brand', 'model_asset', 'serial_no', 'part_no', 'po_no', 'quantity', 'remarks', 'input_date', 'users.name', 'reference_no', 'reference_date', 'location', 'qrcode', 'inventory_status', 'transfer_status', 'is_active'])
+            ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
+            ->leftJoin('locations', 'inventories.brand_id', '=', 'locations.id')
+            ->select(['inventories.id', 'inventory_no', 'employees.nik', 'employees.fullname', 'asset_name', 'project_code', 'dept_name', 'brand_name', 'model_asset', 'serial_no', 'part_no', 'po_no', 'quantity', 'remarks', 'input_date', 'users.name', 'reference_no', 'reference_date', 'location_name', 'qrcode', 'inventory_status', 'transfer_status', 'is_active'])
             ->orderBy('inventories.inventory_no', 'desc')
             ->orderBy('inventories.id', 'desc');
 
@@ -61,7 +63,7 @@ class InventoryExport implements
             $inventory->asset_name,
             $inventory->project_code,
             $inventory->dept_name,
-            $inventory->brand,
+            $inventory->brand_name,
             $inventory->model_asset,
             $inventory->serial_no,
             $inventory->part_no,
@@ -72,7 +74,7 @@ class InventoryExport implements
             $inventory->name,
             $inventory->reference_no,
             $inventory->reference_date ? Date::stringToExcel($inventory->reference_date) : '',
-            $inventory->location,
+            $inventory->location_name,
             $inventory->qrcode,
             $inventory->inventory_status,
             $inventory->transfer_status,

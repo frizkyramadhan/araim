@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -12,8 +13,9 @@ class RegisterController extends Controller
     {
         $title = 'Register';
         $subtitle = 'ARAIM v2.0';
+        $projects = Project::where('project_status', '=', '1')->orderBy('project_code', 'asc')->get();
 
-        return view('register', compact('title', 'subtitle'));
+        return view('register', compact('title', 'subtitle', 'projects'));
     }
 
     public function store(Request $request)
@@ -23,6 +25,7 @@ class RegisterController extends Controller
             'email' => 'required|email:dns|ends_with:@arka.co.id|unique:users',
             'password' => 'required|min:5',
             'level' => 'required',
+            'project_id' => 'required',
             'user_status' => 'required',
         ], [
             'name.required' => 'Full Name is required',

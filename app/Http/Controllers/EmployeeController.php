@@ -104,8 +104,8 @@ class EmployeeController extends Controller
             'nik' => 'required|unique:employees',
             'fullname' => 'required',
             'project_id' => 'required',
-            'position_id' => 'required',
-            'email' => 'required|ends_with:@arka.co.id'
+            'position_id' => 'required'
+            // 'email' => 'required|ends_with:@arka.co.id'
         ], [
             'nik.required' => 'NIK is required',
             'nik.unique' => 'NIK is already taken',

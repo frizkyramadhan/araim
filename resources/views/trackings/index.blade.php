@@ -46,6 +46,8 @@
                           <span class="badge badge-primary">{{ $tracking->inventory_status }}</span>
                           @elseif ($tracking->inventory_status == 'Broken')
                           <span class="badge badge-danger">{{ $tracking->inventory_status }}</span>
+                          @elseif ($tracking->inventory_status == 'Lost')
+                          <span class="badge badge-dark">{{ $tracking->inventory_status }}</span>
                           @endif
                         </div>
                         <div>
@@ -150,7 +152,7 @@
                         </div>
                         @if ($tracking->transfer_status == 'Available')
                         <div class="card-footer col-md-12">
-                          <a href="{{ url('inventories/' . $tracking->id . '/edit') }}" class="btn btn-primary"><i class="fas fa-pen-square"></i> Edit</a>
+                          <a href="{{ url('inventories/edit/' . $tracking->id) }}" class="btn btn-primary"><i class="fas fa-pen-square"></i> Edit</a>
                           <a href="{{ url('inventories/transfer/' . $tracking->id) }}" class="btn btn-danger float-right"><i class="fas fa-exchange-alt"></i> Transfer</a>
                         </div>
                         @endif

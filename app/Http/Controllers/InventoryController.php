@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\Brand;
 use App\Models\Image;
+use App\Models\User;
 use SimpleXMLElement;
 use App\Models\Project;
 use App\Models\Employee;
@@ -38,6 +39,13 @@ class InventoryController extends Controller
         $this->middleware('guest')->only('qrcodeJson');
         $this->middleware('auth');
         $this->middleware('check_role:admin,superuser', ['except' => ['index', 'getInventories', 'show']]);
+        $this->middleware('check_role:admin', ['only' => ['destroy']]);
+    }
+
+    private function getAuthUser()
+    {
+        $userId = auth()->id();
+        return $userId ? User::with('categories')->find($userId) : null;
     }
 
     public function index()
@@ -56,16 +64,77 @@ class InventoryController extends Controller
     public function getInventories(Request $request)
     {
         if ($request->ajax()) {
-            $inventories = Inventory::leftJoin('projects', 'inventories.project_id', '=', 'projects.id')
+            $authUser = $this->getAuthUser();
+            $where = '1';
+            if ($authUser->level == 'user' || $authUser->level == 'superuser') {
+                $where = 'inventories.project_id = ' . $authUser->project_id;
+            }
+
+            $categories = $authUser->categories()->pluck('categories.id')->implode(',');
+
+            if (empty($categories)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'You do not have access to any category. Please contact the Administrator to set up your access.'
+                ]);
+            }
+
+            $query = Inventory::leftJoin('projects', 'inventories.project_id', '=', 'projects.id')
                 ->leftJoin('employees', 'inventories.employee_id', '=', 'employees.id')
                 ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
                 ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
                 ->leftJoin('locations', 'inventories.location_id', '=', 'locations.id')
                 ->leftJoin('departments', 'inventories.department_id', '=', 'departments.id')
-                ->select(['inventories.*', 'projects.project_code', 'departments.dept_name', 'assets.asset_name', 'employees.fullname', 'brands.brand_name', 'locations.location_name'])
-                ->orderBy('inventories.id', 'desc');
+                ->select(['inventories.*', 'projects.project_code', 'departments.dept_name', 'assets.asset_name', 'assets.category_id', 'employees.fullname', 'brands.brand_name', 'locations.location_name'])
+                ->whereRaw($where)
+                ->whereRaw('assets.category_id IN (' . $categories . ')')
+                ->orderBy('inventories.created_at', 'desc');
 
-            return DataTables::of($inventories)
+            if ($request->get('date1') && $request->get('date2')) {
+                $query->whereBetween('input_date', [$request->get('date1'), $request->get('date2')]);
+            }
+
+            if ($request->get('inventory_no')) {
+                $query->where('inventory_no', 'LIKE', "%{$request->get('inventory_no')}%");
+            }
+
+            if ($request->get('asset_name')) {
+                $query->where('asset_name', 'LIKE', "%{$request->get('asset_name')}%");
+            }
+
+            if ($request->get('brand_name')) {
+                $query->where('brand_name', 'LIKE', "%{$request->get('brand_name')}%");
+            }
+
+            if ($request->get('model_asset')) {
+                $query->where('model_asset', 'LIKE', "%{$request->get('model_asset')}%");
+            }
+
+            if ($request->get('serial_no')) {
+                $query->where('serial_no', 'LIKE', "%{$request->get('serial_no')}%");
+            }
+
+            if ($request->get('fullname')) {
+                $query->where('fullname', 'LIKE', "%{$request->get('fullname')}%");
+            }
+
+            if ($request->get('project_code')) {
+                $query->where('project_code', 'LIKE', "%{$request->get('project_code')}%");
+            }
+
+            if ($request->get('dept_name')) {
+                $query->where('dept_name', 'LIKE', "%{$request->get('dept_name')}%");
+            }
+
+            if ($request->get('inventory_status')) {
+                $query->where('inventory_status', 'LIKE', "%{$request->get('inventory_status')}%");
+            }
+
+            if ($request->get('transfer_status')) {
+                $query->where('transfer_status', 'LIKE', "%{$request->get('transfer_status')}%");
+            }
+
+            return DataTables::of($query)
                 ->addIndexColumn()
                 ->addColumn('inventory_no', function ($inventories) {
                     return $inventories->inventory_no;
@@ -78,7 +147,6 @@ class InventoryController extends Controller
                 })
                 ->addColumn('brand_name', function ($inventories) {
                     return $inventories->brand_name ? $inventories->brand_name : $inventories->brand;
-                    // return $inventories->brand;
                 })
                 ->addColumn('model_asset', function ($inventories) {
                     return $inventories->model_asset;
@@ -94,7 +162,6 @@ class InventoryController extends Controller
                 })
                 ->addColumn('location', function ($inventories) {
                     return $inventories->location_name ? $inventories->location_name : $inventories->location;
-                    // return $inventories->location;
                 })
                 ->addColumn('quantity', function ($inventories) {
                     return $inventories->quantity;
@@ -104,6 +171,8 @@ class InventoryController extends Controller
                         return '<span class="badge badge-primary">Good</span>';
                     } elseif ($inventories->inventory_status == 'Broken') {
                         return '<span class="badge badge-danger">Broken</span>';
+                    } elseif ($inventories->inventory_status == 'Lost') {
+                        return '<span class="badge badge-dark">Lost</span>';
                     }
                 })
                 ->addColumn('transfer_status', function ($inventories) {
@@ -115,88 +184,6 @@ class InventoryController extends Controller
                         return '<span class="badge badge-warning">Mutated</span>';
                     }
                 })
-                ->filter(function ($instance) use ($request) {
-                    if (!empty($request->get('date1') && !empty($request->get('date2')))) {
-                        $instance->where(function ($w) use ($request) {
-                            $date1 = $request->get('date1');
-                            $date2 = $request->get('date2');
-                            $w->whereBetween('input_date', array($date1, $date2));
-                        });
-                    }
-                    if (!empty($request->get('inventory_no'))) {
-                        $instance->where(function ($w) use ($request) {
-                            $inventory_no = $request->get('inventory_no');
-                            $w->orWhere('inventory_no', 'LIKE', '%' . $inventory_no . '%');
-                        });
-                    }
-                    if (!empty($request->get('asset_name'))) {
-                        $instance->where(function ($w) use ($request) {
-                            $asset_name = $request->get('asset_name');
-                            $w->orWhere('asset_name', 'LIKE', '%' . $asset_name . '%');
-                        });
-                    }
-                    if (!empty($request->get('brand_name'))) {
-                        $instance->where(function ($w) use ($request) {
-                            $brand_name = $request->get('brand_name');
-                            $w->orWhere('brand_name', 'LIKE', '%' . $brand_name . '%');
-                        });
-                    }
-                    if (!empty($request->get('model_asset'))) {
-                        $instance->where(function ($w) use ($request) {
-                            $model_asset = $request->get('model_asset');
-                            $w->orWhere('model_asset', 'LIKE', '%' . $model_asset . '%');
-                        });
-                    }
-                    if (!empty($request->get('serial_no'))) {
-                        $instance->where(function ($w) use ($request) {
-                            $serial_no = $request->get('serial_no');
-                            $w->orWhere('serial_no', 'LIKE', '%' . $serial_no . '%');
-                        });
-                    }
-                    if (!empty($request->get('fullname'))) {
-                        $instance->where(function ($w) use ($request) {
-                            $fullname = $request->get('fullname');
-                            $w->orWhere('fullname', 'LIKE', '%' . $fullname . '%');
-                        });
-                    }
-                    if (!empty($request->get('project_code'))) {
-                        $instance->where(function ($w) use ($request) {
-                            $project_code = $request->get('project_code');
-                            $w->orWhere('project_code', 'LIKE', '%' . $project_code . '%');
-                        });
-                    }
-                    if (!empty($request->get('dept_name'))) {
-                        $instance->where(function ($w) use ($request) {
-                            $dept_name = $request->get('dept_name');
-                            $w->orWhere('dept_name', 'LIKE', '%' . $dept_name . '%');
-                        });
-                    }
-                    if (!empty($request->get('inventory_status'))) {
-                        $instance->where(function ($w) use ($request) {
-                            $inventory_status = $request->get('inventory_status');
-                            $w->orWhere('inventory_status', 'LIKE', '%' . $inventory_status . '%');
-                        });
-                    }
-                    if (!empty($request->get('transfer_status'))) {
-                        $instance->where(function ($w) use ($request) {
-                            $transfer_status = $request->get('transfer_status');
-                            $w->orWhere('transfer_status', 'LIKE', '%' . $transfer_status . '%');
-                        });
-                    }
-                    if (!empty($request->get('search'))) {
-                        $instance->where(function ($w) use ($request) {
-                            $search = $request->get('search');
-                            $w->orWhere('asset_name', 'LIKE', "%$search%")
-                                ->orWhere('fullname', 'LIKE', "%$search%")
-                                ->orWhere('project_code', 'LIKE', "%$search%")
-                                ->orWhere('inventory_status', 'LIKE', "%$search%")
-                                ->orWhere('transfer_status', 'LIKE', "%$search%")
-                                ->orWhere('brand_name', 'LIKE', "%$search%")
-                                ->orWhere('inventory_no', 'LIKE', "%$search%")
-                                ->orWhere('model_asset', 'LIKE', "%$search%");
-                        });
-                    }
-                }, true)
                 ->addColumn('action', 'inventories.action')
                 ->rawColumns(['inventory_status', 'transfer_status', 'action'])
                 ->toJson();
@@ -205,15 +192,70 @@ class InventoryController extends Controller
 
     public function json(Request $request)
     {
-        $inventories = Inventory::leftJoin('projects', 'inventories.project_id', '=', 'projects.id')
+        $authUser = $this->getAuthUser();
+        $where = '1';
+        if ($authUser->level == 'user' || $authUser->level == 'superuser') {
+            $where = 'inventories.project_id = ' . $authUser->project_id;
+        }
+
+        $categories = $authUser->categories()->pluck('categories.id')->implode(',');
+
+        $query = Inventory::leftJoin('projects', 'inventories.project_id', '=', 'projects.id')
             ->leftJoin('employees', 'inventories.employee_id', '=', 'employees.id')
             ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+            ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
+            ->leftJoin('locations', 'inventories.location_id', '=', 'locations.id')
             ->leftJoin('departments', 'inventories.department_id', '=', 'departments.id')
-            ->leftJoin('users', 'inventories.created_by', '=', 'users.id')
-            ->select(['inventories.id', 'inventories.inventory_no', 'inventories.input_date', 'inventories.brand', 'inventories.model_asset', 'inventories.serial_no', 'inventories.location', 'inventories.quantity', 'inventories.inventory_status', 'inventories.transfer_status', 'projects.project_code', 'departments.dept_name', 'assets.asset_name', 'employees.fullname', 'users.name'])
-            ->orderBy('inventories.id', 'desc');
+            ->select(['inventories.*', 'projects.project_code', 'departments.dept_name', 'assets.asset_name', 'assets.category_id', 'employees.fullname', 'brands.brand_name', 'locations.location_name'])
+            ->whereRaw($where)
+            ->whereRaw('assets.category_id IN (' . $categories . ')')
+            ->orderBy('inventories.created_at', 'desc');
 
-        return DataTables::of($inventories)
+        if ($request->get('date1') && $request->get('date2')) {
+            $query->whereBetween('input_date', [$request->get('date1'), $request->get('date2')]);
+        }
+
+        if ($request->get('inventory_no')) {
+            $query->where('inventory_no', 'LIKE', "%{$request->get('inventory_no')}%");
+        }
+
+        if ($request->get('asset_name')) {
+            $query->where('asset_name', 'LIKE', "%{$request->get('asset_name')}%");
+        }
+
+        if ($request->get('brand_name')) {
+            $query->where('brand_name', 'LIKE', "%{$request->get('brand_name')}%");
+        }
+
+        if ($request->get('model_asset')) {
+            $query->where('model_asset', 'LIKE', "%{$request->get('model_asset')}%");
+        }
+
+        if ($request->get('serial_no')) {
+            $query->where('serial_no', 'LIKE', "%{$request->get('serial_no')}%");
+        }
+
+        if ($request->get('fullname')) {
+            $query->where('fullname', 'LIKE', "%{$request->get('fullname')}%");
+        }
+
+        if ($request->get('project_code')) {
+            $query->where('project_code', 'LIKE', "%{$request->get('project_code')}%");
+        }
+
+        if ($request->get('dept_name')) {
+            $query->where('dept_name', 'LIKE', "%{$request->get('dept_name')}%");
+        }
+
+        if ($request->get('inventory_status')) {
+            $query->where('inventory_status', 'LIKE', "%{$request->get('inventory_status')}%");
+        }
+
+        if ($request->get('transfer_status')) {
+            $query->where('transfer_status', 'LIKE', "%{$request->get('transfer_status')}%");
+        }
+
+        return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('inventory_no', function ($inventories) {
                 return $inventories->inventory_no;
@@ -224,8 +266,8 @@ class InventoryController extends Controller
             ->addColumn('asset_name', function ($inventories) {
                 return $inventories->asset_name;
             })
-            ->addColumn('brand', function ($inventories) {
-                return $inventories->brand;
+            ->addColumn('brand_name', function ($inventories) {
+                return $inventories->brand_name ? $inventories->brand_name : $inventories->brand;
             })
             ->addColumn('model_asset', function ($inventories) {
                 return $inventories->model_asset;
@@ -240,7 +282,7 @@ class InventoryController extends Controller
                 return $inventories->project_code;
             })
             ->addColumn('location', function ($inventories) {
-                return $inventories->location;
+                return $inventories->location_name ? $inventories->location_name : $inventories->location;
             })
             ->addColumn('quantity', function ($inventories) {
                 return $inventories->quantity;
@@ -250,6 +292,8 @@ class InventoryController extends Controller
                     return '<span class="badge badge-primary">Good</span>';
                 } elseif ($inventories->inventory_status == 'Broken') {
                     return '<span class="badge badge-danger">Broken</span>';
+                } elseif ($inventories->inventory_status == 'Lost') {
+                    return '<span class="badge badge-dark">Lost</span>';
                 }
             })
             ->addColumn('transfer_status', function ($inventories) {
@@ -261,85 +305,19 @@ class InventoryController extends Controller
                     return '<span class="badge badge-warning">Mutated</span>';
                 }
             })
-            ->filter(function ($instance) use ($request) {
-                if (!empty($request->get('date1') && !empty($request->get('date2')))) {
-                    $instance->where(function ($w) use ($request) {
-                        $date1 = $request->get('date1');
-                        $date2 = $request->get('date2');
-                        $w->whereBetween('input_date', array($date1, $date2));
-                    });
-                }
-                if (!empty($request->get('inventory_no'))) {
-                    $instance->where(function ($w) use ($request) {
-                        $inventory_no = $request->get('inventory_no');
-                        $w->orWhere('inventory_no', 'LIKE', '%' . $inventory_no . '%');
-                    });
-                }
-                if (!empty($request->get('asset_name'))) {
-                    $instance->where(function ($w) use ($request) {
-                        $asset_name = $request->get('asset_name');
-                        $w->orWhere('asset_name', 'LIKE', '%' . $asset_name . '%');
-                    });
-                }
-                if (!empty($request->get('brand'))) {
-                    $instance->where(function ($w) use ($request) {
-                        $brand = $request->get('brand');
-                        $w->orWhere('brand', 'LIKE', '%' . $brand . '%');
-                    });
-                }
-                if (!empty($request->get('model_asset'))) {
-                    $instance->where(function ($w) use ($request) {
-                        $model_asset = $request->get('model_asset');
-                        $w->orWhere('model_asset', 'LIKE', '%' . $model_asset . '%');
-                    });
-                }
-                if (!empty($request->get('serial_no'))) {
-                    $instance->where(function ($w) use ($request) {
-                        $serial_no = $request->get('serial_no');
-                        $w->orWhere('serial_no', 'LIKE', '%' . $serial_no . '%');
-                    });
-                }
-                if (!empty($request->get('fullname'))) {
-                    $instance->where(function ($w) use ($request) {
-                        $fullname = $request->get('fullname');
-                        $w->orWhere('fullname', 'LIKE', '%' . $fullname . '%');
-                    });
-                }
-                if (!empty($request->get('project_code'))) {
-                    $instance->where(function ($w) use ($request) {
-                        $project_code = $request->get('project_code');
-                        $w->orWhere('project_code', 'LIKE', '%' . $project_code . '%');
-                    });
-                }
-                if (!empty($request->get('inventory_status'))) {
-                    $instance->where(function ($w) use ($request) {
-                        $inventory_status = $request->get('inventory_status');
-                        $w->orWhere('inventory_status', 'LIKE', '%' . $inventory_status . '%');
-                    });
-                }
-                if (!empty($request->get('transfer_status'))) {
-                    $instance->where(function ($w) use ($request) {
-                        $transfer_status = $request->get('transfer_status');
-                        $w->orWhere('transfer_status', 'LIKE', '%' . $transfer_status . '%');
-                    });
-                }
-                if (!empty($request->get('search'))) {
-                    $instance->where(function ($w) use ($request) {
-                        $search = $request->get('search');
-                        $w->orWhere('asset_name', 'LIKE', "%$search%")
-                            ->orWhere('fullname', 'LIKE', "%$search%")
-                            ->orWhere('project_code', 'LIKE', "%$search%")
-                            ->orWhere('inventory_status', 'LIKE', "%$search%")
-                            ->orWhere('transfer_status', 'LIKE', "%$search%")
-                            ->orWhere('brand', 'LIKE', "%$search%")
-                            ->orWhere('inventory_no', 'LIKE', "%$search%")
-                            ->orWhere('model_asset', 'LIKE', "%$search%");
-                    });
-                }
-            }, true)
             ->addColumn('action', 'inventories.action')
             ->rawColumns(['inventory_status', 'transfer_status', 'action'])
             ->toJson();
+    }
+
+    function generateInvNum()
+    {
+        // generate inventory no
+        $year = date('y');
+        $month = date('m');
+        $number = Inventory::max('id') + 1;
+        $inv_no = str_pad($number, 6, '0', STR_PAD_LEFT);
+        return $year . $month . $inv_no;
     }
 
     public function create($employee_id = null)
@@ -361,12 +339,9 @@ class InventoryController extends Controller
         $components = Component::where('component_status', '1')->orderBy('component_name', 'asc')->get();
 
         // generate inventory no
-        $year = date('y');
-        $month = date('m');
-        $number = Inventory::max('id') + 1;
-        $inv_no = str_pad($number, 6, '0', STR_PAD_LEFT);
+        $inv_no = static::generateInvNum();
 
-        return view('inventories.create', compact('title', 'subtitle', 'employees', 'employee', 'assets', 'brands', 'projects', 'departments', 'locations', 'components', 'inv_no', 'year', 'month', 'employee_id'));
+        return view('inventories.create', compact('title', 'subtitle', 'employees', 'employee', 'assets', 'brands', 'projects', 'departments', 'locations', 'components', 'inv_no', 'employee_id'));
     }
 
     public function store(Request $request)
@@ -374,7 +349,7 @@ class InventoryController extends Controller
         $id_employee = $request->input('id_employee');
 
         $request->validate([
-            'inventory_no' => 'required|unique:inventories',
+            'inventory_no' => 'required',
             'input_date' => 'required',
             'asset_id' => 'required',
             'employee_id' => 'required',
@@ -386,6 +361,14 @@ class InventoryController extends Controller
             'model_asset' => 'required',
             'quantity' => 'required'
         ]);
+
+        $docNum = $request->input('inventory_no');
+        // check if inventory number exist
+        if (Inventory::where('inventory_no', $docNum)->exists()) {
+            // generate new inventory no
+            $docNum = static::generateInvNum();
+            $request->request->add(['inventory_no' => $docNum]);
+        }
 
         $data = $request->all();
         $inventory = new Inventory();
@@ -408,8 +391,13 @@ class InventoryController extends Controller
         $inventory->reference_date = $data['reference_date'];
         $inventory->location_id = $data['location_id'];
         // $inventory->location = $data['location'];
-        $inventory->inventory_status = $data['inventory_status'];
-        $inventory->transfer_status = "Available";
+        if ($data['inventory_status'] == 'Lost') {
+            $inventory->inventory_status = "Lost";
+            $inventory->transfer_status = "Discarded";
+        } else {
+            $inventory->inventory_status = $data['inventory_status'];
+            $inventory->transfer_status = "Available";
+        }
         $inventory->is_active = "1";
 
         $inventory->save();
@@ -450,9 +438,13 @@ class InventoryController extends Controller
 
         $specifications = Specification::with('component')->where('inventory_id', $inventory->id)->get();
         $images = DB::table('images')->where('inventory_no', $inventory->inventory_no)->get();
+        $basts = DB::table('basts')
+            ->where('inventory_id', $inventory->id)
+            ->select('basts.*')
+            ->get();
         // dd($inventory->asset);
 
-        return view('inventories.show', compact('title', 'subtitle', 'inventory', 'specifications', 'images', 'employee_id'));
+        return view('inventories.show', compact('title', 'subtitle', 'inventory', 'specifications', 'images', 'basts', 'employee_id'));
     }
 
 
@@ -526,6 +518,7 @@ class InventoryController extends Controller
         $inventory->location_id = $request->location_id;
         // $inventory->location = $request->location;
         $inventory->inventory_status = $request->inventory_status;
+        $inventory->transfer_status = $request->transfer_status;
         $inventory->is_active = $request->is_active;
         $inventory->save();
 
@@ -581,7 +574,7 @@ class InventoryController extends Controller
         $departments = Department::where('dept_status', '1')->orderBy('dept_name', 'asc')->get();
         $locations = Location::where('location_status', '1')->orderBy('location_name', 'asc')->get();
 
-        $inventory = Inventory::with('employee', 'asset', 'project', 'department','brand','location')->find($id);
+        $inventory = Inventory::with('employee', 'asset', 'project', 'department', 'brand', 'location')->find($id);
         $specifications = Specification::with('component')->where('inventory_id', $id)->get();
 
         return view('inventories.transfer', compact('title', 'subtitle', 'employees', 'inventory', 'specifications', 'projects', 'departments', 'locations'));
@@ -596,7 +589,7 @@ class InventoryController extends Controller
         ]);
 
         $data = $request->all();
-        
+
         $inventory = Inventory::find($id);
         $qty = $inventory->quantity;
         $qty_new = $qty - $request->quantity;
@@ -620,7 +613,7 @@ class InventoryController extends Controller
 
 
         // store new data
-        
+
         $new_inventory = new Inventory();
         $new_inventory->inventory_no = $data['inventory_no'];
         $new_inventory->input_date = $data['input_date'];
