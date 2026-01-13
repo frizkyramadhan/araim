@@ -495,7 +495,7 @@
                                                         <div class="text-center">
                                                             <p class="text-muted">Tidak ada dokumen BAST untuk inventory ini.
                                                             </p>
-                                                            <a href="{{ url('basts/create') }}" class="btn btn-primary">
+                                                            <a href="{{ url('basts/create?inventory_id=' . $inventory->id) }}" class="btn btn-primary">
                                                                 <i class="fas fa-plus"></i> Add BAST
                                                             </a>
                                                         </div>

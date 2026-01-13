@@ -276,6 +276,18 @@
 
 ---
 
-**Last Memory Review**: 2026-01-09
-**Next Memory Archive**: When file exceeds 500 lines (currently ~350 lines)
+### [011] JavaScript Variable Scope in DataTables Filter (2026-01-13) ✅ COMPLETE
+
+**Challenge**: Filter functionality for "IT Equipment Without BAST" DataTable was not working. JavaScript error: `Uncaught TypeError: bastTable.draw is not a function`. Event handlers (Select2 dropdowns, text inputs, date inputs) could not access the `bastTable` DataTable instance due to incorrect variable scope.
+
+**Solution**: Refactored JavaScript using IIFE (Immediately Invoked Function Expression) to create proper closure scope. Changed from `var bastTable` inside conditional block to `const bastTable` inside IIFE. Created helper function `redrawTable()` for cleaner code. Consolidated Select2 selectors into array for DRY code. Removed unnecessary `setTimeout` and conditional checks that complicated the code.
+
+**Key Learning**: JavaScript variable scope is critical for event handlers that fire after initialization. Use IIFE to create proper closure when variables need to be accessible to async/deferred event handlers (Select2, click events, keyup). Prefer `const` over `var` for DataTable instances. Create helper functions to avoid repetition and improve readability. Simpler code is often more reliable - avoid unnecessary `setTimeout` and defensive checks. Test filter functionality immediately after DataTable initialization.
+
+**Files**: `resources/views/dashboard/dashboard.blade.php` (lines 428-527)
+
+---
+
+**Last Memory Review**: 2026-01-13
+**Next Memory Archive**: When file exceeds 500 lines (currently ~360 lines)
 **Archive To**: `memory-2026-01.md`

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Bast;
 use App\Models\Employee;
+use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -37,7 +38,8 @@ class BastController extends Controller
                 ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
                 ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
                 ->leftJoin('locations', 'inventories.location_id', '=', 'locations.id')
-                ->select('inventories.*', 'employees.nik', 'employees.fullname', 'assets.asset_name', 'brands.brand_name', 'locations.location_name')
+                ->leftJoin('projects', 'inventories.project_id', '=', 'projects.id')
+                ->select('inventories.*', 'employees.nik', 'employees.fullname', 'assets.asset_name', 'brands.brand_name', 'locations.location_name', 'projects.project_code')
                 ->where('employees.id', $employee_id)
                 ->orderBy('inventories.id', 'desc')
                 ->get();
@@ -51,7 +53,7 @@ class BastController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $title = 'BAST';
         $subtitle = 'Berita Acara Serah Terima';
@@ -69,7 +71,19 @@ class BastController extends Controller
         $number = Bast::max('bast_no') + 1;
         $bast_no = str_pad($number, 6, '0', STR_PAD_LEFT);
 
-        return view('basts.create', compact('title', 'subtitle', 'submits', 'receives', 'bast_no', 'year', 'month'));
+        // Get inventory and employee data if inventory_id is provided
+        $selectedInventoryId = $request->get('inventory_id');
+        $selectedEmployeeId = null;
+        $selectedInventory = null;
+
+        if ($selectedInventoryId) {
+            $selectedInventory = Inventory::with('employee')->find($selectedInventoryId);
+            if ($selectedInventory && $selectedInventory->employee_id) {
+                $selectedEmployeeId = $selectedInventory->employee_id;
+            }
+        }
+
+        return view('basts.create', compact('title', 'subtitle', 'submits', 'receives', 'bast_no', 'year', 'month', 'selectedEmployeeId', 'selectedInventoryId'));
     }
 
     /**
@@ -172,8 +186,9 @@ class BastController extends Controller
             ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
             ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
             ->leftJoin('employees', 'inventories.employee_id', '=', 'employees.id')
+            ->leftJoin('projects', 'inventories.project_id', '=', 'projects.id')
             ->leftJoin('basts', 'basts.inventory_id', '=', 'inventories.id')
-            ->select('inventories.*', 'assets.asset_name', 'basts.inventory_id', 'brands.brand_name')
+            ->select('inventories.*', 'assets.asset_name', 'basts.inventory_id', 'brands.brand_name', 'projects.project_code')
             ->where('employees.id', '=', $bast->bast_receive)
             ->orderBy('inventories.id', 'desc')
             ->distinct()->get();
@@ -182,8 +197,9 @@ class BastController extends Controller
             ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
             ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
             ->leftJoin('employees', 'inventories.employee_id', '=', 'employees.id')
+            ->leftJoin('projects', 'inventories.project_id', '=', 'projects.id')
             ->leftJoin('basts', 'basts.inventory_id', '=', 'inventories.id')
-            ->select('inventories.*', 'assets.asset_name', 'basts.inventory_id', 'basts.bast_no', 'basts.id as bast_id', 'brands.brand_name')
+            ->select('inventories.*', 'assets.asset_name', 'basts.inventory_id', 'basts.bast_no', 'basts.id as bast_id', 'brands.brand_name', 'projects.project_code')
             ->where('employees.id', '=', $bast->bast_receive)
             ->where('basts.bast_no', '=', $bast_no)
             ->orderBy('inventories.id', 'desc')
