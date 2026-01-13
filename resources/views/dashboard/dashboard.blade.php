@@ -305,17 +305,156 @@
                                             class="table table-bordered table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>No</th>
-                                                    <th>Inventory No</th>
-                                                    <th>Date</th>
-                                                    <th>Asset</th>
-                                                    <th>Brand</th>
-                                                    <th>Model</th>
-                                                    <th>Serial No</th>
-                                                    <th>Employee</th>
-                                                    <th>Project</th>
-                                                    <th>Department</th>
-                                                    <th>Action</th>
+                                                    <th class="align-middle">No</th>
+                                                    <th class="align-middle">Inventory No</th>
+                                                    <th class="align-middle">Date</th>
+                                                    <th class="align-middle">Asset</th>
+                                                    <th class="align-middle">Brand</th>
+                                                    <th class="align-middle">Model</th>
+                                                    <th class="align-middle">Serial No</th>
+                                                    <th class="align-middle">Employee</th>
+                                                    <th class="align-middle">Project</th>
+                                                    <th class="align-middle">Department</th>
+                                                    <th class="align-middle">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                    </section>
+                </div>
+                <!-- /.row -->
+
+                <!-- BAPB Without Signed Document Section -->
+                <div class="row">
+                    <section class="col-lg-12">
+                        <div class="card card-warning">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                    BAPB yang belum ada Signed Document
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="accordionBapb">
+                                    <div class="card card-primary">
+                                        <div class="card-header">
+                                            <h4 class="card-title w-100">
+                                                <a class="d-block w-100" data-toggle="collapse" href="#collapseBapbFilter">
+                                                    <i class="fas fa-filter"></i> Filter
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div id="collapseBapbFilter" class="collapse" data-parent="#accordionBapb">
+                                            <div class="card-body">
+                                                <div class="row form-group">
+                                                    <div class="col-3">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">From</label>
+                                                            <input type="date" class="form-control" name="bapb_date1"
+                                                                id="bapb_date1">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">To</label>
+                                                            <input type="date" class="form-control" name="bapb_date2"
+                                                                id="bapb_date2">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">BAPB Reg</label>
+                                                            <input type="text" class="form-control" name="bapb_reg"
+                                                                id="bapb_reg">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Inventory No</label>
+                                                            <input type="text" class="form-control"
+                                                                name="bapb_inventory_no" id="bapb_inventory_no">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Asset</label>
+                                                            <select name="bapb_asset_name" class="form-control select2bs4"
+                                                                id="bapb_asset_name" style="width: 100%;">
+                                                                <option value="">- All -</option>
+                                                                @foreach ($assets as $asset)
+                                                                    <option value="{{ $asset->asset_name }}">
+                                                                        {{ $asset->asset_name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">PIC</label>
+                                                            <input type="text" class="form-control" name="bapb_fullname"
+                                                                id="bapb_fullname">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Project</label>
+                                                            <select name="bapb_project_code" class="form-control select2bs4"
+                                                                id="bapb_project_code" style="width: 100%;">
+                                                                <option value="">- All -</option>
+                                                                @foreach ($projects as $project)
+                                                                    <option value="{{ $project->project_code }}">
+                                                                        {{ $project->project_code }} -
+                                                                        {{ $project->project_name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Department</label>
+                                                            <select name="bapb_dept_name" class="form-control select2bs4"
+                                                                id="bapb_dept_name" style="width: 100%;">
+                                                                <option value="">- All -</option>
+                                                                @foreach ($departments as $department)
+                                                                    <option value="{{ $department->dept_name }}">
+                                                                        {{ $department->dept_name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">&nbsp;</label>
+                                                            <button id="btn-reset-bapb" type="button"
+                                                                class="btn btn-danger btn-block">Reset</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table id="inventoriesWithoutBapbTable"
+                                            class="table table-bordered table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th class="align-middle">No</th>
+                                                    <th class="align-middle">BAPB Reg</th>
+                                                    <th class="align-middle">BAPB Date</th>
+                                                    <th class="align-middle">Submit</th>
+                                                    <th class="align-middle">Receive</th>
+                                                    <th class="align-middle">Duration</th>
+                                                    <th class="align-middle">Inventory No</th>
+                                                    <th class="align-middle">Asset</th>
+                                                    <th class="align-middle">Project</th>
+                                                    <th class="align-middle">Department</th>
+                                                    <th class="align-middle">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -564,6 +703,165 @@
                         // Redraw table
                         redrawTable();
                     });
+                })();
+
+                // Initialize IT Equipment Without BAPB DataTable
+                (function() {
+                    if (!$("#inventoriesWithoutBapbTable").length) return;
+
+                    // Initialize DataTable
+                    var bapbTable = null;
+                    bapbTable = $("#inventoriesWithoutBapbTable").DataTable({
+                        responsive: true,
+                        autoWidth: true,
+                        lengthChange: true,
+                        lengthMenu: [
+                            [10, 25, 50, 100, -1],
+                            [10, 25, 50, 100, "All"]
+                        ],
+                        processing: true,
+                        serverSide: true,
+                        ajax: {
+                            url: "{{ route('dashboard.getInventoriesWithoutBapb') }}",
+                            data: function(d) {
+                                d.date1 = $('#bapb_date1').val();
+                                d.date2 = $('#bapb_date2').val();
+                                d.bapb_reg = $('#bapb_reg').val();
+                                d.inventory_no = $('#bapb_inventory_no').val();
+                                d.asset_name = $('#bapb_asset_name').val();
+                                d.fullname = $('#bapb_fullname').val();
+                                d.project_code = $('#bapb_project_code').val();
+                                d.dept_name = $('#bapb_dept_name').val();
+                            }
+                        },
+                        columns: [{
+                                data: "DT_RowIndex",
+                                orderable: false,
+                                searchable: false,
+                                className: "text-center"
+                            },
+                            {
+                                data: "bapb_reg",
+                                name: "bapb_reg",
+                                orderable: false
+                            },
+                            {
+                                data: "bapb_date",
+                                name: "bapb_date",
+                                orderable: false
+                            },
+                            {
+                                data: "submit_name",
+                                name: "submit_name",
+                                orderable: false
+                            },
+                            {
+                                data: "receive_name",
+                                name: "receive_name",
+                                orderable: false
+                            },
+                            {
+                                data: "duration",
+                                name: "duration",
+                                orderable: false
+                            },
+                            {
+                                data: "inventory_no",
+                                name: "inventory_no",
+                                orderable: false
+                            },
+                            {
+                                data: "asset_name",
+                                name: "asset_name",
+                                orderable: false
+                            },
+                            {
+                                data: "project_code",
+                                name: "project_code",
+                                orderable: false
+                            },
+                            {
+                                data: "dept_name",
+                                name: "dept_name",
+                                orderable: false
+                            },
+                            {
+                                data: "action",
+                                name: "action",
+                                orderable: false,
+                                searchable: false,
+                                className: "text-center"
+                            }
+                        ],
+                        dom: 'Bfrtip',
+                        buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                    });
+
+                    // Move buttons to top
+                    bapbTable.buttons().container().appendTo(
+                        '#inventoriesWithoutBapbTable_wrapper .col-md-6:eq(0)');
+
+                    // Initialize Select2 dropdowns
+                    const select2ElementsBapb = ['#bapb_asset_name', '#bapb_project_code',
+                        '#bapb_dept_name'
+                    ];
+
+                    setTimeout(function() {
+                        select2ElementsBapb.forEach(function(selector) {
+                            if ($(selector).length && !$(selector).hasClass(
+                                    'select2-hidden-accessible')) {
+                                $(selector).select2({
+                                    theme: 'bootstrap4',
+                                    width: '100%'
+                                });
+                            }
+                        });
+
+                        var isInitializing = true;
+
+                        // Redraw function
+                        var redrawTable = function() {
+                            if (isInitializing) return;
+                            if (bapbTable && typeof bapbTable.draw === 'function') {
+                                bapbTable.draw();
+                            }
+                        };
+
+                        isInitializing = false;
+
+                        // Attach filter events - Text inputs
+                        $('#bapb_reg, #bapb_inventory_no, #bapb_fullname')
+                            .off('keyup.bapbFilter')
+                            .on('keyup.bapbFilter', redrawTable);
+
+                        // Attach filter events - Date inputs
+                        $('#bapb_date1, #bapb_date2')
+                            .off('change.bapbFilter')
+                            .on('change.bapbFilter', redrawTable);
+
+                        // Attach filter events - Select2 dropdowns
+                        $(select2ElementsBapb.join(', '))
+                            .off('select2:select select2:unselect select2:clear')
+                            .on('select2:select select2:unselect select2:clear', redrawTable);
+
+                        // Reset button handler
+                        $('#btn-reset-bapb').on('click', function() {
+                            // Reset text and date inputs
+                            $('#bapb_date1, #bapb_date2, #bapb_reg, #bapb_inventory_no, #bapb_fullname')
+                                .val('');
+
+                            // Reset Select2 dropdowns
+                            $(select2ElementsBapb.join(', ')).val(null).trigger(
+                                'change.select2');
+
+                            // Redraw table
+                            setTimeout(function() {
+                                if (bapbTable && typeof bapbTable.draw === 'function') {
+                                    bapbTable.draw();
+                                }
+                            }, 100);
+                        });
+                    }, 500);
                 })();
             @endif
         });

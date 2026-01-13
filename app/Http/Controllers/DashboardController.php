@@ -166,6 +166,88 @@ class DashboardController extends Controller
         }
     }
 
+    public function getInventoriesWithoutBapb(Request $request)
+    {
+        if ($request->ajax()) {
+            // Get BAPB yang belum ada signed_document
+            // Group by bapb_no to get unique BAPB records
+            $query = DB::table('bapbs')
+                ->leftJoin('employees as submit', 'bapbs.bapb_submit', '=', 'submit.id')
+                ->leftJoin('employees as receive', 'bapbs.bapb_receive', '=', 'receive.id')
+                ->leftJoin('inventories', 'bapbs.inventory_id', '=', 'inventories.id')
+                ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+                ->leftJoin('projects', 'inventories.project_id', '=', 'projects.id')
+                ->leftJoin('departments', 'inventories.department_id', '=', 'departments.id')
+                ->select('bapbs.bapb_no', 'bapbs.bapb_reg', 'bapbs.bapb_date', 'bapbs.duration', 'submit.fullname as submit_name', 'receive.fullname as receive_name', DB::raw('GROUP_CONCAT(DISTINCT inventories.inventory_no SEPARATOR ", ") as inventory_no'), DB::raw('GROUP_CONCAT(DISTINCT assets.asset_name SEPARATOR ", ") as asset_name'), DB::raw('GROUP_CONCAT(DISTINCT projects.project_code SEPARATOR ", ") as project_code'), DB::raw('GROUP_CONCAT(DISTINCT departments.dept_name SEPARATOR ", ") as dept_name'))
+                ->whereNull('bapbs.signed_document')
+                ->groupBy('bapbs.bapb_no', 'bapbs.bapb_reg', 'bapbs.bapb_date', 'bapbs.duration', 'submit.fullname', 'receive.fullname')
+                ->orderBy('bapbs.bapb_date', 'desc');
+
+            // Apply filters
+            if ($request->get('date1') && $request->get('date2')) {
+                $query->whereBetween('bapbs.bapb_date', [$request->get('date1'), $request->get('date2')]);
+            }
+
+            if ($request->get('bapb_reg')) {
+                $query->where('bapbs.bapb_reg', 'LIKE', "%{$request->get('bapb_reg')}%");
+            }
+
+            if ($request->get('inventory_no')) {
+                $query->where('inventories.inventory_no', 'LIKE', "%{$request->get('inventory_no')}%");
+            }
+
+            if ($request->get('asset_name')) {
+                $query->where('assets.asset_name', 'LIKE', "%{$request->get('asset_name')}%");
+            }
+
+            if ($request->get('fullname')) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('submit.fullname', 'LIKE', "%{$request->get('fullname')}%")
+                        ->orWhere('receive.fullname', 'LIKE', "%{$request->get('fullname')}%");
+                });
+            }
+
+            if ($request->get('project_code')) {
+                $query->where('projects.project_code', 'LIKE', "%{$request->get('project_code')}%");
+            }
+
+            if ($request->get('dept_name')) {
+                $query->where('departments.dept_name', 'LIKE', "%{$request->get('dept_name')}%");
+            }
+
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('bapb_reg', function ($bapb) {
+                    return '<b>' . $bapb->bapb_reg . '</b>';
+                })
+                ->addColumn('bapb_date', function ($bapb) {
+                    return $bapb->bapb_date ? date('d-M-Y', strtotime($bapb->bapb_date)) : '-';
+                })
+                ->addColumn('submit_name', function ($bapb) {
+                    return $bapb->submit_name ?? '-';
+                })
+                ->addColumn('receive_name', function ($bapb) {
+                    return $bapb->receive_name ?? '-';
+                })
+                ->addColumn('duration', function ($bapb) {
+                    return $bapb->duration ? $bapb->duration . ' Days' : '-';
+                })
+                ->addColumn('inventory_no', function ($bapb) {
+                    return $bapb->inventory_no ?? '-';
+                })
+                ->addColumn('dept_name', function ($bapb) {
+                    return $bapb->dept_name ?? '-';
+                })
+                ->addColumn('action', function ($bapb) {
+                    $viewBtn = '<a href="' . url('bapbs/' . $bapb->bapb_no) . '" class="btn btn-sm btn-info" target="_blank"><i class="fas fa-eye"></i> View</a>';
+                    $uploadBtn = '<a href="' . url('bapbs/' . $bapb->bapb_no) . '" class="btn btn-sm btn-primary"><i class="fas fa-upload"></i> Upload Document</a>';
+                    return $viewBtn . ' ' . $uploadBtn;
+                })
+                ->rawColumns(['bapb_reg', 'action'])
+                ->toJson();
+        }
+    }
+
     public function summary($id)
     {
         $asset = Asset::find($id);

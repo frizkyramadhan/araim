@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Bast;
 use App\Models\Employee;
 use App\Models\Inventory;
+use App\Mail\BastNotificationMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 
 class BastController extends Controller
 {
@@ -105,6 +108,7 @@ class BastController extends Controller
         ]);
 
         $data = $request->all();
+
         foreach ($data['inventory_id'] as $inventory => $value) {
             $inventories = array(
                 'bast_no' => $data['bast_no'],
@@ -136,7 +140,7 @@ class BastController extends Controller
             ->leftJoin('positions as pos_submit', 'submit.position_id', '=', 'pos_submit.id')
             ->leftJoin('employees as receive', 'basts.bast_receive', '=', 'receive.id')
             ->leftJoin('positions as pos_receive', 'receive.position_id', '=', 'pos_receive.id')
-            ->select('basts.bast_no', 'basts.bast_reg', 'bast_date', 'receive.fullname as receive_name', 'receive.nik as receive_nik', 'pos_receive.position_name as receive_pos', 'submit.fullname as submit_name', 'submit.nik as submit_nik', 'pos_submit.position_name as submit_pos')
+            ->select('basts.bast_no', 'basts.bast_reg', 'basts.signed_document', 'bast_date', 'receive.fullname as receive_name', 'receive.nik as receive_nik', 'pos_receive.position_name as receive_pos', 'submit.fullname as submit_name', 'submit.nik as submit_nik', 'pos_submit.position_name as submit_pos')
             ->where('bast_no', '=', $bast_no)
             ->orderBy('bast_no', 'desc')->first();
         $bast_row = DB::table('basts')
@@ -237,6 +241,7 @@ class BastController extends Controller
         ]);
 
         $data = $request->all();
+
         if (!empty($request->inventory_id)) {
             foreach ($data['inventory_id'] as $inventory => $value) {
                 DB::table('basts')->where('bast_no', $bast_no)->update([
@@ -282,6 +287,51 @@ class BastController extends Controller
         return back()->with('success', 'BAST deleted successfully');
     }
 
+    public function uploadDocument(Request $request, $bast_no)
+    {
+        $request->validate([
+            'signed_document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // max 5MB
+        ]);
+
+        // Get existing document path to delete old file
+        $existingBast = DB::table('basts')->where('bast_no', $bast_no)->first();
+        if ($existingBast && $existingBast->signed_document) {
+            Storage::disk('public')->delete($existingBast->signed_document);
+        }
+
+        // Handle file upload
+        $file = $request->file('signed_document');
+        $fileName = 'bast_' . $bast_no . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $signedDocumentPath = $file->storeAs('basts/signed_documents', $fileName, 'public');
+
+        // Update all records with same bast_no
+        DB::table('basts')->where('bast_no', $bast_no)->update([
+            'signed_document' => $signedDocumentPath
+        ]);
+
+        return redirect('basts/' . $bast_no)->with('success', 'Dokumen berhasil diupload');
+    }
+
+    public function deleteDocument($bast_no)
+    {
+        // Get existing document path to delete file
+        $existingBast = DB::table('basts')->where('bast_no', $bast_no)->first();
+
+        if ($existingBast && $existingBast->signed_document) {
+            // Delete file from storage
+            Storage::disk('public')->delete($existingBast->signed_document);
+
+            // Update all records with same bast_no to remove document path
+            DB::table('basts')->where('bast_no', $bast_no)->update([
+                'signed_document' => null
+            ]);
+
+            return redirect('basts/' . $bast_no)->with('success', 'Dokumen berhasil dihapus');
+        }
+
+        return redirect('basts/' . $bast_no)->with('error', 'Dokumen tidak ditemukan');
+    }
+
     public function print($bast_no)
     {
         $title = 'BAST';
@@ -291,7 +341,7 @@ class BastController extends Controller
             ->leftJoin('positions as pos_submit', 'submit.position_id', '=', 'pos_submit.id')
             ->leftJoin('employees as receive', 'basts.bast_receive', '=', 'receive.id')
             ->leftJoin('positions as pos_receive', 'receive.position_id', '=', 'pos_receive.id')
-            ->select('basts.bast_no', 'basts.bast_reg', 'bast_date', 'receive.fullname as receive_name', 'receive.nik as receive_nik', 'pos_receive.position_name as receive_pos', 'submit.fullname as submit_name', 'submit.nik as submit_nik', 'pos_submit.position_name as submit_pos')
+            ->select('basts.bast_no', 'basts.bast_reg', 'basts.signed_document', 'bast_date', 'receive.fullname as receive_name', 'receive.nik as receive_nik', 'pos_receive.position_name as receive_pos', 'submit.fullname as submit_name', 'submit.nik as submit_nik', 'pos_submit.position_name as submit_pos')
             ->where('bast_no', '=', $bast_no)
             ->orderBy('bast_no', 'desc')->first();
         $bast_row = DB::table('basts')
@@ -303,5 +353,122 @@ class BastController extends Controller
             ->get();
         // dd($bast, $bast_row);
         return view('basts.print', compact('title', 'subtitle', 'bast', 'bast_row'));
+    }
+
+    public function previewEmail($bast_no)
+    {
+        // Get BAST data
+        $bast = DB::table('basts')
+            ->leftJoin('employees as submit', 'basts.bast_submit', '=', 'submit.id')
+            ->leftJoin('positions as pos_submit', 'submit.position_id', '=', 'pos_submit.id')
+            ->leftJoin('employees as receive', 'basts.bast_receive', '=', 'receive.id')
+            ->leftJoin('positions as pos_receive', 'receive.position_id', '=', 'pos_receive.id')
+            ->select('basts.bast_no', 'basts.bast_reg', 'basts.signed_document', 'bast_date', 'receive.fullname as receive_name', 'receive.nik as receive_nik', 'pos_receive.position_name as receive_pos', 'submit.fullname as submit_name', 'submit.nik as submit_nik', 'pos_submit.position_name as submit_pos')
+            ->where('bast_no', '=', $bast_no)
+            ->orderBy('bast_no', 'desc')->first();
+
+        $bastRow = DB::table('basts')
+            ->leftJoin('inventories', 'basts.inventory_id', '=', 'inventories.id')
+            ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+            ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
+            ->select('basts.bast_no', 'inventories.*', 'assets.asset_name', 'brands.brand_name')
+            ->where('bast_no', '=', $bast_no)
+            ->get();
+
+        if (empty($bast)) {
+            return redirect('basts')->with('error', 'BAST not found');
+        }
+
+        return view('emails.bast_notification', compact('bast', 'bastRow'));
+    }
+
+    public function sendEmail(Request $request, $bast_no)
+    {
+        $request->validate([
+            'mail_to' => 'required|string',
+            'mail_cc' => 'nullable|string',
+        ]);
+
+        // Parse email addresses for TO (comma or newline separated)
+        $mailTo = array_filter(array_map('trim', preg_split('/[,\n\r]+/', $request->mail_to)));
+
+        if (empty($mailTo)) {
+            return redirect('basts/' . $bast_no)->with('error', 'Please provide at least one email address in Mail To');
+        }
+
+        // Parse email addresses for CC (comma or newline separated) - optional
+        $mailCc = [];
+        if (!empty($request->mail_cc)) {
+            $mailCc = array_filter(array_map('trim', preg_split('/[,\n\r]+/', $request->mail_cc)));
+        }
+
+        // Validate email addresses for TO
+        $validToEmails = [];
+        foreach ($mailTo as $email) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $validToEmails[] = $email;
+            }
+        }
+
+        if (empty($validToEmails)) {
+            return redirect('basts/' . $bast_no)->with('error', 'No valid email addresses found in Mail To');
+        }
+
+        // Validate email addresses for CC
+        $validCcEmails = [];
+        foreach ($mailCc as $email) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $validCcEmails[] = $email;
+            }
+        }
+
+        // Get BAST data
+        $bast = DB::table('basts')
+            ->leftJoin('employees as submit', 'basts.bast_submit', '=', 'submit.id')
+            ->leftJoin('positions as pos_submit', 'submit.position_id', '=', 'pos_submit.id')
+            ->leftJoin('employees as receive', 'basts.bast_receive', '=', 'receive.id')
+            ->leftJoin('positions as pos_receive', 'receive.position_id', '=', 'pos_receive.id')
+            ->select('basts.bast_no', 'basts.bast_reg', 'basts.signed_document', 'bast_date', 'receive.fullname as receive_name', 'receive.nik as receive_nik', 'pos_receive.position_name as receive_pos', 'submit.fullname as submit_name', 'submit.nik as submit_nik', 'pos_submit.position_name as submit_pos')
+            ->where('bast_no', '=', $bast_no)
+            ->orderBy('bast_no', 'desc')->first();
+
+        $bast_row = DB::table('basts')
+            ->leftJoin('inventories', 'basts.inventory_id', '=', 'inventories.id')
+            ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+            ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
+            ->select('basts.bast_no', 'inventories.*', 'assets.asset_name', 'brands.brand_name')
+            ->where('bast_no', '=', $bast_no)
+            ->get();
+
+        if (empty($bast)) {
+            return redirect('basts/' . $bast_no)->with('error', 'BAST not found');
+        }
+
+        try {
+            // Create mailable instance
+            $mailable = new BastNotificationMail($bast, $bast_row);
+
+            // Send email with TO and CC recipients
+            $mail = Mail::to($validToEmails);
+
+            // Add CC recipients if provided
+            if (!empty($validCcEmails)) {
+                $mail->cc($validCcEmails);
+            }
+
+            // Send the email
+            $mail->send($mailable);
+
+            $toCount = count($validToEmails);
+            $ccCount = count($validCcEmails);
+            $message = "Email notification sent successfully to {$toCount} recipient(s)";
+            if ($ccCount > 0) {
+                $message .= " and {$ccCount} CC recipient(s)";
+            }
+
+            return redirect('basts/' . $bast_no)->with('success', $message);
+        } catch (\Exception $e) {
+            return redirect('basts/' . $bast_no)->with('error', 'Failed to send email: ' . $e->getMessage());
+        }
     }
 }
