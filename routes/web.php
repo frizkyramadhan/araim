@@ -45,6 +45,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('dashboard/json', [DashboardController::class, 'json'])->name('dashboard.json');
     Route::get('dashboard/getLogs', [DashboardController::class, 'getLogs'])->name('dashboard.getLogs');
     Route::get('dashboard/getInventoriesWithoutBast', [DashboardController::class, 'getInventoriesWithoutBast'])->name('dashboard.getInventoriesWithoutBast');
+    Route::get('dashboard/getInventoriesWithoutBapb', [DashboardController::class, 'getInventoriesWithoutBapb'])->name('dashboard.getInventoriesWithoutBapb');
     Route::get('contact', function () {
         return view('contact', ['title' => 'Contact Us']);
     });
@@ -112,6 +113,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('basts/delete_item/{id}', [BastController::class, 'delete_item'])->name('basts.delete_item');
     Route::delete('basts/{bast_no}', [BastController::class, 'destroy'])->name('basts.destroy');
     Route::get('basts/{bast_no}/print', [BastController::class, 'print'])->name('basts.print');
+    Route::post('basts/{bast_no}/upload-document', [BastController::class, 'uploadDocument'])->name('basts.uploadDocument');
+    Route::delete('basts/{bast_no}/delete-document', [BastController::class, 'deleteDocument'])->name('basts.deleteDocument');
+    Route::post('basts/{bast_no}/send-email', [BastController::class, 'sendEmail'])->name('basts.sendEmail');
+    Route::get('basts/{bast_no}/preview-email', [BastController::class, 'previewEmail'])->name('basts.previewEmail');
 
     Route::get('bapbs', [BapbController::class, 'index'])->name('bapbs.index');
     Route::get('bapbs/getInventories', [BapbController::class, 'getInventories'])->name('bapbs.getInventories');
@@ -123,4 +128,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('bapbs/delete_item/{id}', [BapbController::class, 'delete_item'])->name('bapbs.delete_item');
     Route::delete('bapbs/{bapb_no}', [BapbController::class, 'destroy'])->name('bapbs.destroy');
     Route::get('bapbs/{bapb_no}/print', [BapbController::class, 'print'])->name('bapbs.print');
+    Route::post('bapbs/{bapb_no}/upload-document', [BapbController::class, 'uploadDocument'])->name('bapbs.uploadDocument');
+    Route::delete('bapbs/{bapb_no}/delete-document', [BapbController::class, 'deleteDocument'])->name('bapbs.deleteDocument');
+    Route::post('bapbs/{bapb_no}/send-email', [BapbController::class, 'sendEmail'])->name('bapbs.sendEmail');
+    Route::get('bapbs/{bapb_no}/preview-email', [BapbController::class, 'previewEmail'])->name('bapbs.previewEmail');
 });

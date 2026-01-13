@@ -401,7 +401,99 @@
                                         </div>
                                         <!-- /.card-body -->
                                     </div>
-                                    <div class="col-6">
+                                    @can('admin')
+                                        <div class="col-6">
+                                            <div class="card card-primary">
+                                                <div class="card-header">
+                                                    <h4 class="card-title">Document BAST</h4>
+                                                </div>
+                                                <div class="card-body">
+                                                    @if ($basts->count() > 0)
+                                                        <div class="table-responsive">
+                                                            <table class="table table-striped table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>No BAST</th>
+                                                                        <th>Action</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach ($basts as $bast)
+                                                                        <tr>
+                                                                            <td><b>{{ $bast->bast_reg }}</b></td>
+                                                                            <td>
+                                                                                <a href="{{ url('basts/' . $bast->bast_no) }}"
+                                                                                    class="btn btn-sm btn-info"
+                                                                                    target="_blank">
+                                                                                    <i class="fas fa-eye"></i> Detail
+                                                                                </a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    @endforeach
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    @else
+                                                        <div class="text-center">
+                                                            <p class="text-muted">Tidak ada dokumen BAST untuk inventory
+                                                                ini.
+                                                            </p>
+                                                            <a href="{{ url('basts/create?inventory_id=' . $inventory->id) }}"
+                                                                class="btn btn-primary">
+                                                                <i class="fas fa-plus"></i> Add BAST
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="card card-warning">
+                                                <div class="card-header">
+                                                    <h4 class="card-title">Document BAPB</h4>
+                                                </div>
+                                                <div class="card-body">
+                                                    @if ($bapbs->count() > 0)
+                                                        <div class="table-responsive">
+                                                            <table class="table table-striped table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>No BAPB</th>
+                                                                        <th>Action</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach ($bapbs as $bapb)
+                                                                        <tr>
+                                                                            <td><b>{{ $bapb->bapb_reg }}</b></td>
+                                                                            <td>
+                                                                                <a href="{{ url('bapbs/' . $bapb->bapb_no) }}"
+                                                                                    class="btn btn-sm btn-info"
+                                                                                    target="_blank">
+                                                                                    <i class="fas fa-eye"></i> Detail
+                                                                                </a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    @endforeach
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    @else
+                                                        <div class="text-center">
+                                                            <p class="text-muted">Tidak ada dokumen BAPB untuk inventory
+                                                                ini.
+                                                            </p>
+                                                            <a href="{{ url('bapbs/create?inventory_id=' . $inventory->id) }}"
+                                                                class="btn btn-primary">
+                                                                <i class="fas fa-plus"></i> Add BAPB
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endcan
+                                    <div class="col-12">
                                         <div class="card card-dark">
                                             <div class="card-header">
                                                 <h4 class="card-title">Images</h4>
@@ -459,55 +551,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @can('admin')
-                                        <div class="col-6">
-                                            <div class="card card-primary">
-                                                <div class="card-header">
-                                                    <h4 class="card-title">Document BAST</h4>
-                                                </div>
-                                                <div class="card-body">
-                                                    @if ($basts->count() > 0)
-                                                        <div class="table-responsive">
-                                                            <table class="table table-striped table-hover">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>No BAST</th>
-                                                                        <th>Action</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    @foreach ($basts as $bast)
-                                                                        <tr>
-                                                                            <td><b>{{ $bast->bast_reg }}</b></td>
-                                                                            <td>
-                                                                                <a href="{{ url('basts/' . $bast->bast_no) }}"
-                                                                                    class="btn btn-sm btn-info"
-                                                                                    target="_blank">
-                                                                                    <i class="fas fa-eye"></i> Detail
-                                                                                </a>
-                                                                            </td>
-                                                                        </tr>
-                                                                    @endforeach
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    @else
-                                                        <div class="text-center">
-                                                            <p class="text-muted">Tidak ada dokumen BAST untuk inventory ini.
-                                                            </p>
-                                                            <a href="{{ url('basts/create?inventory_id=' . $inventory->id) }}" class="btn btn-primary">
-                                                                <i class="fas fa-plus"></i> Add BAST
-                                                            </a>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endcan
                                 </div>
                             </div>
-                        </div>
-                        <!-- /.card -->
+                            <!-- /.card -->
                 </section>
                 <!-- right col -->
             </div>

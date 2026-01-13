@@ -442,9 +442,13 @@ class InventoryController extends Controller
             ->where('inventory_id', $inventory->id)
             ->select('basts.*')
             ->get();
+        $bapbs = DB::table('bapbs')
+            ->where('inventory_id', $inventory->id)
+            ->select('bapbs.*')
+            ->get();
         // dd($inventory->asset);
 
-        return view('inventories.show', compact('title', 'subtitle', 'inventory', 'specifications', 'images', 'basts', 'employee_id'));
+        return view('inventories.show', compact('title', 'subtitle', 'inventory', 'specifications', 'images', 'basts', 'bapbs', 'employee_id'));
     }
 
 
