@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\Location;
 use App\Models\Inventory;
 use App\Models\Department;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +40,7 @@ class DashboardController extends Controller
             ->where('inventories.transfer_status', '!=', 'Mutated')
             ->where('is_active', '=', '1')
             ->groupBy('project_code', 'projects.id', 'project_name')
+            ->orderBy('project_code', 'asc')
             ->get();
 
         $projectAssets = DB::table('inventories')
@@ -51,7 +53,117 @@ class DashboardController extends Controller
             ->orderBy('count', 'desc')
             ->get();
 
-        return view('dashboard.dashboard', compact('title', 'subtitle', 'total_inv', 'good_inv', 'broken_inv', 'total_emp', 'asset_sum', 'projects', 'projectAssets'));
+        // Get IT Equipment category
+        $itEquipmentCategory = Category::where('category_name', 'IT Equipment')->first();
+
+        // Get inventories IT Equipment without BAST (only for admin)
+        $inventoriesWithoutBast = collect();
+        if ($itEquipmentCategory) {
+            $inventoriesWithoutBast = DB::table('inventories')
+                ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+                ->leftJoin('categories', 'assets.category_id', '=', 'categories.id')
+                ->leftJoin('basts', 'inventories.id', '=', 'basts.inventory_id')
+                ->leftJoin('employees', 'inventories.employee_id', '=', 'employees.id')
+                ->leftJoin('projects', 'inventories.project_id', '=', 'projects.id')
+                ->select('inventories.id', 'inventories.inventory_no', 'inventories.model_asset', 'inventories.serial_no', 'employees.fullname', 'projects.project_code', 'assets.asset_name')
+                ->where('categories.id', $itEquipmentCategory->id)
+                ->where('inventories.is_active', '=', '1')
+                ->whereNull('basts.id')
+                ->orderBy('inventories.created_at', 'desc')
+                ->get();
+        }
+
+        // Get data for filters (only for admin)
+        $assets = Asset::where('asset_status', '1')->orderBy('asset_name', 'asc')->get();
+        $brands = Brand::where('brand_status', '1')->orderBy('brand_name', 'asc')->get();
+        $departments = Department::where('dept_status', '1')->orderBy('dept_name', 'asc')->get();
+
+        return view('dashboard.dashboard', compact('title', 'subtitle', 'total_inv', 'good_inv', 'broken_inv', 'total_emp', 'asset_sum', 'projects', 'projectAssets', 'inventoriesWithoutBast', 'assets', 'brands', 'departments'));
+    }
+
+    public function getInventoriesWithoutBast(Request $request)
+    {
+        if ($request->ajax()) {
+            // Get IT Equipment category
+            $itEquipmentCategory = Category::where('category_name', 'IT Equipment')->first();
+
+            if (!$itEquipmentCategory) {
+                return DataTables::of(collect())->toJson();
+            }
+
+            $query = DB::table('inventories')
+                ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+                ->leftJoin('categories', 'assets.category_id', '=', 'categories.id')
+                ->leftJoin('basts', 'inventories.id', '=', 'basts.inventory_id')
+                ->leftJoin('employees', 'inventories.employee_id', '=', 'employees.id')
+                ->leftJoin('projects', 'inventories.project_id', '=', 'projects.id')
+                ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
+                ->leftJoin('departments', 'inventories.department_id', '=', 'departments.id')
+                ->select('inventories.id', 'inventories.inventory_no', 'inventories.model_asset', 'inventories.serial_no', 'inventories.input_date', 'inventories.inventory_status', 'inventories.transfer_status', 'employees.fullname', 'projects.project_code', 'assets.asset_name', 'brands.brand_name', 'departments.dept_name')
+                ->where('categories.id', $itEquipmentCategory->id)
+                ->where('inventories.is_active', '=', '1')
+                ->whereNull('basts.id')
+                ->orderBy('inventories.created_at', 'desc');
+
+            // Apply filters
+            if ($request->get('date1') && $request->get('date2')) {
+                $query->whereBetween('inventories.input_date', [$request->get('date1'), $request->get('date2')]);
+            }
+
+            if ($request->get('inventory_no')) {
+                $query->where('inventories.inventory_no', 'LIKE', "%{$request->get('inventory_no')}%");
+            }
+
+            if ($request->get('asset_name')) {
+                $query->where('assets.asset_name', 'LIKE', "%{$request->get('asset_name')}%");
+            }
+
+            if ($request->get('brand_name')) {
+                $query->where('brands.brand_name', 'LIKE', "%{$request->get('brand_name')}%");
+            }
+
+            if ($request->get('model_asset')) {
+                $query->where('inventories.model_asset', 'LIKE', "%{$request->get('model_asset')}%");
+            }
+
+            if ($request->get('serial_no')) {
+                $query->where('inventories.serial_no', 'LIKE', "%{$request->get('serial_no')}%");
+            }
+
+            if ($request->get('fullname')) {
+                $query->where('employees.fullname', 'LIKE', "%{$request->get('fullname')}%");
+            }
+
+            if ($request->get('project_code')) {
+                $query->where('projects.project_code', 'LIKE', "%{$request->get('project_code')}%");
+            }
+
+            if ($request->get('dept_name')) {
+                $query->where('departments.dept_name', 'LIKE', "%{$request->get('dept_name')}%");
+            }
+
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('inventory_no', function ($inventory) {
+                    return '<b>' . $inventory->inventory_no . '</b>';
+                })
+                ->addColumn('input_date', function ($inventory) {
+                    return $inventory->input_date ? date('d-M-Y', strtotime($inventory->input_date)) : '-';
+                })
+                ->addColumn('brand_name', function ($inventory) {
+                    return $inventory->brand_name ?? '-';
+                })
+                ->addColumn('dept_name', function ($inventory) {
+                    return $inventory->dept_name ?? '-';
+                })
+                ->addColumn('action', function ($inventory) {
+                    $viewBtn = '<a href="' . url('inventories/' . $inventory->id) . '" class="btn btn-sm btn-info" target="_blank"><i class="fas fa-eye"></i> View</a>';
+                    $addBastBtn = '<a href="' . url('basts/create?inventory_id=' . $inventory->id) . '" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i> Add BAST</a>';
+                    return $viewBtn . ' ' . $addBastBtn;
+                })
+                ->rawColumns(['inventory_no', 'action'])
+                ->toJson();
+        }
     }
 
     public function summary($id)
