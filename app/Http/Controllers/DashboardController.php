@@ -240,10 +240,87 @@ class DashboardController extends Controller
                 })
                 ->addColumn('action', function ($bapb) {
                     $viewBtn = '<a href="' . url('bapbs/' . $bapb->bapb_no) . '" class="btn btn-sm btn-info" target="_blank"><i class="fas fa-eye"></i> View</a>';
-                    $uploadBtn = '<a href="' . url('bapbs/' . $bapb->bapb_no) . '" class="btn btn-sm btn-primary"><i class="fas fa-upload"></i> Upload Document</a>';
-                    return $viewBtn . ' ' . $uploadBtn;
+                    return $viewBtn;
                 })
                 ->rawColumns(['bapb_reg', 'action'])
+                ->toJson();
+        }
+    }
+
+    public function getBastsWithoutSignedDocument(Request $request)
+    {
+        if ($request->ajax()) {
+            // Get BAST yang belum ada signed_document
+            // Group by bast_no to get unique BAST records
+            $query = DB::table('basts')
+                ->leftJoin('employees as submit', 'basts.bast_submit', '=', 'submit.id')
+                ->leftJoin('employees as receive', 'basts.bast_receive', '=', 'receive.id')
+                ->leftJoin('inventories', 'basts.inventory_id', '=', 'inventories.id')
+                ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+                ->leftJoin('projects', 'inventories.project_id', '=', 'projects.id')
+                ->leftJoin('departments', 'inventories.department_id', '=', 'departments.id')
+                ->select('basts.bast_no', 'basts.bast_reg', 'basts.bast_date', 'submit.fullname as submit_name', 'receive.fullname as receive_name', DB::raw('GROUP_CONCAT(DISTINCT inventories.inventory_no SEPARATOR ", ") as inventory_no'), DB::raw('GROUP_CONCAT(DISTINCT assets.asset_name SEPARATOR ", ") as asset_name'), DB::raw('GROUP_CONCAT(DISTINCT projects.project_code SEPARATOR ", ") as project_code'), DB::raw('GROUP_CONCAT(DISTINCT departments.dept_name SEPARATOR ", ") as dept_name'))
+                ->whereNull('basts.signed_document')
+                ->groupBy('basts.bast_no', 'basts.bast_reg', 'basts.bast_date', 'submit.fullname', 'receive.fullname')
+                ->orderBy('basts.bast_date', 'desc');
+
+            // Apply filters
+            if ($request->get('date1') && $request->get('date2')) {
+                $query->whereBetween('basts.bast_date', [$request->get('date1'), $request->get('date2')]);
+            }
+
+            if ($request->get('bast_reg')) {
+                $query->where('basts.bast_reg', 'LIKE', "%{$request->get('bast_reg')}%");
+            }
+
+            if ($request->get('inventory_no')) {
+                $query->where('inventories.inventory_no', 'LIKE', "%{$request->get('inventory_no')}%");
+            }
+
+            if ($request->get('asset_name')) {
+                $query->where('assets.asset_name', 'LIKE', "%{$request->get('asset_name')}%");
+            }
+
+            if ($request->get('fullname')) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('submit.fullname', 'LIKE', "%{$request->get('fullname')}%")
+                        ->orWhere('receive.fullname', 'LIKE', "%{$request->get('fullname')}%");
+                });
+            }
+
+            if ($request->get('project_code')) {
+                $query->where('projects.project_code', 'LIKE', "%{$request->get('project_code')}%");
+            }
+
+            if ($request->get('dept_name')) {
+                $query->where('departments.dept_name', 'LIKE', "%{$request->get('dept_name')}%");
+            }
+
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('bast_reg', function ($bast) {
+                    return '<b>' . $bast->bast_reg . '</b>';
+                })
+                ->addColumn('bast_date', function ($bast) {
+                    return $bast->bast_date ? date('d-M-Y', strtotime($bast->bast_date)) : '-';
+                })
+                ->addColumn('submit_name', function ($bast) {
+                    return $bast->submit_name ?? '-';
+                })
+                ->addColumn('receive_name', function ($bast) {
+                    return $bast->receive_name ?? '-';
+                })
+                ->addColumn('inventory_no', function ($bast) {
+                    return $bast->inventory_no ?? '-';
+                })
+                ->addColumn('dept_name', function ($bast) {
+                    return $bast->dept_name ?? '-';
+                })
+                ->addColumn('action', function ($bast) {
+                    $viewBtn = '<a href="' . url('basts/' . $bast->bast_no) . '" class="btn btn-sm btn-info" target="_blank"><i class="fas fa-eye"></i> View</a>';
+                    return $viewBtn;
+                })
+                ->rawColumns(['bast_reg', 'action'])
                 ->toJson();
         }
     }
