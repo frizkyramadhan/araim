@@ -717,9 +717,10 @@
                         responsive: true,
                         autoWidth: true,
                         lengthChange: true,
+                        pageLength: 5,
                         lengthMenu: [
-                            [10, 25, 50, 100, -1],
-                            ['10', '25', '50', '100', 'Show all']
+                            [5, 10, 25, 50, 100, -1],
+                            ['5', '10', '25', '50', '100', 'Show all']
                         ],
                         dom: 'lBrtpi',
                         buttons: ["copy", "csv", "excel", "print", "colvis"],
@@ -859,9 +860,10 @@
                         responsive: true,
                         autoWidth: true,
                         lengthChange: true,
+                        pageLength: 5,
                         lengthMenu: [
-                            [10, 25, 50, 100, -1],
-                            [10, 25, 50, 100, "All"]
+                            [5, 10, 25, 50, 100, -1],
+                            [5, 10, 25, 50, 100, "All"]
                         ],
                         processing: true,
                         serverSide: true,
@@ -1018,9 +1020,10 @@
                         responsive: true,
                         autoWidth: true,
                         lengthChange: true,
+                        pageLength: 5,
                         lengthMenu: [
-                            [10, 25, 50, 100, -1],
-                            [10, 25, 50, 100, "All"]
+                            [5, 10, 25, 50, 100, -1],
+                            [5, 10, 25, 50, 100, "All"]
                         ],
                         processing: true,
                         serverSide: true,
