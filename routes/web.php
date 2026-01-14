@@ -46,6 +46,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('dashboard/getLogs', [DashboardController::class, 'getLogs'])->name('dashboard.getLogs');
     Route::get('dashboard/getInventoriesWithoutBast', [DashboardController::class, 'getInventoriesWithoutBast'])->name('dashboard.getInventoriesWithoutBast');
     Route::get('dashboard/getInventoriesWithoutBapb', [DashboardController::class, 'getInventoriesWithoutBapb'])->name('dashboard.getInventoriesWithoutBapb');
+    Route::get('dashboard/getBastsWithoutSignedDocument', [DashboardController::class, 'getBastsWithoutSignedDocument'])->name('dashboard.getBastsWithoutSignedDocument');
     Route::get('contact', function () {
         return view('contact', ['title' => 'Contact Us']);
     });
