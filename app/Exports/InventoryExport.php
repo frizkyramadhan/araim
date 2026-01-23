@@ -42,11 +42,12 @@ class InventoryExport implements
         $inventory = Inventory::leftJoin('projects', 'inventories.project_id', '=', 'projects.id')
             ->leftJoin('employees', 'inventories.employee_id', '=', 'employees.id')
             ->leftJoin('assets', 'inventories.asset_id', '=', 'assets.id')
+            ->leftJoin('categories', 'assets.category_id', '=', 'categories.id')
             ->leftJoin('departments', 'inventories.department_id', '=', 'departments.id')
             ->leftJoin('users', 'inventories.created_by', '=', 'users.id')
             ->leftJoin('brands', 'inventories.brand_id', '=', 'brands.id')
             ->leftJoin('locations', 'inventories.brand_id', '=', 'locations.id')
-            ->select(['inventories.id', 'inventory_no', 'employees.nik', 'employees.fullname', 'asset_name', 'project_code', 'dept_name', 'brand_name', 'model_asset', 'serial_no', 'part_no', 'po_no', 'quantity', 'remarks', 'input_date', 'users.name', 'reference_no', 'reference_date', 'location_name', 'qrcode', 'inventory_status', 'transfer_status', 'is_active'])
+            ->select(['inventories.id', 'inventory_no', 'employees.nik', 'employees.fullname', 'asset_name', 'project_code', 'dept_name', 'categories.category_name', 'brand_name', 'model_asset', 'serial_no', 'part_no', 'po_no', 'quantity', 'remarks', 'input_date', 'users.name', 'reference_no', 'reference_date', 'location_name', 'qrcode', 'inventory_status', 'transfer_status', 'is_active'])
             ->orderBy('inventories.inventory_no', 'desc')
             ->orderBy('inventories.id', 'desc');
 
@@ -63,6 +64,7 @@ class InventoryExport implements
             $inventory->asset_name,
             $inventory->project_code,
             $inventory->dept_name,
+            $inventory->category_name,
             $inventory->brand_name,
             $inventory->model_asset,
             $inventory->serial_no,
@@ -84,7 +86,7 @@ class InventoryExport implements
 
     public function headings(): array
     {
-        return ['id', 'inventory_no', 'nik', 'fullname', 'asset_name', 'project_code', 'dept_name', 'brand_name', 'model_asset', 'serial_no', 'part_no', 'po_no', 'quantity', 'remarks', 'input_date', 'created_by', 'reference_no', 'reference_date', 'location_name', 'qrcode', 'inventory_status', 'transfer_status', 'is_active'];
+        return ['id', 'inventory_no', 'nik', 'fullname', 'asset_name', 'project_code', 'dept_name', 'category_name', 'brand_name', 'model_asset', 'serial_no', 'part_no', 'po_no', 'quantity', 'remarks', 'input_date', 'created_by', 'reference_no', 'reference_date', 'location_name', 'qrcode', 'inventory_status', 'transfer_status', 'is_active'];
     }
 
     public function columnFormats(): array
