@@ -6,7 +6,10 @@ use App\Models\Project;
 use App\Models\Employee;
 use App\Models\Inventory;
 use App\Models\Position;
+use App\Services\HeroEmployeeClient;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use RuntimeException;
 use Yajra\DataTables\DataTables;
 
 class EmployeeController extends Controller
@@ -42,6 +45,9 @@ class EmployeeController extends Controller
                 ->addColumn('fullname', function ($employees) {
                     return $employees->fullname;
                 })
+                ->addColumn('email', function ($employees) {
+                    return $employees->email ?: '-';
+                })
                 ->addColumn('position_name', function ($employees) {
                     return $employees->position->position_name ?? 'null';
                 })
@@ -55,12 +61,20 @@ class EmployeeController extends Controller
                         return '<span class="badge badge-danger">Inactive</span>';
                     }
                 })
+                ->addColumn('hero_bind', function ($employees) {
+                    if ($employees->hero_employee_id) {
+                        return '<span class="badge badge-info">Link</span>';
+                    }
+
+                    return '<span class="badge badge-secondary">Not linked</span>';
+                })
                 ->filter(function ($instance) use ($request) {
                     if (!empty($request->get('search'))) {
                         $instance->where(function ($w) use ($request) {
                             $search = $request->get('search');
                             $w->orWhere('nik', 'LIKE', "%$search%")
                                 ->orWhere('fullname', 'LIKE', "%$search%")
+                                ->orWhere('employees.email', 'LIKE', "%$search%")
                                 ->orWhere('positions.position_name', 'LIKE', "%$search%")
                                 ->orWhere('projects.project_code', 'LIKE', "%$search%")
                                 ->orWhere('status', 'LIKE', "%$search%");
@@ -72,7 +86,7 @@ class EmployeeController extends Controller
                     $total = Inventory::where('employee_id', '=', $employees->id)->where('inventory_status', '=', 'Good')->count('id');
                     return $total;
                 })
-                ->rawColumns(['status', 'action'])
+                ->rawColumns(['status', 'hero_bind', 'action'])
                 ->toJson();
         }
     }
@@ -82,14 +96,15 @@ class EmployeeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(HeroEmployeeClient $hero)
     {
         $title = 'Employees';
         $subtitle = 'Add Employees';
         $projects = Project::where('project_status', '=', '1')->orderBy('project_code', 'asc')->get();
         $positions = Position::where('position_status', '=', '1')->orderBy('position_name', 'asc')->get();
+        $heroLink = $this->resolveHeroLink(old('hero_employee_id'), $hero);
 
-        return view('employees.create', compact('title', 'subtitle', 'projects', 'positions'));
+        return view('employees.create', compact('title', 'subtitle', 'projects', 'positions', 'heroLink'));
     }
 
     /**
@@ -98,13 +113,35 @@ class EmployeeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    public function heroSearch(Request $request, HeroEmployeeClient $hero)
+    {
+        $term = trim((string) $request->get('q'));
+        if ($term === '') {
+            return response()->json(['data' => []]);
+        }
+
+        try {
+            $data = $hero->search($term);
+        } catch (RuntimeException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+                'data' => [],
+            ], 502);
+        }
+
+        return response()->json(['data' => $data]);
+    }
+
     public function store(Request $request)
     {
+        $this->emptyHeroIdToNull($request);
+
         $request->validate([
             'nik' => 'required|unique:employees',
             'fullname' => 'required',
             'project_id' => 'required',
-            'position_id' => 'required'
+            'position_id' => 'required',
+            'hero_employee_id' => ['nullable', 'uuid', Rule::unique('employees', 'hero_employee_id')],
             // 'email' => 'required|ends_with:@arka.co.id'
         ], [
             'nik.required' => 'NIK is required',
@@ -120,6 +157,7 @@ class EmployeeController extends Controller
         $employee->project_id = $request->project_id;
         $employee->position_id = $request->position_id;
         $employee->email = $request->email;
+        $employee->hero_employee_id = $request->hero_employee_id;
         $employee->save();
 
         return redirect()->route('employees.index')->with('success', 'Employee has been added');
@@ -152,14 +190,15 @@ class EmployeeController extends Controller
      * @param  \App\Models\Employee  $employee
      * @return \Illuminate\Http\Response
      */
-    public function edit(Employee $employee)
+    public function edit(Employee $employee, HeroEmployeeClient $hero)
     {
         $title = 'Employees';
         $subtitle = 'Edit Employees';
         $projects = Project::where('project_status', '=', '1')->orderBy('project_code', 'asc')->get();
         $positions = Position::where('position_status', '=', '1')->orderBy('position_name', 'asc')->get();
+        $heroLink = $this->resolveHeroLink(old('hero_employee_id', $employee->hero_employee_id), $hero);
 
-        return view('employees.edit', compact('title', 'subtitle', 'projects', 'positions', 'employee'));
+        return view('employees.edit', compact('title', 'subtitle', 'projects', 'positions', 'employee', 'heroLink'));
     }
 
     /**
@@ -171,10 +210,17 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, Employee $employee)
     {
+        $this->emptyHeroIdToNull($request);
+
         $this->validate($request, [
             'fullname' => 'required',
             'project_id' => 'required',
-            'position_id' => 'required'
+            'position_id' => 'required',
+            'hero_employee_id' => [
+                'nullable',
+                'uuid',
+                Rule::unique('employees', 'hero_employee_id')->ignore($employee->id),
+            ],
         ], [
             'fullname.required' => 'Fullname is required',
             'project_id.required' => 'Project is required',
@@ -197,7 +243,8 @@ class EmployeeController extends Controller
                 'project_id' => $request->project_id,
                 'position_id' => $request->position_id,
                 'email' => $request->email,
-                'status' => $request->status
+                'status' => $request->status,
+                'hero_employee_id' => $request->hero_employee_id,
             ]);
 
         return redirect()->route('employees.index')->with('success', 'Employee has been updated');
@@ -214,6 +261,40 @@ class EmployeeController extends Controller
         Employee::destroy($employee->id);
 
         return redirect()->route('employees.index')->with('success', 'Employee has been deleted');
+    }
+
+    private function emptyHeroIdToNull(Request $request)
+    {
+        if (!$request->filled('hero_employee_id')) {
+            $request->merge(['hero_employee_id' => null]);
+        }
+    }
+
+    /**
+     * @return array{id: string, fullname: string, nik: string, project: string}|null
+     */
+    private function resolveHeroLink($heroEmployeeId, HeroEmployeeClient $hero)
+    {
+        $id = trim((string) $heroEmployeeId);
+        if ($id === '') {
+            return null;
+        }
+
+        try {
+            $person = $hero->findById($id);
+            if ($person !== null) {
+                return $person;
+            }
+        } catch (RuntimeException $exception) {
+            // Keep the link value; show a label without the UUID.
+        }
+
+        return [
+            'id' => $id,
+            'fullname' => 'Linked person',
+            'nik' => '',
+            'project' => '',
+        ];
     }
 
     public function json(Request $request)

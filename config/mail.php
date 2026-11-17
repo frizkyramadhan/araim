@@ -115,4 +115,19 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Inventory Notification CC Recipients
+    |--------------------------------------------------------------------------
+    |
+    | Fixed CC list for inventory create/transfer notification emails.
+    | Comma-separated addresses via INVENTORY_MAIL_CC in .env.
+    |
+    */
+
+    'inventory_cc' => array_values(array_filter(array_map('trim', explode(',', env(
+        'INVENTORY_MAIL_CC',
+        'frizky.ramadhan@arka.co.id'
+    ))))),
+
 ];

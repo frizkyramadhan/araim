@@ -7,6 +7,18 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 class Kernel extends HttpKernel
 {
     /**
+     * @var array<int, class-string>
+     */
+    protected $bootstrappers = [
+        \App\Bootstrap\LoadEnvironmentVariables::class,
+        \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
+        \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
+        \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
+        \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
+        \Illuminate\Foundation\Bootstrap\BootProviders::class,
+    ];
+
+    /**
      * The application's global HTTP middleware stack.
      *
      * These middleware are run during every request to your application.
@@ -64,5 +76,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'check_role' => \App\Http\Middleware\CheckRole::class,
+        'api.key' => \App\Http\Middleware\RequireApiKey::class,
     ];
 }

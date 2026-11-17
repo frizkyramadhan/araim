@@ -30,4 +30,18 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    /*
+    | Inbound API key for /api/hero/* (X-API-Key).
+    | Prefer ARAIM_API_KEY so it stays distinct from Hero's API key. Both apps
+    | share one Windows Apache process; each HTTP request reloads its own .env.
+    */
+    'api' => [
+        'key' => env('ARAIM_API_KEY', env('API_KEY')),
+    ],
+
+    'hero' => [
+        'url' => env('HERO_API_URL'),
+        'token' => env('HERO_API_TOKEN'),
+    ],
+
 ];

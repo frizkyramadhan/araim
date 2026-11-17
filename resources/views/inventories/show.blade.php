@@ -76,7 +76,18 @@
                                             {{ session('success') }}
                                         </div>
                                     </div>
-                                @elseif (count($errors) > 0)
+                                @endif
+                                @if (session('warning'))
+                                    <div class="alert alert-warning alert-dismissible show fade">
+                                        <div class="alert-body">
+                                            <button class="close" data-dismiss="alert">
+                                                <span>&times;</span>
+                                            </button>
+                                            {{ session('warning') }}
+                                        </div>
+                                    </div>
+                                @endif
+                                @if (count($errors) > 0)
                                     <div class="alert alert-danger">
                                         <strong>Whoops!</strong> There were some problems with your input.<br><br>
                                         <ul>

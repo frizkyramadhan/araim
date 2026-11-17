@@ -1,5 +1,5 @@
 **Purpose**: Record technical decisions and rationale for future reference
-**Last Updated**: 2026-01-09
+**Last Updated**: 2026-11-17
 
 # Technical Decision Records - AR AIM v2 Inventory Management System
 
@@ -29,6 +29,80 @@ Decision: [Title] - [YYYY-MM-DD]
 ---
 
 ## Recent Decisions
+
+### Decision: Bind ARAIM employees to Arka Hero by employee id - 2026-11-11
+
+**Context**: Hero NIK (`administrations.active_nik`) can change, including contract staff who receive a new NIK. ARAIM `employees.nik` does not follow that change. Binding holdings by NIK would detach the person from the inventory they still hold. Hero employee detail will only display holdings; it will not copy them.
+
+**Options Considered**:
+
+1. **Bind by NIK**
+    - ✅ Pros: No new column; one-time match is a simple join
+    - ❌ Cons: Breaks when Hero NIK changes
+2. **Bind by Hero administration id**
+    - ✅ Pros: Stable for one employment spell
+    - ❌ Cons: A new administration row is a new id; the person key in Hero is `employees.id`
+3. **Store Hero `employees.id` on ARAIM `employees.hero_employee_id`**
+    - ✅ Pros: Follows the person; NIK is only a search key; unbound ARAIM rows stay invisible to Hero
+    - ❌ Cons: Needs a one-time backfill plus manual bind where NIK no longer matches
+
+**Decision**: Option 3. ARAIM keeps inventory CRUD. Hero reads current `Available` rows and same-`inventory_no` holder history through that id.
+
+**Rationale**: Employee id is the stable person key in Hero. Administration id and NIK both move for reasons that should not move company holdings.
+
+**Implementation**: `employees.hero_employee_id`, link UI in `EmployeeController` (`/employees/hero-search`), `employees:bind-hero`, read-only `GET /api/hero/employees/{heroEmployeeId}/inventories` (Hero `ARAIM_API_URL` + `X-API-Key` / `ARAIM_API_KEY`). `holdings` returns the same list. `HeroEmployeeClient` reads Hero's employee search with `X-API-Key` = Hero `HERO_API_KEY`. When that payload has no employee id, the client resolves it from `GET /employees/list` plus `GET /employees/{id}`. On Laragon, each app's HTTP kernel reloads its own `.env` so the shared Apache process does not keep the other app's `DB_*` or API key.
+
+**Review Date**: 2027-05-11
+
+### Decision: Inventory create/transfer email with config CC + admin debug - 2026-11-11
+
+**Context**: Need automatic email when inventory is created or transferred, TO = assignee `employees.email`, CC = fixed list. Also need admin ability to preview HTML and send test to custom addresses without changing production recipient rules.
+
+**Options Considered**:
+
+1. **Manual send UI like BAPB/BAST**
+    - ✅ Pros: Consistent with existing BAPB/BAST UX
+    - ❌ Cons: Easy to forget; does not match "on create/transfer" requirement
+2. **Auto-send on store/transferProcess + fixed CC in env + dedicated admin debug page**
+    - ✅ Pros: Matches business trigger; CC changeable without code deploy; preview/test isolated to admin
+    - ❌ Cons: Depends on `employees.email` data quality; sync SMTP can slow request slightly
+3. **Queued notifications**
+    - ✅ Pros: Non-blocking
+    - ❌ Cons: No queue worker pattern in current BAPB/BAST mail; extra ops
+
+**Decision**: Option 2 — `InventoryMailer` sync send after save; CC from `INVENTORY_MAIL_CC` / `config('mail.inventory_cc')`; skip (no rollback) if employee email missing; admin-only `/inventories/email-debug` for preview + custom test send; Outlook/Thunderbird-safe table HTML.
+
+**Rationale**: Separates production recipient rules (TO dynamic, CC fixed) from debug custom recipients; reuses existing Mail facade pattern.
+
+**Implementation**: `app/Services/InventoryMailer.php`, mailables/views under `app/Mail` and `resources/views/emails`, hooks in `InventoryController::store` / `transferProcess`, `InventoryEmailDebugController`, routes before `inventories/{inventory}`.
+
+**Review Date**: 2027-05-11
+
+### Decision: Pin local PHP 8.1 via start-php81.bat - 2026-11-05
+
+**Context**: Laragon may run a newer global PHP (e.g. 8.5) for other apps. Laravel 8 in araim.v2 floods deprecation warnings on PHP 8.5 and needs a compatible runtime without changing Laragon’s global PHP.
+
+**Options Considered**:
+
+1. **Switch Laragon global PHP to 8.1**
+    - ✅ Pros: Simple for this app alone
+    - ❌ Cons: Breaks or inconveniences other apps that need a different PHP
+2. **Use PHP 7.4 like it-wo CI3 scripts**
+    - ✅ Pros: Matches existing `start-php74.bat` pattern; Laravel 8 supports 7.4
+    - ❌ Cons: Older than current working PATH PHP 8.1; unnecessary downgrade
+3. **Project-local `start-php81.bat` calling pinned `php-8.1.10` + `artisan serve`**
+    - ✅ Pros: Same approach as it-wo/arka-rest-server; no global switch; verified with `artisan --version`
+    - ❌ Cons: Port/path hard-coded for this machine’s Laragon layout
+
+**Decision**: `start-php81.bat` with Laragon `php-8.1.10-Win32-vs16-x64` on `127.0.0.1:8078`
+
+**Rationale**: Mirrors the IT WO local-server pattern while targeting PHP 8.1, which Laravel 8.83 runs cleanly on.
+
+**Implementation**: Run `start-php81.bat` from project root; Apache vhost at `http://localhost/araim.v2` remains optional.
+
+**Review Date**: 2026-05-05 (or when upgrading Laravel past 8.x)
+
+---
 
 ### Decision: Spatie Activity Log for Audit Trail - 2023-01-XX
 

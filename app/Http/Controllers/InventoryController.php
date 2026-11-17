@@ -20,6 +20,7 @@ use App\Models\Specification;
 use App\Imports\LocationImport;
 use App\Exports\InventoryExport;
 use App\Imports\InventoryImport;
+use App\Services\InventoryMailer;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
 use Endroid\QrCode\Builder\Builder;
@@ -416,11 +417,17 @@ class InventoryController extends Controller
             }
         }
 
-        if ($id_employee) {
-            return redirect('employees/' . $id_employee)->with('success', 'Inventory successfully added!');
-        } else {
-            return redirect()->route('inventories.index')->with('success', 'Inventory successfully added!');
+        $mailResult = app(InventoryMailer::class)->notifyCreated($inventory);
+        $successMessage = 'Inventory successfully added!';
+        $redirect = $id_employee
+            ? redirect('employees/' . $id_employee)->with('success', $successMessage)
+            : redirect()->route('inventories.index')->with('success', $successMessage);
+
+        if (!empty($mailResult['message'])) {
+            $redirect = $redirect->with('warning', $mailResult['message']);
         }
+
+        return $redirect;
     }
 
     public function show(Inventory $inventory, $employee_id = null)
@@ -656,7 +663,15 @@ class InventoryController extends Controller
             }
         }
 
-        return redirect('inventories/' . $new_inventory->id)->with('success', 'Inventory successfully transferred!');
+        $mailResult = app(InventoryMailer::class)->notifyTransferred($inventory, $new_inventory);
+        $redirect = redirect('inventories/' . $new_inventory->id)
+            ->with('success', 'Inventory successfully transferred!');
+
+        if (!empty($mailResult['message'])) {
+            $redirect = $redirect->with('warning', $mailResult['message']);
+        }
+
+        return $redirect;
     }
 
     public function export()
