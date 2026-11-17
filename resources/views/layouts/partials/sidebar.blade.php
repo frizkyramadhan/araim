@@ -43,7 +43,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="{{ url('inventories') }}" class="nav-link {{ Request::is('inventories*') ? 'active' : '' }}">
+          <a href="{{ url('inventories') }}" class="nav-link {{ (Request::is('inventories') || Request::is('inventories/*')) && !Request::is('inventories/email-debug*') ? 'active' : '' }}">
             <i class="nav-icon fas fa-qrcode"></i>
             <p>
               Inventories
@@ -170,6 +170,12 @@
           <a href="{{ url('users') }}" class="nav-link {{ Request::is('users*') ? 'active' : '' }}">
             <i class="nav-icon fas fa-key"></i>
             <p>Users</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{ url('inventories/email-debug') }}" class="nav-link {{ Request::is('inventories/email-debug*') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-envelope-open-text"></i>
+            <p>Inventory Email Debug</p>
           </a>
         </li>
         @endcan

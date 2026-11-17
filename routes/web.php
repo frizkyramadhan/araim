@@ -17,6 +17,7 @@ use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\InventoryEmailDebugController;
 use App\Http\Controllers\DepartmentController;
 
 /*
@@ -59,6 +60,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('inventories/import', [InventoryController::class, 'import'])->name('inventories.import');
     Route::get('inventories/create', [InventoryController::class, 'create'])->name('inventories.create');
     Route::get('inventories/create/{employee_id}', [InventoryController::class, 'create'])->name('inventories.create');
+    // Admin email debug — must be registered before inventories/{inventory}
+    Route::get('inventories/email-debug', [InventoryEmailDebugController::class, 'index'])->name('inventories.emailDebug');
+    Route::get('inventories/email-debug/preview', [InventoryEmailDebugController::class, 'preview'])->name('inventories.emailDebug.preview');
+    Route::post('inventories/email-debug/send', [InventoryEmailDebugController::class, 'send'])->name('inventories.emailDebug.send');
+    Route::post('inventories/email-debug/cc', [InventoryEmailDebugController::class, 'saveCc'])->name('inventories.emailDebug.saveCc');
     Route::get('inventories/{inventory}', [InventoryController::class, 'show'])->name('inventories.show');
     Route::get('trackings', [TrackingController::class, 'index'])->name('trackings.index');
 
@@ -77,6 +83,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('employees/getEmployees', [EmployeeController::class, 'getEmployees'])->name('employees.getEmployees');
     Route::get('employees/json', [EmployeeController::class, 'json'])->name('employees.json');
+    Route::get('employees/hero-search', [EmployeeController::class, 'heroSearch'])->name('employees.heroSearch');
     Route::resource('employees', EmployeeController::class);
 
     Route::get('inventories/edit/{inventory}', [InventoryController::class, 'edit'])->name('inventories.edit');

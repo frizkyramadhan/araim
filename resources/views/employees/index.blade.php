@@ -69,9 +69,11 @@
 												<th class="text-center">No</th>
 												<th>NIK</th>
 												<th>Name</th>
+												<th>Email</th>
 												<th>Position</th>
 												<th>Project</th>
 												<th class="text-center">Status</th>
+												<th class="text-center">Link</th>
 												<th class="text-center">Total Assets</th>
 												<th class="text-center">Action</th>
 											</tr>
@@ -184,6 +186,10 @@
 	    name: "fullname",
 	    orderable: false,
 	   }, {
+	    data: "email",
+	    name: "email",
+	    orderable: false,
+	   }, {
 	    data: "position_name",
 	    name: "position_name",
 	    orderable: false,
@@ -194,6 +200,11 @@
 	   }, {
 	    data: "status",
 	    name: "status",
+	    className: "text-center",
+	    orderable: false,
+	   }, {
+	    data: "hero_bind",
+	    name: "hero_bind",
 	    className: "text-center",
 	    orderable: false,
 	   }, {

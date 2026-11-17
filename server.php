@@ -18,4 +18,16 @@ if ($uri !== '/' && file_exists(__DIR__.'/public'.$uri)) {
     return false;
 }
 
+if (empty($_SERVER['HTTP_AUTHORIZATION'])) {
+    if (!empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $_SERVER['HTTP_AUTHORIZATION'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    } elseif (function_exists('apache_request_headers')) {
+        $headers = apache_request_headers();
+        $authorization = $headers['Authorization'] ?? ($headers['authorization'] ?? null);
+        if (is_string($authorization) && $authorization !== '') {
+            $_SERVER['HTTP_AUTHORIZATION'] = $authorization;
+        }
+    }
+}
+
 require_once __DIR__.'/public/index.php';

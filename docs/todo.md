@@ -1,5 +1,5 @@
 **Purpose**: Track current work and immediate priorities for AR AIM v2 Inventory Management System
-**Last Updated**: 2026-01-09
+**Last Updated**: 2026-11-17
 
 ## Task Management Guidelines
 
@@ -40,7 +40,7 @@ Include relevant context in brackets to help with future AI-assisted coding:
 
 ## Working On Now
 
--   `[done] P0: Update all documentation files with current inventory system state [docs/*, MEMORY.md]` (completed: 2026-01-09)
+-   `[done] P1: Bind ARAIM employees to Hero and expose read-only holdings [docs/analisa-pengecekan-aset-karyawan.md]` (completed: 2026-11-16)
 
 ## Up Next (This Week)
 
@@ -54,6 +54,11 @@ Include relevant context in brackets to help with future AI-assisted coding:
 
 ## Recently Completed
 
+-   `[done] P2: Link panel shows Hero name/NIK/project instead of UUID [hero_bind.blade.php, HeroEmployeeClient::findById]` (completed: 2026-11-17)
+-   `[done] P1: Hero employee search 502 on create (invalid API key, then Hero queried arka_assets) [App\Bootstrap\LoadEnvironmentVariables, Hero HERO_API_KEY]` (completed: 2026-11-17)
+-   `[done] P1: Hero employee bind on employees.hero_employee_id, create/edit search, list badge, employees:bind-hero, GET /api/hero/employees/{heroEmployeeId}/holdings [HeroEmployeeClient, HeroHoldingController, EmployeeController]` (completed: 2026-11-16)
+-   `[done] P1: Inventory email notification on create + transfer, fixed CC via INVENTORY_MAIL_CC, admin email debug preview/send [InventoryMailer, InventoryCreatedMail, InventoryTransferredMail, InventoryEmailDebugController, inventories/email-debug]` (completed: 2026-11-11)
+-   `[done] P2: Add start-php81.bat to run Laravel 8 on pinned PHP 8.1 without switching Laragon global PHP [start-php81.bat, docs/architecture.md]` (completed: 2026-11-05)
 -   `[done] P0: Updated all documentation files to reflect actual inventory management system [docs/architecture.md, docs/todo.md, docs/backlog.md, docs/decisions.md, MEMORY.md]` (completed: 2026-01-09)
 
 ## Quick Notes

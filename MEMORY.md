@@ -1,5 +1,15 @@
 **Purpose**: AI's persistent knowledge base for project context and learnings - AR AIM v2 Inventory Management System
-**Last Updated**: 2026-01-09
+**Last Updated**: 2026-11-17
+
+### [ENV] Shared Apache env collision with Hero (2026-11-17) ✅ COMPLETE
+
+**Challenge**: Employee Hero search returned 502. Hero answered 401 (`Invalid or missing API key.`), then after the key rename answered 500 because it queried `arka_assets.administrations`. Laragon `mpm_winnt` + `mod_php` keeps `putenv` in one process, and Laravel's immutable dotenv will not replace a variable the other app already set.
+
+**Solution**: Both apps load `.env` through `App\Bootstrap\LoadEnvironmentVariables` (mutable repository, registered on the HTTP kernel) so each request writes that app's file back over the process. Hero's API key is `HERO_API_KEY`. ARAIM's inbound key is `ARAIM_API_KEY`. `AppServiceProvider::reclaimOwnEnvironment()` still re-applies ARAIM's DB and API config after boot.
+
+**Key Learning**: A key that works from CLI curl can still fail inside Apache until the other app reloads its own `.env`. Distinct variable names are not enough when `DB_*` is shared.
+
+**Files**: `app/Bootstrap/LoadEnvironmentVariables.php`, `app/Http/Kernel.php`, Hero `app/Bootstrap/LoadEnvironmentVariables.php`, Hero `config/services.php`
 
 ## Memory Maintenance Guidelines
 
@@ -26,6 +36,42 @@
 ---
 
 ## Project Memory Entries - AR AIM v2 Inventory Management System
+
+### [016] Apache holdings calls lost the Sanctum bearer (2026-11-16) ✅ COMPLETE
+
+**Challenge**: `GET /api/hero/employees/{id}/holdings` returned 401 from `http://localhost/araim.v2` even with a valid Sanctum token. PHPUnit, which does not use Apache, succeeded.
+
+**Solution**: The site root `.htaccess` sends requests to `server.php` and never runs `public/.htaccess`. `server.php` now copies `Authorization` from `apache_request_headers()` or `REDIRECT_HTTP_AUTHORIZATION`.
+
+**Key Learning**: A bearer check that passes in `artisan test` can still fail on Laragon until `server.php` sees the header. Hero's list stays empty or errors until that header arrives.
+
+**Files**: `.htaccess`, `server.php`
+
+---
+
+### [015] Hero employee bind and holdings API (2026-11-16) ✅ COMPLETE
+
+**Challenge**: Holdings had to follow Hero's person id, while Hero's administration search JSON often omits `employee.id`.
+
+**Solution**: `employees.hero_employee_id` is set from the employee form or `employees:bind-hero` (exact active NIK, one person, no overwrite, NIK unchanged). `HeroEmployeeClient` uses `employee.id` when present, otherwise resolves it from `/employees/list` and `/employees/{id}`. Holdings are `GET /api/hero/employees/{uuid}/holdings`.
+
+**Key Learning**: Current holding is `transfer_status = Available` and `is_active = 1`. History is every row with the same `inventory_no`. A partial transfer leaves the old row `Available`, so one number can have two current holders.
+
+**Files**: `app/Services/HeroEmployeeClient.php`, `app/Http/Controllers/Api/HeroHoldingController.php`, `app/Console/Commands/BindHeroEmployees.php`, `app/Http/Controllers/EmployeeController.php`
+
+---
+
+### [014] Inventory email notify create/transfer + admin debug (2026-11-11) ✅ COMPLETE
+
+**Challenge**: Notify assignee on inventory create and transfer with fixed CC; need browser preview and custom test send for admins without mixing into production TO rules.
+
+**Solution**: `InventoryMailer` resolves TO from `employees.email`, CC from `INVENTORY_MAIL_CC`; hooks after `store`/`transferProcess` with try/catch (never fail save). Admin `InventoryEmailDebugController` at `/inventories/email-debug` previews same Blade views and sends test to custom TO/CC. Templates use table/inline CSS for Outlook/Thunderbird.
+
+**Key Learning**: Keep production recipient rules separate from debug custom addresses. Register `inventories/email-debug*` routes before `inventories/{inventory}` so Laravel does not treat `email-debug` as an ID.
+
+**Files**: `app/Services/InventoryMailer.php`, `app/Mail/InventoryCreatedMail.php`, `app/Mail/InventoryTransferredMail.php`, `app/Http/Controllers/InventoryEmailDebugController.php`, `config/mail.php`, `routes/web.php`
+
+---
 
 ### [001] Documentation Synchronization Issue (2026-01-09) ✅ COMPLETE
 
@@ -273,6 +319,18 @@
 -   Include relationship attributes for readability
 -   Set `submitEmptyLogs = false`
 -   View logs in dashboard
+
+---
+
+### [012] Local PHP 8.1 starter script (2026-11-05) ✅ COMPLETE
+
+**Challenge**: Need to run araim.v2 (Laravel 8) on a compatible PHP without switching Laragon global PHP used by other apps; PHP 8.5 emits many deprecations on this stack.
+
+**Solution**: Added `start-php81.bat` modeled on `it-wo/start-php74.bat`, pinning `C:\laragon\bin\php\php-8.1.10-Win32-vs16-x64\php.exe` and serving via `artisan serve` on `127.0.0.1:8078`.
+
+**Key Learning**: For multi-app Laragon setups, prefer project-local PHP binaries over changing the global Laragon PHP. Match sibling project bat patterns; pick the highest PHP the framework actually supports cleanly (8.1 for Laravel 8 here, not 8.5).
+
+**Files**: `start-php81.bat`, `docs/architecture.md`, `docs/decisions.md`
 
 ---
 

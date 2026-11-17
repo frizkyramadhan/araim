@@ -1,5 +1,5 @@
 Purpose: Technical reference for understanding system design and development patterns
-Last Updated: 2026-01-09
+Last Updated: 2026-11-17
 
 ## Architecture Documentation Guidelines
 
@@ -87,8 +87,9 @@ This document describes the CURRENT WORKING STATE of the application architectur
 ### Infrastructure
 
 -   **Local Development**: Laragon (Apache, MySQL, PHP)
+-   **Pinned PHP for CLI/dev server**: PHP 8.1.10 via `start-php81.bat` (same pattern as `it-wo/start-php74.bat`) so Laragon global PHP can stay on another version
 -   **Server**: Apache Web Server
--   **Base URL**: `http://localhost/araim.v2` (development)
+-   **Base URL**: `http://localhost/araim.v2` (Apache) or `http://127.0.0.1:8078` (`start-php81.bat` / `artisan serve`)
 -   **Session Storage**: Database-backed sessions
 -   **File Storage**: Local filesystem (storage/app)
 
@@ -128,22 +129,38 @@ This document describes the CURRENT WORKING STATE of the application architectur
 -   Excel import/export functionality
 -   Inventory transfer between employees/locations
 -   Public QR code JSON endpoint for scanning
+-   Automatic email notification on create and transfer (TO = `employees.email`, CC from admin settings on email-debug page)
+-   Admin-only email debug page for CC settings, browser preview, and custom test send
 
 **Key Routes**:
 
 -   Web: `/inventories/*` - Full CRUD + transfer, QR code, images
+-   Web (admin): `/inventories/email-debug` - Preview/send test inventory emails
 -   API: `/api/inventories/qrcode_json/{id}` - Public QR code data
+
+**Email notification**:
+
+-   Service: `App\Services\InventoryMailer`
+-   Mailables: `InventoryCreatedMail`, `InventoryTransferredMail`
+-   Views: `resources/views/emails/inventory_created.blade.php`, `inventory_transferred.blade.php` (table/inline CSS for Outlook & Thunderbird)
+-   Create hook: `InventoryController::store` → `notifyCreated`
+-   Transfer hook: `InventoryController::transferProcess` → `notifyTransferred`
+-   Failures never roll back inventory save; flash `warning` when skipped/failed
+-   Debug controller: `InventoryEmailDebugController` (`check_role:admin`)
+-   Production CC saved to `storage/app/settings/inventory_mail_cc.json` via email-debug; env `INVENTORY_MAIL_CC` is fallback only until first save
 
 **Data Flow**:
 
 ```mermaid
 graph LR
     A[Create Inventory] --> B[Assign Asset/Employee/Project]
-    B --> C[Generate QR Code]
-    C --> D[Add Images/Specifications]
-    D --> E[Set Status]
-    E --> F[Track Activity Log]
-    F --> G[Transfer/Update]
+    B --> C[NotifyCreated Email]
+    C --> D[Generate QR Code]
+    D --> E[Add Images/Specifications]
+    E --> F[Set Status]
+    F --> G[Track Activity Log]
+    G --> H[Transfer/Update]
+    H --> I[NotifyTransferred Email]
 ```
 
 ### 2. Asset Management
@@ -172,14 +189,16 @@ graph LR
 -   Employee master data management
 -   Project and position assignment
 -   Employee-inventory relationship (who has what)
--   DataTables integration for listing
+-   DataTables integration for listing, including a Link / Not linked column
 -   JSON API for dropdowns
+-   Optional link to an Arka Hero person via `employees.hero_employee_id` (Hero `employees.id`). NIK stays the ARAIM value. Search on create/edit calls Hero (`HERO_API_URL`, `HERO_API_TOKEN` = Hero `HERO_API_KEY`, sent as `X-API-Key`) through `HeroEmployeeClient`. The link panel shows Hero name, NIK, and project (UUID stays in the hidden field only). One-shot backfill: `php artisan employees:bind-hero` (exact active NIK, one person only, does not overwrite an existing link). Both apps reload `.env` on each HTTP request (`App\Bootstrap\LoadEnvironmentVariables`) because Laragon Apache shares one PHP process.
 
 **Key Routes**:
 
 -   Web: `/employees/*` - Full CRUD
 -   Web: `/employees/getEmployees` - DataTables data
 -   Web: `/employees/json` - JSON API
+-   Web: `/employees/hero-search` - Hero person search for the bind field (`check_role:admin,superuser`)
 
 ### 4. Project Management
 
@@ -453,6 +472,11 @@ erDiagram
 
 -   `GET /api/inventories/qrcode_json/{id}` - Get QR code data (public)
 
+**Hero inventories** (`X-API-Key` = `ARAIM_API_KEY`; Hero sends that same value):
+
+-   `GET /api/hero/employees/{heroEmployeeId}/inventories` - Path Hero calls with `ARAIM_API_URL`. Current `Available` active inventories for the bound ARAIM employee. Each item is the list Hero shows: `inventory_no`, `asset_name`, `quantity`, `date` (`input_date` as `Y-m-d`), plus `history` of the same `inventory_no` (`holder_name`, `nik`, `transfer_status`, `quantity`, `date`). Unknown Hero id returns `{ "data": [] }`. Read only. A bearer token is not accepted.
+-   `GET /api/hero/employees/{heroEmployeeId}/holdings` - Same response.
+
 **User**:
 
 -   `GET /api/user` - Get authenticated user (requires Sanctum auth)
@@ -490,6 +514,7 @@ erDiagram
 
 -   Token expiration (Sanctum tokens)
 -   Public QR code endpoint for scanning (read-only)
+-   Laragon routes this app through the project `.htaccess` into `server.php`, which copies the `Authorization` header onto `HTTP_AUTHORIZATION`. `public/.htaccess` does the same when the document root is `public/`.
 
 ### Database Security
 
